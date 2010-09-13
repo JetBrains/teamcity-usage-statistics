@@ -27,9 +27,7 @@ import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettings;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
-import jetbrains.buildServer.web.openapi.PagePlaces;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
-import jetbrains.buildServer.web.openapi.WebControllerManager;
+import jetbrains.buildServer.web.openapi.*;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
@@ -56,7 +54,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
     authInterceptor.addPathBasedPermissionsChecker("/admin/usageStatistics.html", new RequestPermissionsChecker() {
       public void checkPermissions(@NotNull final AuthorityHolder authorityHolder, @NotNull final HttpServletRequest request) throws AccessDeniedException {
-        if (!authorityHolder.isPermissionGrantedGlobally(Permission.VIEW_STATISTICS)) {
+        if (!authorityHolder.isPermissionGrantedGlobally(Permission.VIEW_USAGE_STATISTICS)) {
           throw new AccessDeniedException(authorityHolder, "You do not have enough permissions to view usage statistics");
         }
       }
