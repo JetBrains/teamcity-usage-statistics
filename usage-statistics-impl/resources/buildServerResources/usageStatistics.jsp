@@ -40,8 +40,8 @@
           </tr>
           <c:forEach var="statistic" items="${statistics}">
             <tr>
-              <td>${statistic.displayName}</td>
-              <td class="text-center"><bs:stringValueOf object="${statistic.value}"/></td>
+              <td><c:out value="${statistic.displayName}"/></td>
+              <td class="text-center"><c:out value="${statistic.formattedValue}"/></td>
             </tr>
           </c:forEach>
         </table>

@@ -37,6 +37,7 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
   private static final long DEFAULT_USAGE_STATISTICS_REPORTING_PERIOD = Dates.ONE_DAY;
 
   @NotNull private final UsageStatisticsSettingsPersistor mySettingsPersistor;
+  @NotNull private final UsageStatisticsCommonDataPersistor myCommonDataPersistor;
   @NotNull private final UsageStatisticsReporter myStatisticsReporter;
   @NotNull private final ScheduledFuture<?> myTask;
   private final long myReportingPeriod;
@@ -44,8 +45,10 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
   public UsageStatisticsReportingScheduler(@NotNull final SBuildServer server,
                                            @NotNull final ScheduledExecutorService executor,
                                            @NotNull final UsageStatisticsSettingsPersistor settingsPersistor,
+                                           @NotNull final UsageStatisticsCommonDataPersistor commonDataPersistor,
                                            @NotNull final UsageStatisticsReporter statisticsReporter) {
     mySettingsPersistor = settingsPersistor;
+    myCommonDataPersistor = commonDataPersistor;
     myStatisticsReporter = statisticsReporter;
     myTask = executor.scheduleAtFixedRate(this, CHECKING_PERIOD, CHECKING_PERIOD, TimeUnit.MILLISECONDS);
     myReportingPeriod = TeamCityProperties.getLong(USAGE_STATISTICS_REPORTING_PERIOD, DEFAULT_USAGE_STATISTICS_REPORTING_PERIOD);
@@ -59,13 +62,11 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
 
   public void run() {
     try {
-      final UsageStatisticsSettings settings = mySettingsPersistor.loadSettings();
-      if (settings.isReportingEnabled()) {
-        final Date lastReportingDate = settings.getLastReportingDate();
+      if (mySettingsPersistor.loadSettings().isReportingEnabled()) {
+        final Date lastReportingDate = myCommonDataPersistor.getLastReportingDate();
         if (lastReportingDate == null || Dates.now().after(Dates.after(lastReportingDate, myReportingPeriod))) {
           if (myStatisticsReporter.reportStatistics()) {
-            settings.setLastReportingDate(Dates.now());
-            mySettingsPersistor.saveSettings(settings);
+            myCommonDataPersistor.setLastReportingDate(Dates.now());
           }
         }
       }

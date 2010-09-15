@@ -45,31 +45,31 @@ public class StaticServerUsageStatisticsProvider implements UsageStatisticsProvi
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher) {
     final BuildAgentManager buildAgentManager = myServer.getBuildAgentManager();
     final int agentNumber = buildAgentManager.getRegisteredAgents(true).size() + buildAgentManager.getUnregisteredAgents().size();
-    publisher.publishStatistic("jetbrains.buildServer.statistics.agentNumber", "Number of agents", agentNumber);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.agentNumber", "Number of agents", agentNumber, null);
   }
 
   private void publishNumberOfBuildTypes(@NotNull final UsageStatisticsPublisher publisher) {
     final int buildTypeNumber = myServer.getProjectManager().getNumberOfBuildTypes();
-    publisher.publishStatistic("jetbrains.buildServer.statistics.buildTypeNumber", "Number of build configurations", buildTypeNumber);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.buildTypeNumber", "Number of build configurations", buildTypeNumber, null);
   }
 
   private void publishNumberOfProjects(@NotNull final UsageStatisticsPublisher publisher) {
     final int projectNumber = myServer.getProjectManager().getNumberOfProjects();
-    publisher.publishStatistic("jetbrains.buildServer.statistics.projectNumber", "Number of projects", projectNumber);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.projectNumber", "Number of projects", projectNumber, null);
   }
 
   private void publishNumberOfUserGroups(@NotNull final UsageStatisticsPublisher publisher) {
     final int userGroupNumber = myUserGroupManager.getUserGroups().size();
-    publisher.publishStatistic("jetbrains.buildServer.statistics.userGroupNumber", "Number of user groups", userGroupNumber);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.userGroupNumber", "Number of user groups", userGroupNumber, null);
   }
 
   private void publishNumberOfUsers(@NotNull final UsageStatisticsPublisher publisher) {
     final int userNumber = myServer.getUserModel().getNumberOfRegisteredUsers();
-    publisher.publishStatistic("jetbrains.buildServer.statistics.userNumber", "Number of users", userNumber);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.userNumber", "Number of users", userNumber, null);
   }
 
   private void publishNumberOfVcsRoots(@NotNull final UsageStatisticsPublisher publisher) {
     final int vcsRootNumber = myServer.getVcsManager().getAllRegisteredVcsRoots().size();
-    publisher.publishStatistic("jetbrains.buildServer.statistics.vcsRootNumber", "Number of VCS roots", vcsRootNumber);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.vcsRootNumber", "Number of VCS roots", vcsRootNumber, null);
   }
 }

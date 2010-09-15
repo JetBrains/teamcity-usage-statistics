@@ -17,92 +17,37 @@
 package jetbrains.buildServer.usageStatistics.impl;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Date;
 import jetbrains.buildServer.serverSide.ServerPaths;
-import jetbrains.buildServer.util.ExceptionUtil;
-import org.jdom.Document;
+import jetbrains.buildServer.usageStatistics.util.XmlUtil;
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
 
 public class UsageStatisticsSettingsPersistor {
-  @NotNull private static final Object ourFileLock = new Object();
-
-  @NotNull private final File mySettingsFile;
+  @NotNull private static final String REPORTING_ENABLED = "reporting-enabled";
+  @NotNull private final File myConfigFile;
 
   public UsageStatisticsSettingsPersistor(@NotNull final ServerPaths serverPaths) {
-    mySettingsFile = new File(serverPaths.getConfigDir(), "usage-statistics-config.xml");
+    myConfigFile = new File(serverPaths.getConfigDir(), "usage-statistics-config.xml");
   }
 
   public void saveSettings(@NotNull final UsageStatisticsSettings settings) {
     final Element element = new Element("usage-statistics-settings");
-
-    element.setAttribute("reporting-enabled", String.valueOf(settings.isReportingEnabled()));
-
-    final Date lastReportingDate = settings.getLastReportingDate();
-    if (lastReportingDate != null) {
-      element.setAttribute("last-reporting-date", String.valueOf(lastReportingDate.getTime()));
-    }
-
-    synchronized (ourFileLock) {
-      try {
-        saveXml(element);
-      }
-      catch (final IOException e) {
-        ExceptionUtil.rethrowAsRuntimeException(e);
-      }
-    }
+    element.setAttribute(REPORTING_ENABLED, String.valueOf(settings.isReportingEnabled()));
+    XmlUtil.saveXml(element, myConfigFile);
   }
 
   @NotNull
   public UsageStatisticsSettings loadSettings() {
     final UsageStatisticsSettings settings = new UsageStatisticsSettings();
 
-    if (mySettingsFile.exists() && mySettingsFile.canRead()) {
-      Element element = null;
-      synchronized (ourFileLock) {
-        try {
-          element = new SAXBuilder().build(mySettingsFile).getRootElement();
-        }
-        catch (final JDOMException e) {
-          ExceptionUtil.rethrowAsRuntimeException(e);
-        }
-        catch (final IOException e) {
-          ExceptionUtil.rethrowAsRuntimeException(e);
-        }
-      }
-
-      final String reportingEnabled = element.getAttributeValue("reporting-enabled");
+    final Element element = XmlUtil.loadXml(myConfigFile);
+    if (element != null) {
+      final String reportingEnabled = element.getAttributeValue(REPORTING_ENABLED);
       if (reportingEnabled != null) {
         settings.setReportingEnabled(Boolean.parseBoolean(reportingEnabled));
-      }
-
-      final String lastReportingDate = element.getAttributeValue("last-reporting-date");
-      if (lastReportingDate != null) {
-        try {
-          settings.setLastReportingDate(new Date(Long.parseLong(lastReportingDate)));
-        } catch (final NumberFormatException ignore) {}
       }
     }
 
     return settings;
-  }
-
-  private void saveXml(@NotNull final Element element) throws IOException {
-    final OutputStream fos = new FileOutputStream(mySettingsFile);
-    try {
-      final XMLOutputter outputter = new XMLOutputter();
-      outputter.setFormat(Format.getPrettyFormat());
-      outputter.output(new Document(element), fos);
-    }
-    finally {
-      fos.close();
-    }
   }
 }

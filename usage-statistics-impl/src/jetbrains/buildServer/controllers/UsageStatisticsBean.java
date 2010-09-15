@@ -2,9 +2,11 @@ package jetbrains.buildServer.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import jetbrains.buildServer.usageStatistics.Formatter;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
+import jetbrains.buildServer.usageStatistics.impl.formatters.FormatUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,8 +23,8 @@ public class UsageStatisticsBean {
     myReportingEnabled = settingsPersistor.loadSettings().isReportingEnabled();
     myStatistics = new ArrayList<Statistic>();
     statisticsCollector.collectStatistics(new UsageStatisticsPublisher() {
-      public void publishStatistic(@NotNull final String id, @NotNull final String displayName, @Nullable final Object value) {
-        myStatistics.add(new Statistic(displayName, value));
+      public void publishStatistic(@NotNull final String id, @NotNull final String displayName, @Nullable final Object value, @Nullable final Formatter formatter) {
+        myStatistics.add(new Statistic(displayName, value, formatter));
       }
     });
   }
@@ -38,11 +40,11 @@ public class UsageStatisticsBean {
 
   public static class Statistic {
     @NotNull private final String myDisplayName;
-    @Nullable private final Object myValue;
+    @NotNull private final String myFormattedValue;
 
-    public Statistic(@NotNull final String displayName, @Nullable final Object value) {
+    public Statistic(@NotNull final String displayName, @Nullable final Object value, @Nullable final Formatter formatter) {
       myDisplayName = displayName;
-      myValue = value;
+      myFormattedValue = FormatUtil.format(formatter, value);
     }
 
     @NotNull
@@ -51,8 +53,8 @@ public class UsageStatisticsBean {
     }
 
     @Nullable
-    public Object getValue() {
-      return myValue;
+    public String getFormattedValue() {
+      return myFormattedValue;
     }
   }
 }

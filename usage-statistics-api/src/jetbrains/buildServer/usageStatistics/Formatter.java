@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package jetbrains.buildServer.usageStatistics.impl;
+package jetbrains.buildServer.usageStatistics;
 
-public class UsageStatisticsSettings {
-  private boolean myIsReportingEnabled = false;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-  public boolean isReportingEnabled() {
-    return myIsReportingEnabled;
-  }
-
-  public void setReportingEnabled(boolean reportingEnabled) {
-    myIsReportingEnabled = reportingEnabled;
-  }
+/**
+ * Formatter can be used to customize the string representation of the value in UI
+ */
+public interface Formatter {
+  @NotNull
+  String format(@Nullable Object value);
 }

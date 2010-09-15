@@ -23,6 +23,9 @@
   <bean id="usageStatisticsReporter" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsReporterImpl"/>
   <bean id="usageStatisticsReportingScheduler" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsReportingScheduler"/>
   <bean id="usageStatisticsSettingsPersistor" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor"/>
+  <bean id="usageStatisticsCommonDataPersistor" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCommonDataPersistor"/>
+
+  <bean id="buildDataUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.BuildDataUsageStatisticsProvider"/>
   <bean id="staticServerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.StaticServerUsageStatisticsProvider"/>
 </beans>
 
