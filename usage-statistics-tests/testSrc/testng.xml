@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Usage Statistics Suite">
+  <test name="Usage Statistics Test">
+    <classes>
+      <class name="jetbrains.buildServer.usageStatistics.impl.providers.UsageStatisticsProvidersTest"/>
+    </classes>
+  </test>
+</suite>

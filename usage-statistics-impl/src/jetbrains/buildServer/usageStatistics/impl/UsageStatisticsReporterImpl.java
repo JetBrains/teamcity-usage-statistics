@@ -93,7 +93,11 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   private Map<String, String> collectStatistics() {
     final Map<String, String> myStatistics = new HashMap<String, String>();
     myStatisticsCollector.collectStatistics(new UsageStatisticsPublisher() {
-      public void publishStatistic(@NotNull final String id, @NotNull final String displayName, @Nullable final Object value, @Nullable final Formatter formatter) {
+      public void publishStatistic(@NotNull final String id,
+                                   @NotNull final String displayName,
+                                   @Nullable final Object value,
+                                   @Nullable final Formatter formatter,
+                                   @Nullable final String groupName) {
         myStatistics.put(id, String.valueOf(value));
       }
     });

@@ -23,7 +23,11 @@ public class UsageStatisticsBean {
     myReportingEnabled = settingsPersistor.loadSettings().isReportingEnabled();
     myStatistics = new ArrayList<Statistic>();
     statisticsCollector.collectStatistics(new UsageStatisticsPublisher() {
-      public void publishStatistic(@NotNull final String id, @NotNull final String displayName, @Nullable final Object value, @Nullable final Formatter formatter) {
+      public void publishStatistic(@NotNull final String id,
+                                   @NotNull final String displayName,
+                                   @Nullable final Object value,
+                                   @Nullable final Formatter formatter,
+                                   @Nullable final String groupName) {
         myStatistics.add(new Statistic(displayName, value, formatter));
       }
     });

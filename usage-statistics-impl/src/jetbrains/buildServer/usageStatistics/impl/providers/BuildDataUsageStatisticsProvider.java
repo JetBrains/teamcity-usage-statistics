@@ -93,9 +93,9 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     ourBuildTestCountQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
-          publish(publisher, idFormat, nameFormat, "minBuildTestCount", "Minimal test count in the build", getNullableLong(rs, 1), null);
-          publish(publisher, idFormat, nameFormat, "maxBuildTestCount", "Maximal test count in the build", getNullableLong(rs, 2), null);
-          publish(publisher, idFormat, nameFormat, "avgBuildTestCount", "Average test count in the build", getNullableLong(rs, 3), null);
+          publish(publisher, idFormat, nameFormat, "minBuildTestCount", "Minimal test count per build", getNullableLong(rs, 1), null);
+          publish(publisher, idFormat, nameFormat, "maxBuildTestCount", "Maximal test count per build", getNullableLong(rs, 2), null);
+          publish(publisher, idFormat, nameFormat, "avgBuildTestCount", "Average test count per build", getNullableLong(rs, 3), null);
         }
         return null;
       }
@@ -115,6 +115,6 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
                        @NotNull final String name,
                        @Nullable final Object value,
                        @Nullable final Formatter formatter) {
-    publisher.publishStatistic(String.format(idFormat, id), String.format(nameFormat, name), value, formatter);
+    publisher.publishStatistic(String.format(idFormat, id), String.format(nameFormat, name), value, formatter, null);
   }
 }
