@@ -22,48 +22,58 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SQLRunner;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
 import jetbrains.buildServer.usageStatistics.Formatter;
-import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.impl.formatters.TimeFormatter;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider implements UsageStatisticsProvider {
+public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
   @NotNull private static final Formatter ourFormatter = new TimeFormatter();
 
   @NotNull private static final GenericQuery<Void> ourMainBuildDataQuery = new GenericQuery<Void>(
     "select" +
-    "  count(build_id)," +
-    "  sum(is_personal)," +
-    "  min(remove_from_queue_time - queued_time)," +
-    "  max(remove_from_queue_time - queued_time)," +
-    "  avg(remove_from_queue_time - queued_time)," +
-    "  min(build_finish_time_server - build_start_time_server)," +
-    "  max(build_finish_time_server - build_start_time_server)," +
-    "  avg(build_finish_time_server - build_start_time_server) " +
-    "from (select * from history union select * from light_history) " +
-    "where build_start_time_server > ?"
+    "  count(h.build_id)," +
+    "  sum(h.is_personal)," +
+    "  min(h.remove_from_queue_time - h.queued_time)," +
+    "  max(h.remove_from_queue_time - h.queued_time)," +
+    "  avg(h.remove_from_queue_time - h.queued_time)," +
+    "  min(h.build_finish_time_server - h.build_start_time_server)," +
+    "  max(h.build_finish_time_server - h.build_start_time_server)," +
+    "  avg(h.build_finish_time_server - h.build_start_time_server) " +
+    "from (select * from history union select * from light_history) h " +
+    "where h.build_start_time_server > ?"
   );
 
   @NotNull private static final GenericQuery<Void> ourBuildTestCountQuery = new GenericQuery<Void>(
     "select" +
-    "  min(test_count)," +
-    "  max(test_count)," +
-    "  avg(test_count) " +
+    "  min(t.test_count)," +
+    "  max(t.test_count)," +
+    "  avg(t.test_count) " +
     "from (" +
     "  select" +
     "    h.build_id, " +
-    "    count(test_id) test_count " +
-    "  from (select build_id, build_start_time_server from history union select build_id, build_start_time_server from light_history) h " +
-    "  left outer join test_info on h.build_id = test_info.build_id " +
-    "  where build_start_time_server > ? " +
+    "    count(ti.test_id) test_count " +
+    "  from (" +
+    "    select build_id, build_start_time_server from history " +
+    "    union " +
+    "    select build_id, build_start_time_server from light_history" +
+    "  ) h " +
+    "  left outer join test_info ti on h.build_id = ti.build_id " +
+    "  where h.build_start_time_server > ? " +
     "  group by h.build_id" +
-    ")"
+    ") t"
   );
+
+  @NonNls @NotNull private static final String TEST_COUNT_PER_BUILD_GROUP = "Test count per build";
+  @NonNls @NotNull private static final String BUILD_COUNT_GROUP = "Build count";
+  @NonNls @NotNull private static final String BUILD_WAITING_IN_QUEUE_TIME_GROUP = "Build waiting in queue time";
+  @NonNls @NotNull private static final String BUILD_DURATION_GROUP = "Build duration";
 
   @NotNull private final SQLRunner mySQLRunner;
 
   public BuildDataUsageStatisticsProvider(@NotNull final SBuildServer server) {
+    super(server);
     mySQLRunner = server.getSQLRunner();
   }
 
@@ -77,14 +87,14 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     ourMainBuildDataQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
-          publish(publisher, idFormat, nameFormat, "buildCount", "Build count", rs.getLong(1), null);
-          publish(publisher, idFormat, nameFormat, "personalBuildCount", "Personal build count", rs.getLong(2), null);
-          publish(publisher, idFormat, nameFormat, "minBuildWaitInQueueTime", "Minimal build waiting in queue time", getNullableLong(rs, 3), ourFormatter);
-          publish(publisher, idFormat, nameFormat, "maxBuildWaitInQueueTime", "Maximal build waiting in queue time", getNullableLong(rs, 4), ourFormatter);
-          publish(publisher, idFormat, nameFormat, "avgBuildWaitInQueueTime", "Average build waiting in queue time", getNullableLong(rs, 5), ourFormatter);
-          publish(publisher, idFormat, nameFormat, "minBuildDuration", "Minimal build duration", getNullableLong(rs, 6), ourFormatter);
-          publish(publisher, idFormat, nameFormat, "maxBuildDuration", "Maximal build duration", getNullableLong(rs, 7), ourFormatter);
-          publish(publisher, idFormat, nameFormat, "avgBuildDuration", "Average build duration", getNullableLong(rs, 8), ourFormatter);
+          publish(publisher, idFormat, nameFormat, "buildCount", "Build count", rs.getLong(1), null, BUILD_COUNT_GROUP);
+          publish(publisher, idFormat, nameFormat, "personalBuildCount", "Personal build count", rs.getLong(2), null, BUILD_COUNT_GROUP);
+          publish(publisher, idFormat, nameFormat, "minBuildWaitInQueueTime", "Minimal build waiting in queue time", getNullableLong(rs, 3), ourFormatter, BUILD_WAITING_IN_QUEUE_TIME_GROUP);
+          publish(publisher, idFormat, nameFormat, "maxBuildWaitInQueueTime", "Maximal build waiting in queue time", getNullableLong(rs, 4), ourFormatter, BUILD_WAITING_IN_QUEUE_TIME_GROUP);
+          publish(publisher, idFormat, nameFormat, "avgBuildWaitInQueueTime", "Average build waiting in queue time", getNullableLong(rs, 5), ourFormatter, BUILD_WAITING_IN_QUEUE_TIME_GROUP);
+          publish(publisher, idFormat, nameFormat, "minBuildDuration", "Minimal build duration", getNullableLong(rs, 6), ourFormatter, BUILD_DURATION_GROUP);
+          publish(publisher, idFormat, nameFormat, "maxBuildDuration", "Maximal build duration", getNullableLong(rs, 7), ourFormatter, BUILD_DURATION_GROUP);
+          publish(publisher, idFormat, nameFormat, "avgBuildDuration", "Average build duration", getNullableLong(rs, 8), ourFormatter, BUILD_DURATION_GROUP);
         }
         return null;
       }
@@ -93,9 +103,9 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     ourBuildTestCountQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
-          publish(publisher, idFormat, nameFormat, "minBuildTestCount", "Minimal test count per build", getNullableLong(rs, 1), null);
-          publish(publisher, idFormat, nameFormat, "maxBuildTestCount", "Maximal test count per build", getNullableLong(rs, 2), null);
-          publish(publisher, idFormat, nameFormat, "avgBuildTestCount", "Average test count per build", getNullableLong(rs, 3), null);
+          publish(publisher, idFormat, nameFormat, "minBuildTestCount", "Minimal test count per build", getNullableLong(rs, 1), null, TEST_COUNT_PER_BUILD_GROUP);
+          publish(publisher, idFormat, nameFormat, "maxBuildTestCount", "Maximal test count per build", getNullableLong(rs, 2), null, TEST_COUNT_PER_BUILD_GROUP);
+          publish(publisher, idFormat, nameFormat, "avgBuildTestCount", "Average test count per build", getNullableLong(rs, 3), null, TEST_COUNT_PER_BUILD_GROUP);
         }
         return null;
       }
@@ -114,7 +124,8 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
                        @NotNull final String id,
                        @NotNull final String name,
                        @Nullable final Object value,
-                       @Nullable final Formatter formatter) {
-    publisher.publishStatistic(String.format(idFormat, id), String.format(nameFormat, name), value, formatter, null);
+                       @Nullable final Formatter formatter,
+                       @Nullable final String groupName) {
+    publisher.publishStatistic(String.format(idFormat, id), String.format(nameFormat, name), value, formatter, groupName);
   }
 }

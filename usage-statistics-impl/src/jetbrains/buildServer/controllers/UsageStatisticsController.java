@@ -88,7 +88,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
         setReportingEnabled(reportingEnabled);
         ActionMessages.getOrCreateMessages(request).addMessage(
           USAGE_STATISTICS_REPORTING_STATUS_MESSAGE_KEY,
-          reportingEnabled ? "Statistics will be reported to JetBrains periodically" : "Statistics will not be reported to JetBrains"
+          reportingEnabled ? "Usage statistics will be sent to JetBrains periodically" : "Usage statistics will not be sent to JetBrains"
         );
       }
       catch (final Throwable e) {

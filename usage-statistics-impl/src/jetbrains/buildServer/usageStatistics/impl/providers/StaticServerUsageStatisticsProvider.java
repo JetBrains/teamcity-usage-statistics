@@ -19,18 +19,18 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import org.jetbrains.annotations.NotNull;
 
-public class StaticServerUsageStatisticsProvider implements UsageStatisticsProvider {
+public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProvider {
+  @NotNull private static final String ourGroupName = "Static Server Information";
   @NotNull private final SBuildServer myServer;
   @NotNull private final UserGroupManager myUserGroupManager;
 
   public StaticServerUsageStatisticsProvider(@NotNull final SBuildServer server, @NotNull final UserGroupManager userGroupManager) {
+    super(server);
     myServer = server;
     myUserGroupManager = userGroupManager;
-    server.registerExtension(UsageStatisticsProvider.class, getClass().getName(), this);
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
@@ -45,31 +45,31 @@ public class StaticServerUsageStatisticsProvider implements UsageStatisticsProvi
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher) {
     final BuildAgentManager buildAgentManager = myServer.getBuildAgentManager();
     final int agentNumber = buildAgentManager.getRegisteredAgents(true).size() + buildAgentManager.getUnregisteredAgents().size();
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.agentNumber", "Number of agents", agentNumber, null, null);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.agentNumber", "Number of agents", agentNumber, null, ourGroupName);
   }
 
   private void publishNumberOfBuildTypes(@NotNull final UsageStatisticsPublisher publisher) {
     final int buildTypeNumber = myServer.getProjectManager().getNumberOfBuildTypes();
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.buildTypeNumber", "Number of build configurations", buildTypeNumber, null, null);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.buildTypeNumber", "Number of build configurations", buildTypeNumber, null, ourGroupName);
   }
 
   private void publishNumberOfProjects(@NotNull final UsageStatisticsPublisher publisher) {
     final int projectNumber = myServer.getProjectManager().getNumberOfProjects();
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.projectNumber", "Number of projects", projectNumber, null, null);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.projectNumber", "Number of projects", projectNumber, null, ourGroupName);
   }
 
   private void publishNumberOfUserGroups(@NotNull final UsageStatisticsPublisher publisher) {
     final int userGroupNumber = myUserGroupManager.getUserGroups().size();
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.userGroupNumber", "Number of user groups", userGroupNumber, null, null);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.userGroupNumber", "Number of user groups", userGroupNumber, null, ourGroupName);
   }
 
   private void publishNumberOfUsers(@NotNull final UsageStatisticsPublisher publisher) {
     final int userNumber = myServer.getUserModel().getNumberOfRegisteredUsers();
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.userNumber", "Number of users", userNumber, null, null);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.userNumber", "Number of users", userNumber, null, ourGroupName);
   }
 
   private void publishNumberOfVcsRoots(@NotNull final UsageStatisticsPublisher publisher) {
     final int vcsRootNumber = myServer.getVcsManager().getAllRegisteredVcsRoots().size();
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.vcsRootNumber", "Number of VCS roots", vcsRootNumber, null, null);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.vcsRootNumber", "Number of VCS roots", vcsRootNumber, null, ourGroupName);
   }
 }

@@ -1,5 +1,6 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import jetbrains.buildServer.groups.UserGroupManager;
@@ -47,6 +48,13 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
 
     final UserGroupManager userGroupManager = myServer.getSingletonService(UserGroupManager.class);
     assertEquals(userGroupManager.getUserGroups().size(), statistics.get("jetbrains.buildServer.usageStatistics.userGroupNumber"));
+  }
+
+  public void all_providers_should_be_registered() {
+    final Collection<String> registeredProviders = myServer.getExtensionSources(UsageStatisticsProvider.class);
+
+    assertTrue(registeredProviders.contains(StaticServerUsageStatisticsProvider.class.getName()));
+    assertTrue(registeredProviders.contains(BuildDataUsageStatisticsProvider.class.getName()));
   }
 
   private Map<String, Object> collectStatisticsByProvider(final Class<? extends UsageStatisticsProvider> providerClass) {

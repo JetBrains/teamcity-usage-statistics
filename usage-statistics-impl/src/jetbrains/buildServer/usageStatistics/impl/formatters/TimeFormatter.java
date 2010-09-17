@@ -16,6 +16,6 @@ public class TimeFormatter implements Formatter {
   public String format(@Nullable final Object obj) {
     if (!(obj instanceof Number)) return StringUtil.NA;
     final long seconds = ((Number) obj).longValue() / Dates.ONE_SECOND;
-    return TimePrinter.createSecondsFormatter(true).formatTime(seconds);
+    return TimePrinter.createSecondsFormatter(false).formatTime(seconds);
   }
 }

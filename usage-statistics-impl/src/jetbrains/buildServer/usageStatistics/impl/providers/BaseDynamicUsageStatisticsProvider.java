@@ -16,12 +16,16 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.util.Dates;
 import org.jetbrains.annotations.NotNull;
 
-abstract class BaseDynamicUsageStatisticsProvider implements UsageStatisticsProvider {
+abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsProvider {
+  protected BaseDynamicUsageStatisticsProvider(@NotNull final SBuildServer server) {
+    super(server);
+  }
+
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
     final long now = Dates.now().getTime();
     accept(publisher, "Hour", now - Dates.ONE_HOUR);

@@ -29,5 +29,20 @@ BS.UsageStatistics = {
         });
       }
     });
+  },
+
+  sortGroups: function(count) {
+    var leftHeight = 0, rightHeight = 0;
+    for (var i = 0; i < count; i++) {
+      var group = $('group-' + i);
+      if (leftHeight <= rightHeight) {
+        group.style['float'] = 'left';
+        leftHeight += group.offsetHeight;
+      }
+      else {
+        group.style['float'] = 'right';
+        rightHeight += group.offsetHeight;
+      }
+    }
   }
 };
