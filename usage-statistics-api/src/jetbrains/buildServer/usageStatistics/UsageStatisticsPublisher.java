@@ -28,19 +28,9 @@ public interface UsageStatisticsPublisher {
    *
    * @param id Statistic identifier. It is recommended to use your package name as prefix for this id to be sure
    *           it does not clash with other statistics. E.g. "com.myCompanyName.teamcity.statistic.myStatisticName".
-   * @param displayName The string to use in UI for displaying this statistic.
    * @param value The value of this statistic.
-   * @param formatter This object determines how the value will be shown in UI. If formatter is null, the default behavior
-   *                  is used: if the value is not null the {@link java.lang.String#valueOf(Object) String.valueOf(Object)}
-   *                  method is used to show the value in UI, otherwise the string "N/A" is used.
-   * @param groupName This parameter is used to group the statistics in UI. Statistics with equal group names are put
-   *                  in one group. Statistics with the null group name are put in group "Miscellaneous".
    *
    * @see UsageStatisticsProvider#accept(UsageStatisticsPublisher)
    */
-  void publishStatistic(@NotNull String id,
-                        @NotNull String displayName,
-                        @Nullable Object value,
-                        @Nullable Formatter formatter,
-                        @Nullable String groupName);
+  void publishStatistic(@NotNull String id, @Nullable Object value);
 }

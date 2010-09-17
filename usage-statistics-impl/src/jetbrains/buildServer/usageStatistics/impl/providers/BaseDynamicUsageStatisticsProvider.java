@@ -17,21 +17,37 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.util.Dates;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsProvider {
-  protected BaseDynamicUsageStatisticsProvider(@NotNull final SBuildServer server) {
-    super(server);
+  @NonNls @NotNull private static final String HOUR = "Hour";
+  @NonNls @NotNull private static final String DAY = "Day";
+  @NonNls @NotNull private static final String WEEK = "Week";
+
+  protected BaseDynamicUsageStatisticsProvider(@NotNull final SBuildServer server,
+                                               @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    super(server, presentationManager);
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
     final long now = Dates.now().getTime();
-    accept(publisher, "Hour", now - Dates.ONE_HOUR);
-    accept(publisher, "Day", now - Dates.ONE_DAY);
-    accept(publisher, "Week", now - Dates.ONE_WEEK);
+    accept(publisher, HOUR, now - Dates.ONE_HOUR);
+    accept(publisher, DAY, now - Dates.ONE_DAY);
+    accept(publisher, WEEK, now - Dates.ONE_WEEK);
+  }
+
+  @Override
+  protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
+    applyPresentations(presentationManager, HOUR);
+    applyPresentations(presentationManager, DAY);
+    applyPresentations(presentationManager, WEEK);
   }
 
   protected abstract void accept(@NotNull UsageStatisticsPublisher publisher, @NotNull String periodDescription, long startDate);
+
+  protected abstract void applyPresentations(@NotNull UsageStatisticsPresentationManager presentationManager, @NotNull String periodDescription);
 }

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package jetbrains.buildServer.usageStatistics;
+package jetbrains.buildServer.usageStatistics.presentation;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Formatter can be used to customize the string representation of the value in UI
+ * Class is used to customize the string representation of the statistic value in UI
  */
-public interface Formatter {
+public interface UsageStatisticsFormatter {
   @NotNull
-  String format(@Nullable Object value);
+  String format(@Nullable Object statisticValue);
 }

@@ -21,15 +21,16 @@ import java.sql.SQLException;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SQLRunner;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
-import jetbrains.buildServer.usageStatistics.Formatter;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
-import jetbrains.buildServer.usageStatistics.impl.formatters.TimeFormatter;
+import jetbrains.buildServer.usageStatistics.presentation.formatters.TimeFormatter;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
-  @NotNull private static final Formatter ourFormatter = new TimeFormatter();
+  @NotNull private static final UsageStatisticsFormatter ourTimeFormatter = new TimeFormatter();
 
   @NotNull private static final GenericQuery<Void> ourMainBuildDataQuery = new GenericQuery<Void>(
     "select" +
@@ -72,8 +73,9 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
 
   @NotNull private final SQLRunner mySQLRunner;
 
-  public BuildDataUsageStatisticsProvider(@NotNull final SBuildServer server) {
-    super(server);
+  public BuildDataUsageStatisticsProvider(@NotNull final SBuildServer server,
+                                          @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    super(server, presentationManager);
     mySQLRunner = server.getSQLRunner();
   }
 
@@ -81,20 +83,19 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
   protected void accept(@NotNull final UsageStatisticsPublisher publisher,
                         @NotNull final String periodDescription,
                         final long fromDate) {
-    final String idFormat = "jetbrains.buildServer.usageStatistics.%sForTheLast" + periodDescription;
-    final String nameFormat = "%s for the last " + periodDescription.toLowerCase();
+    final String idFormat = createIdFromat(periodDescription);
 
     ourMainBuildDataQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
-          publish(publisher, idFormat, nameFormat, "buildCount", "Build count", rs.getLong(1), null, BUILD_COUNT_GROUP);
-          publish(publisher, idFormat, nameFormat, "personalBuildCount", "Personal build count", rs.getLong(2), null, BUILD_COUNT_GROUP);
-          publish(publisher, idFormat, nameFormat, "minBuildWaitInQueueTime", "Minimal build waiting in queue time", getNullableLong(rs, 3), ourFormatter, BUILD_WAITING_IN_QUEUE_TIME_GROUP);
-          publish(publisher, idFormat, nameFormat, "maxBuildWaitInQueueTime", "Maximal build waiting in queue time", getNullableLong(rs, 4), ourFormatter, BUILD_WAITING_IN_QUEUE_TIME_GROUP);
-          publish(publisher, idFormat, nameFormat, "avgBuildWaitInQueueTime", "Average build waiting in queue time", getNullableLong(rs, 5), ourFormatter, BUILD_WAITING_IN_QUEUE_TIME_GROUP);
-          publish(publisher, idFormat, nameFormat, "minBuildDuration", "Minimal build duration", getNullableLong(rs, 6), ourFormatter, BUILD_DURATION_GROUP);
-          publish(publisher, idFormat, nameFormat, "maxBuildDuration", "Maximal build duration", getNullableLong(rs, 7), ourFormatter, BUILD_DURATION_GROUP);
-          publish(publisher, idFormat, nameFormat, "avgBuildDuration", "Average build duration", getNullableLong(rs, 8), ourFormatter, BUILD_DURATION_GROUP);
+          publish(publisher, idFormat, "buildCount", rs.getLong(1));
+          publish(publisher, idFormat, "personalBuildCount", rs.getLong(2));
+          publish(publisher, idFormat, "minBuildWaitInQueueTime", getNullableLong(rs, 3));
+          publish(publisher, idFormat, "maxBuildWaitInQueueTime", getNullableLong(rs, 4));
+          publish(publisher, idFormat, "avgBuildWaitInQueueTime", getNullableLong(rs, 5));
+          publish(publisher, idFormat, "minBuildDuration", getNullableLong(rs, 6));
+          publish(publisher, idFormat, "maxBuildDuration", getNullableLong(rs, 7));
+          publish(publisher, idFormat, "avgBuildDuration", getNullableLong(rs, 8));
         }
         return null;
       }
@@ -103,13 +104,36 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     ourBuildTestCountQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
-          publish(publisher, idFormat, nameFormat, "minBuildTestCount", "Minimal test count per build", getNullableLong(rs, 1), null, TEST_COUNT_PER_BUILD_GROUP);
-          publish(publisher, idFormat, nameFormat, "maxBuildTestCount", "Maximal test count per build", getNullableLong(rs, 2), null, TEST_COUNT_PER_BUILD_GROUP);
-          publish(publisher, idFormat, nameFormat, "avgBuildTestCount", "Average test count per build", getNullableLong(rs, 3), null, TEST_COUNT_PER_BUILD_GROUP);
+          publish(publisher, idFormat, "minBuildTestCount", getNullableLong(rs, 1));
+          publish(publisher, idFormat, "maxBuildTestCount", getNullableLong(rs, 2));
+          publish(publisher, idFormat, "avgBuildTestCount", getNullableLong(rs, 3));
         }
         return null;
       }
     }, fromDate);
+  }
+
+  @Override
+  protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager manager, @NotNull final String periodDescription) {
+    final String idFormat = createIdFromat(periodDescription);
+    final String nameFormat = "%s for the last " + periodDescription.toLowerCase();
+
+    apply(manager, idFormat, nameFormat, "buildCount", "Build count", BUILD_COUNT_GROUP, null);
+    apply(manager, idFormat, nameFormat, "personalBuildCount", "Personal build count", BUILD_COUNT_GROUP, null);
+    apply(manager, idFormat, nameFormat, "minBuildWaitInQueueTime", "Minimal build waiting in queue time", BUILD_WAITING_IN_QUEUE_TIME_GROUP, ourTimeFormatter);
+    apply(manager, idFormat, nameFormat, "maxBuildWaitInQueueTime", "Maximal build waiting in queue time", BUILD_WAITING_IN_QUEUE_TIME_GROUP, ourTimeFormatter);
+    apply(manager, idFormat, nameFormat, "avgBuildWaitInQueueTime", "Average build waiting in queue time", BUILD_WAITING_IN_QUEUE_TIME_GROUP, ourTimeFormatter);
+    apply(manager, idFormat, nameFormat, "minBuildDuration", "Minimal build duration", BUILD_DURATION_GROUP, ourTimeFormatter);
+    apply(manager, idFormat, nameFormat, "maxBuildDuration", "Maximal build duration", BUILD_DURATION_GROUP, ourTimeFormatter);
+    apply(manager, idFormat, nameFormat, "avgBuildDuration", "Average build duration", BUILD_DURATION_GROUP, ourTimeFormatter);
+    apply(manager, idFormat, nameFormat, "minBuildTestCount", "Minimal test count per build", TEST_COUNT_PER_BUILD_GROUP, null);
+    apply(manager, idFormat, nameFormat, "maxBuildTestCount", "Maximal test count per build", TEST_COUNT_PER_BUILD_GROUP, null);
+    apply(manager, idFormat, nameFormat, "avgBuildTestCount", "Average test count per build", TEST_COUNT_PER_BUILD_GROUP, null);
+  }
+
+  @NotNull
+  private String createIdFromat(@NotNull final String periodDescription) {
+    return "jetbrains.buildServer.usageStatistics.%sForTheLast" + periodDescription;
   }
 
   @Nullable
@@ -118,14 +142,20 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     return rs.wasNull() ? null : value;
   }
 
+  private void apply(@NotNull final UsageStatisticsPresentationManager presentationManager,
+                     @NotNull final String idFormat,
+                     @NotNull final String nameFormat,
+                     @NotNull final String id,
+                     @NotNull final String name,
+                     @NotNull final String groupName,
+                     @Nullable final UsageStatisticsFormatter formatter) {
+    presentationManager.applyPresentation(String.format(idFormat, id), String.format(nameFormat, name), groupName, formatter);
+  }
+
   private void publish(@NotNull final UsageStatisticsPublisher publisher,
                        @NotNull final String idFormat,
-                       @NotNull final String nameFormat,
                        @NotNull final String id,
-                       @NotNull final String name,
-                       @Nullable final Object value,
-                       @Nullable final Formatter formatter,
-                       @Nullable final String groupName) {
-    publisher.publishStatistic(String.format(idFormat, id), String.format(nameFormat, name), value, formatter, groupName);
+                       @Nullable final Object value) {
+    publisher.publishStatistic(String.format(idFormat, id), value);
   }
 }

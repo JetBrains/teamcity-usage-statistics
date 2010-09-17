@@ -25,6 +25,7 @@ import jetbrains.buildServer.serverSide.auth.AccessDeniedException;
 import jetbrains.buildServer.serverSide.auth.AuthorityHolder;
 import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettings;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
 import jetbrains.buildServer.web.openapi.*;
@@ -37,6 +38,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
   @NotNull private final UsageStatisticsSettingsPersistor mySettingsPersistor;
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
+  @NotNull private final UsageStatisticsPresentationManagerEx myPresentationManager;
   @NotNull private final String myJspPath;
 
   @Used("spring")
@@ -46,10 +48,12 @@ public class UsageStatisticsController extends BaseFormXmlController {
                                    @NotNull final PluginDescriptor pluginDescriptor,
                                    @NotNull final PagePlaces pagePlaces,
                                    @NotNull final UsageStatisticsSettingsPersistor settingsPersistor,
-                                   @NotNull final UsageStatisticsCollector statisticsCollector) {
+                                   @NotNull final UsageStatisticsCollector statisticsCollector,
+                                   @NotNull final UsageStatisticsPresentationManagerEx presentationManager) {
     super(server);
     mySettingsPersistor = settingsPersistor;
     myStatisticsCollector = statisticsCollector;
+    myPresentationManager = presentationManager;
     myJspPath = pluginDescriptor.getPluginResourcesPath("usageStatistics.jsp");
 
     authInterceptor.addPathBasedPermissionsChecker("/admin/usageStatistics.html", new RequestPermissionsChecker() {
@@ -75,7 +79,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
   protected ModelAndView doGet(final HttpServletRequest request, final HttpServletResponse response) {
     final ModelAndView modelAndView = new ModelAndView(myJspPath);
     //noinspection unchecked
-    modelAndView.getModel().put("statisticsData", new UsageStatisticsBean(mySettingsPersistor, myStatisticsCollector));
+    modelAndView.getModel().put("statisticsData", new UsageStatisticsBean(mySettingsPersistor, myStatisticsCollector, myPresentationManager));
     return modelAndView;
   }
 

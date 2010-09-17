@@ -25,7 +25,6 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
-import jetbrains.buildServer.usageStatistics.Formatter;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsReporter;
@@ -93,11 +92,7 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   private Map<String, String> collectStatistics() {
     final Map<String, String> myStatistics = new HashMap<String, String>();
     myStatisticsCollector.collectStatistics(new UsageStatisticsPublisher() {
-      public void publishStatistic(@NotNull final String id,
-                                   @NotNull final String displayName,
-                                   @Nullable final Object value,
-                                   @Nullable final Formatter formatter,
-                                   @Nullable final String groupName) {
+      public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
         myStatistics.put(id, String.valueOf(value));
       }
     });

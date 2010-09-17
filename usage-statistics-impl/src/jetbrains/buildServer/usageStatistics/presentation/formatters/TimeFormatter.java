@@ -1,6 +1,6 @@
-package jetbrains.buildServer.usageStatistics.impl.formatters;
+package jetbrains.buildServer.usageStatistics.presentation.formatters;
 
-import jetbrains.buildServer.usageStatistics.Formatter;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.util.TimePrinter;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Maxim.Manuylov
  *         Date: 15.09.2010
  */
-public class TimeFormatter implements Formatter {
+public class TimeFormatter implements UsageStatisticsFormatter {
   @NotNull
   public String format(@Nullable final Object obj) {
     if (!(obj instanceof Number)) return StringUtil.NA;

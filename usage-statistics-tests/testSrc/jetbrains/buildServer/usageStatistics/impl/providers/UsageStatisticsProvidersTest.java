@@ -6,7 +6,6 @@ import java.util.Map;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
-import jetbrains.buildServer.usageStatistics.Formatter;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -23,11 +22,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   public void provider_should_not_fail_on_publishing_statistics() {
     final UsageStatisticsCollector collector = myServer.getSingletonService(UsageStatisticsCollector.class);
     collector.collectStatistics(new UsageStatisticsPublisher() {
-      public void publishStatistic(@NotNull final String id,
-                                   @NotNull final String displayName,
-                                   @Nullable final Object value,
-                                   @Nullable final Formatter formatter,
-                                   @Nullable final String groupName) {
+      public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
         // do nothing
       }
     });
@@ -61,11 +56,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
     final Map<String, Object> statistics = new HashMap<String, Object>();
     final UsageStatisticsProvider provider = myServer.getSingletonService(providerClass);
     provider.accept(new UsageStatisticsPublisher() {
-      public void publishStatistic(@NotNull final String id,
-                                   @NotNull final String displayName,
-                                   @Nullable final Object value,
-                                   @Nullable final Formatter formatter,
-                                   @Nullable final String groupName) {
+      public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
         statistics.put(id, value);
       }
     });
