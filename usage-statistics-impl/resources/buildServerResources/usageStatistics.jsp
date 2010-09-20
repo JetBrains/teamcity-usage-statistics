@@ -8,6 +8,7 @@
 <bs:linkCSS>
   ${teamcityPluginResourcesPath}css/usageStatistics.css
   /css/profilePage.css
+  /css/admin/serverConfig.css
 </bs:linkCSS>
 
 <div>
@@ -42,7 +43,7 @@
             <l:settingsBlock title="${group.key}" style="">
               <table style="width: 100%" cellspacing="0">
                 <c:forEach var="statistic" items="${group.value}">
-                  <tr class="statisticRow">
+                  <tr class="highlightRow statisticRow">
                     <td><c:out value="${statistic.displayName}"/></td>
                     <td style="width: 13%"><c:out value="${statistic.formattedValue}"/></td>
                   </tr>
