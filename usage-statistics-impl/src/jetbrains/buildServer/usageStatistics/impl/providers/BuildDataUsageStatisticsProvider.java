@@ -66,10 +66,10 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     ") t"
   );
 
-  @NonNls @NotNull private static final String TEST_COUNT_PER_BUILD_GROUP = "Test count per build";
-  @NonNls @NotNull private static final String BUILD_COUNT_GROUP = "Build count";
-  @NonNls @NotNull private static final String BUILD_WAITING_IN_QUEUE_TIME_GROUP = "Build waiting in queue time";
-  @NonNls @NotNull private static final String BUILD_DURATION_GROUP = "Build duration";
+  @NonNls @NotNull private static final String TEST_COUNT_PER_BUILD_GROUP = "Test Count Per Build";
+  @NonNls @NotNull private static final String BUILD_COUNT_GROUP = "Build Count";
+  @NonNls @NotNull private static final String BUILD_WAITING_IN_QUEUE_TIME_GROUP = "Build Waiting In Queue Time";
+  @NonNls @NotNull private static final String BUILD_DURATION_GROUP = "Build Duration";
 
   @NotNull private final SQLRunner mySQLRunner;
 

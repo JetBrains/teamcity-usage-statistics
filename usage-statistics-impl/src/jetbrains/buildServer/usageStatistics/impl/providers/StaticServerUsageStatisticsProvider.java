@@ -34,6 +34,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     super(server, presentationManager);
     myServer = server;
     myUserGroupManager = userGroupManager;
+    applyPresentations(presentationManager);
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
@@ -45,7 +46,6 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     publishNumberOfVcsRoots(publisher);
   }
 
-  @Override
   protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.agentNumber", "Number of agents", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.buildTypeNumber", "Number of build configurations", ourGroupName, null);

@@ -31,6 +31,7 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
   protected BaseDynamicUsageStatisticsProvider(@NotNull final SBuildServer server,
                                                @NotNull final UsageStatisticsPresentationManager presentationManager) {
     super(server, presentationManager);
+    applyPresentations(presentationManager);
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
@@ -40,14 +41,17 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
     accept(publisher, WEEK, now - Dates.ONE_WEEK);
   }
 
-  @Override
-  protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
-    applyPresentations(presentationManager, HOUR);
-    applyPresentations(presentationManager, DAY);
-    applyPresentations(presentationManager, WEEK);
+  protected long getThresholdDate() {
+    return Dates.now().getTime() - Dates.ONE_WEEK;
   }
 
   protected abstract void accept(@NotNull UsageStatisticsPublisher publisher, @NotNull String periodDescription, long startDate);
 
-  protected abstract void applyPresentations(@NotNull UsageStatisticsPresentationManager presentationManager, @NotNull String periodDescription);
+  protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager, @NotNull final String periodDescription) {}
+
+  private void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
+    applyPresentations(presentationManager, HOUR);
+    applyPresentations(presentationManager, DAY);
+    applyPresentations(presentationManager, WEEK);
+  }
 }

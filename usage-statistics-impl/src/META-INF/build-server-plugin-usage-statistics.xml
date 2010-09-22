@@ -28,5 +28,8 @@
 
   <bean id="buildDataUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.BuildDataUsageStatisticsProvider"/>
   <bean id="staticServerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.StaticServerUsageStatisticsProvider"/>
+  <bean id="ideUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.IDEUsageStatisticsProvider">
+    <constructor-arg index="2" ref="xmlRpcDispatcher"/>
+  </bean>
 </beans>
 

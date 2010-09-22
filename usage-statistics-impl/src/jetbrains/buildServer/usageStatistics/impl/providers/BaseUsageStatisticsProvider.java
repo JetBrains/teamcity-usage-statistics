@@ -10,11 +10,11 @@ import org.jetbrains.annotations.NotNull;
  *         Date: 17.09.2010
  */
 abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider {
+  @NotNull protected final UsageStatisticsPresentationManager myPresentationManager;
+
   protected BaseUsageStatisticsProvider(@NotNull final SBuildServer server,
                                         @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    myPresentationManager = presentationManager;
     server.registerExtension(UsageStatisticsProvider.class, getClass().getName(), this);
-    applyPresentations(presentationManager);
   }
-
-  protected abstract void applyPresentations(@NotNull UsageStatisticsPresentationManager presentationManager);
 }

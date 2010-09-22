@@ -32,16 +32,21 @@ BS.UsageStatistics = {
   },
 
   sortGroups: function(count) {
+    var heights = [];
+    for (var k = 0; k < count; k++) {
+      heights[k] = $('group-' + k).offsetHeight;
+    }
+
     var leftHeight = 0, rightHeight = 0;
     for (var i = 0; i < count; i++) {
       var group = $('group-' + i);
       if (leftHeight <= rightHeight) {
         group.style['float'] = 'left';
-        leftHeight += group.offsetHeight;
+        leftHeight += heights[i];
       }
       else {
         group.style['float'] = 'right';
-        rightHeight += group.offsetHeight;
+        rightHeight += heights[i];
       }
     }
   }
