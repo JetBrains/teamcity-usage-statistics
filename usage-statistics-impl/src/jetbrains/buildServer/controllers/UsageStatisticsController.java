@@ -25,9 +25,9 @@ import jetbrains.buildServer.serverSide.auth.AccessDeniedException;
 import jetbrains.buildServer.serverSide.auth.AuthorityHolder;
 import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettings;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
 import jetbrains.buildServer.web.openapi.*;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -85,6 +85,11 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
   @Override
   protected void doPost(final HttpServletRequest request, final HttpServletResponse response, final Element xmlResponse) {
+    if (request.getParameter("forceCollectingNow") != null) {
+      myStatisticsCollector.forceAsynchronousCollectingNow();
+      return;
+    }
+
     final String reportingEnabledStr = request.getParameter("reportingEnabled");
     if (reportingEnabledStr != null) {
       final boolean reportingEnabled = "true".equalsIgnoreCase(reportingEnabledStr);

@@ -16,8 +16,19 @@
 
 package jetbrains.buildServer.usageStatistics;
 
+import java.util.Date;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface UsageStatisticsCollector {
-  void collectStatistics(@NotNull UsageStatisticsPublisher publisher);
+  boolean isCollectingNow();
+
+  boolean isStatisticsCollected();
+
+  @Nullable
+  Date getLastCollectingFinishDate();
+
+  void forceAsynchronousCollectingNow();
+
+  void publishCollectedStatistics(@NotNull UsageStatisticsPublisher publisher);
 }

@@ -15,6 +15,8 @@
  */
 
 BS.UsageStatistics = {
+  _lastCollectingFinishTimestamp: null,
+
   updateReportingStatus: function() {
     BS.Util.show('usageStatisticsReportingStatusUpdatingProgress');
 
@@ -29,6 +31,35 @@ BS.UsageStatistics = {
         });
       }
     });
+  },
+
+  forceCollectingNow: function() {
+    BS.Util.show('usageStatisticsCollectNowProgress');
+
+    BS.ajaxRequest(base_uri + "/admin/usageStatistics.html", {
+      method: "post",
+      parameters: "forceCollectingNow=true",
+      onComplete: function() {
+        $('usageStatisticsStatus').refresh();
+      }
+    });
+  },
+
+  scheduleStatusUpdating: function() {
+    setTimeout("BS.UsageStatistics.updateStatus();", 10000);
+  },
+
+  updateStatus: function() {
+    $('usageStatisticsStatus').refresh();
+    BS.UsageStatistics.scheduleStatusUpdating();
+  },
+
+  onStatusUpdated: function(lastCollectingFinishTimestamp) {
+    if (BS.UsageStatistics._lastCollectingFinishTimestamp != null && BS.UsageStatistics._lastCollectingFinishTimestamp != lastCollectingFinishTimestamp) {
+      $('usageStatisticsContent').refresh();
+    }
+
+    BS.UsageStatistics._lastCollectingFinishTimestamp = lastCollectingFinishTimestamp;
   },
 
   sortGroups: function(count) {

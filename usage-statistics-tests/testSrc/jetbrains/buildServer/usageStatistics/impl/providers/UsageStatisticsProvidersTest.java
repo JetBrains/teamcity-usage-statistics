@@ -6,7 +6,6 @@ import java.util.Map;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
-import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import org.jetbrains.annotations.NotNull;
@@ -20,12 +19,16 @@ import org.testng.annotations.Test;
 @Test
 public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   public void provider_should_not_fail_on_publishing_statistics() {
-    final UsageStatisticsCollector collector = myServer.getSingletonService(UsageStatisticsCollector.class);
-    collector.collectStatistics(new UsageStatisticsPublisher() {
+    final UsageStatisticsPublisher publisher = new UsageStatisticsPublisher() {
       public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
         // do nothing
       }
-    });
+    };
+
+    final Collection<UsageStatisticsProvider> providers = myServer.getExtensions(UsageStatisticsProvider.class);
+    for (final UsageStatisticsProvider provider : providers) {
+      provider.accept(publisher);
+    }
   }
 
   public void static_server_usage_statistics_provider_test() {

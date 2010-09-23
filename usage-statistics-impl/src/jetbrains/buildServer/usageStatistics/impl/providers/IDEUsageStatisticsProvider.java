@@ -86,7 +86,7 @@ public class IDEUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvid
     return new TypeBasedFormatter<Integer>(Integer.class) {
       @Override
       protected String doFormat(@NotNull final Integer count) {
-        return count + " (" + (count * 100 / totalUsages) + "%)";
+        return totalUsages == 0 ? String.valueOf(count) : count + " (" + (count * 100 / totalUsages) + "%)";
       }
     };
   }
@@ -103,16 +103,27 @@ public class IDEUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvid
   private synchronized Map<String, Set<IDEUsage>> filterUsages(final long startDate) {
     final Map<String, Set<IDEUsage>> result = new HashMap<String, Set<IDEUsage>>();
     for (final Map.Entry<String, Set<IDEUsage>> entry : myIDEUsages.entrySet()) {
-      final HashSet<IDEUsage> filteredUsages = FilterUtil.filterAndCopy(entry.getValue(), new HashSet<IDEUsage>(), new Filter<IDEUsage>() {
+      final Set<IDEUsage> usages = entry.getValue();
+      final HashSet<IDEUsage> filteredUsages = FilterUtil.filterAndCopy(usages, new HashSet<IDEUsage>(), new Filter<IDEUsage>() {
         public boolean accept(@NotNull final IDEUsage usage) {
           return usage.getTimestamp() > startDate;
         }
       });
-      if (!filteredUsages.isEmpty()) {
+      if (!filteredUsages.isEmpty() || hasActiveUsage(usages)) {
         result.put(entry.getKey(), filteredUsages);
       }
     }
     return result;
+  }
+
+  private boolean hasActiveUsage(final Set<IDEUsage> usages) {
+    final long threshold = getThresholdDate();
+    for (final IDEUsage usage : usages) {
+      if (usage.getTimestamp() > threshold) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private synchronized void addUsage(@NotNull final String ideName, final long userId) {

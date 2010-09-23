@@ -43,6 +43,7 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   }
 
   public boolean reportStatistics() {
+    if (!myStatisticsCollector.isStatisticsCollected()) return false;
     return doReportStatistics(createDataString(collectStatistics()));
   }
 
@@ -91,7 +92,7 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   @NotNull
   private Map<String, String> collectStatistics() {
     final Map<String, String> myStatistics = new HashMap<String, String>();
-    myStatisticsCollector.collectStatistics(new UsageStatisticsPublisher() {
+    myStatisticsCollector.publishCollectedStatistics(new UsageStatisticsPublisher() {
       public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
         myStatistics.put(id, String.valueOf(value));
       }

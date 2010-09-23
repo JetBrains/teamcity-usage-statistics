@@ -31,16 +31,16 @@ import org.jetbrains.annotations.NotNull;
 public class UsageStatisticsReportingScheduler extends BuildServerAdapter implements Runnable {
   @NotNull private static final Logger LOG = Logger.getLogger(UsageStatisticsReportingScheduler.class);
 
-  private static final long CHECKING_PERIOD = Dates.ONE_HOUR;
+  private static final String CHECKING_INTERVAL = "teamcity.usageStatistics.checking.interval";
+  private static final int DEFAULT_CHECKING_INTERVAL = 60; // hour
 
-  @NotNull public static final String USAGE_STATISTICS_REPORTING_PERIOD = "teamcity.usageStatistics.reporting.period";
-  private static final long DEFAULT_USAGE_STATISTICS_REPORTING_PERIOD = Dates.ONE_DAY;
+  @NotNull public static final String REPORTING_PERIOD = "teamcity.usageStatistics.reporting.period";
+  private static final int DEFAULT_REPORTING_PERIOD = 24 * 60; // day
 
   @NotNull private final UsageStatisticsSettingsPersistor mySettingsPersistor;
   @NotNull private final UsageStatisticsCommonDataPersistor myCommonDataPersistor;
   @NotNull private final UsageStatisticsReporter myStatisticsReporter;
   @NotNull private final ScheduledFuture<?> myTask;
-  private final long myReportingPeriod;
 
   public UsageStatisticsReportingScheduler(@NotNull final SBuildServer server,
                                            @NotNull final ScheduledExecutorService executor,
@@ -50,8 +50,8 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
     mySettingsPersistor = settingsPersistor;
     myCommonDataPersistor = commonDataPersistor;
     myStatisticsReporter = statisticsReporter;
-    myTask = executor.scheduleAtFixedRate(this, CHECKING_PERIOD, CHECKING_PERIOD, TimeUnit.MILLISECONDS);
-    myReportingPeriod = TeamCityProperties.getLong(USAGE_STATISTICS_REPORTING_PERIOD, DEFAULT_USAGE_STATISTICS_REPORTING_PERIOD);
+    final long checkingInterval = TeamCityProperties.getInteger(CHECKING_INTERVAL, DEFAULT_CHECKING_INTERVAL) * Dates.ONE_MINUTE;
+    myTask = executor.scheduleAtFixedRate(this, checkingInterval, checkingInterval, TimeUnit.MILLISECONDS);
     server.addListener(this);
   }
 
@@ -64,7 +64,7 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
     try {
       if (mySettingsPersistor.loadSettings().isReportingEnabled()) {
         final Date lastReportingDate = myCommonDataPersistor.getLastReportingDate();
-        if (lastReportingDate == null || Dates.now().after(Dates.after(lastReportingDate, myReportingPeriod))) {
+        if (lastReportingDate == null || Dates.now().after(Dates.after(lastReportingDate, getReportingPeriod()))) {
           if (myStatisticsReporter.reportStatistics()) {
             myCommonDataPersistor.setLastReportingDate(Dates.now());
           }
@@ -74,5 +74,9 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
     catch (final Throwable e) {
       LOG.error("Cannot report usage statistics: ", e);
     }
+  }
+
+  private long getReportingPeriod() {
+    return TeamCityProperties.getInteger(REPORTING_PERIOD, DEFAULT_REPORTING_PERIOD) * Dates.ONE_MINUTE;
   }
 }
