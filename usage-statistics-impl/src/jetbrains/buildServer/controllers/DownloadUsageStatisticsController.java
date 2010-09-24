@@ -1,12 +1,16 @@
 package jetbrains.buildServer.controllers;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.util.Date;
+import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.WebLinks;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCollectorImpl;
@@ -23,15 +27,19 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class DownloadUsageStatisticsController extends BaseController {
   @NotNull private static final Logger LOG = Logger.getLogger(DownloadUsageStatisticsController.class);
-  @NotNull private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HHmmss");
+  @NotNull private static final SimpleDateFormat FILE_NAME_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HHmmss");
+  @NotNull private static final SimpleDateFormat FILE_CONTENT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
+  @NotNull private final WebLinks myWebLinks;
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
 
   public DownloadUsageStatisticsController(@NotNull final SBuildServer server,
+                                           @NotNull final WebLinks webLinks,
                                            @NotNull final AuthorizationInterceptor authInterceptor,
                                            @NotNull final WebControllerManager webControllerManager,
                                            @NotNull final UsageStatisticsCollector statisticsCollector) {
     super(server);
+    myWebLinks = webLinks;
     myStatisticsCollector = statisticsCollector;
 
     UsageStatisticsControllerUtil.register(this, authInterceptor, webControllerManager, "/admin/downloadUsageStatistics.html");
@@ -46,33 +54,18 @@ public class DownloadUsageStatisticsController extends BaseController {
       return null;
     }
 
-    final String baseFileName = String.format("tc-usage-statistics-%s.", DATE_FORMAT.format(myStatisticsCollector.getLastCollectingFinishDate()));
+    final Date collectingFinishDate = myStatisticsCollector.getLastCollectingFinishDate();
+    final String fileName = String.format("tc-usage-statistics-%s.properties", FILE_NAME_DATE_FORMAT.format(collectingFinishDate));
 
-    final boolean archived = "true".equals(request.getParameter("archived"));
-
-    PrintWriter out = null;
+    OutputStream out = null;
     try {
-      final String contentType, extension;
+      out = response.getOutputStream();
 
-      if (archived) {
-        final ZipOutputStream zipOutputStream = new ZipOutputStream(response.getOutputStream());
-        zipOutputStream.putNextEntry(new ZipEntry(baseFileName + "txt"));
-
-        out = new PrintWriter(zipOutputStream);
-        contentType = "application/zip";
-        extension = "zip";
-      }
-      else {
-        out = response.getWriter();
-        contentType = "text/plain";
-        extension = "txt";
-      }
-
-      response.setContentType(contentType);
-      WebUtil.setContentDisposition(response, baseFileName + extension, false);
+      response.setContentType("text/plain");
+      WebUtil.setContentDisposition(response, fileName, false);
       WebUtil.addCacheHeadersForIE(request, response);
 
-      writeStatistics(out);
+      writeStatistics(out, collectingFinishDate);
     }
     catch (final Exception e) {
       response.sendError(500, "Failed to download usage statistics");
@@ -88,14 +81,25 @@ public class DownloadUsageStatisticsController extends BaseController {
     return null;
   }
 
-  private void writeStatistics(@NotNull final PrintWriter out) {
+  private void writeStatistics(@NotNull final OutputStream out, @NotNull final Date collectingFinishDate) throws IOException {
+    final BufferedWriter writer = new BufferedWriter(new PrintWriter(out));
+
+    writer.write("#TeamCity URL: " + myWebLinks.getRootUrl());
+    writer.newLine();
+
+    writer.write("#Usage statistics collecting finish date: " + FILE_CONTENT_DATE_FORMAT.format(collectingFinishDate));
+    writer.newLine();
+
+    writer.flush();
+
+    final Properties properties = new Properties();
+
     myStatisticsCollector.publishCollectedStatistics(new UsageStatisticsPublisher() {
       public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
-        out.write(id);
-        out.write("=");
-        out.write(String.valueOf(value));
-        out.write("\r\n");
+        properties.setProperty(id, String.valueOf(value));
       }
     });
+
+    properties.store(out, null);
   }
 }

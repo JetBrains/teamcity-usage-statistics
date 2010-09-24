@@ -43,13 +43,9 @@
         ><c:otherwise>.</span> <input type="button" value="Collect Now" class="collectNowButton" onclick="BS.UsageStatistics.forceCollectingNow();"><forms:saving id="usageStatisticsCollectNowProgress" style="float: left;"/></c:otherwise
       ></c:choose>
     <c:if test="${statisticsData.statisticsCollected}">
-      <table style="float:right;">
-      <tr>
-        <td><a class="downloadLink" href="<c:url value="/admin/downloadUsageStatistics.html"/>" style="white-space:nowrap;">Download (~${statisticsData.sizeEstimate})</a></td>
-        <td><div class="separator"></div></td>
-        <td><a href="<c:url value="/admin/downloadUsageStatistics.html?archived=true"/>">zipped</a></td>
-      </tr>
-      </table>
+      <div class="downloadLink">
+        <a class="downloadLink" href="<c:url value="/admin/downloadUsageStatistics.html"/>">Download (~${statisticsData.sizeEstimate})</a>
+      </div>
     </c:if>
     <script type="text/javascript">
       <c:choose>
