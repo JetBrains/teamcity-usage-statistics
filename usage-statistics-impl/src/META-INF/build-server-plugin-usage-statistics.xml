@@ -18,7 +18,11 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans default-autowire="constructor">
+  <!-- Web -->
   <bean id="usageStatisticsController" class="jetbrains.buildServer.controllers.UsageStatisticsController"/>
+  <bean id="downloadUsageStatisticsController" class="jetbrains.buildServer.controllers.DownloadUsageStatisticsController"/>
+
+  <!-- Core -->
   <bean id="usageStatisticsManager" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCollectorImpl"/>
   <bean id="usageStatisticsReporter" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsReporterImpl"/>
   <bean id="usageStatisticsReportingScheduler" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsReportingScheduler"/>
@@ -26,6 +30,7 @@
   <bean id="usageStatisticsCommonDataPersistor" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCommonDataPersistor"/>
   <bean id="usageStatisticsPresentationManger" class="jetbrains.buildServer.usageStatistics.presentation.impl.UsageStatisticsPresentationManagerImpl"/>
 
+  <!-- Providers -->
   <bean id="buildDataUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.BuildDataUsageStatisticsProvider"/>
   <bean id="staticServerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.StaticServerUsageStatisticsProvider"/>
   <bean id="ideUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.IDEUsageStatisticsProvider">

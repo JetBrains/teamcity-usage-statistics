@@ -21,9 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.Used;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.auth.AccessDeniedException;
-import jetbrains.buildServer.serverSide.auth.AuthorityHolder;
-import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettings;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
@@ -56,13 +53,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
     myPresentationManager = presentationManager;
     myJspPath = pluginDescriptor.getPluginResourcesPath("usageStatistics.jsp");
 
-    authInterceptor.addPathBasedPermissionsChecker("/admin/usageStatistics.html", new RequestPermissionsChecker() {
-      public void checkPermissions(@NotNull final AuthorityHolder authorityHolder, @NotNull final HttpServletRequest request) throws AccessDeniedException {
-        if (!authorityHolder.isPermissionGrantedGlobally(Permission.VIEW_USAGE_STATISTICS)) {
-          throw new AccessDeniedException(authorityHolder, "You do not have enough permissions to view usage statistics");
-        }
-      }
-    });
+    UsageStatisticsControllerUtil.register(this, authInterceptor, webControllerManager, "/admin/usageStatistics.html");
 
     final SimpleCustomTab tab = new SimpleCustomTab(pagePlaces);
     tab.setPlaceId(PlaceId.ADMIN_SERVER_CONFIGURATION_TAB);
@@ -71,8 +62,6 @@ public class UsageStatisticsController extends BaseFormXmlController {
     tab.setTabTitle("Usage Statistics");
     tab.setPosition(PositionConstraint.last());
     tab.register();
-
-    webControllerManager.registerController("/admin/usageStatistics.html", this);
   }
 
   @Override
