@@ -39,6 +39,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     publishNumberOfAgents(publisher);
     publishNumberOfBuildTypes(publisher);
     publishNumberOfProjects(publisher);
+    publishNumberOfArchivedProjects(publisher);
     publishNumberOfUserGroups(publisher);
     publishNumberOfUsers(publisher);
     publishNumberOfVcsRoots(publisher);
@@ -47,6 +48,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.agentNumber", "Number of agents", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.buildTypeNumber", "Number of build configurations", ourGroupName, null);
+    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.archivedProjectNumber", "Number of archived projects", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.projectNumber", "Number of projects", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.userGroupNumber", "Number of user groups", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.userNumber", "Number of users", ourGroupName, null);
@@ -67,6 +69,11 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   private void publishNumberOfProjects(@NotNull final UsageStatisticsPublisher publisher) {
     final int projectNumber = myServer.getProjectManager().getNumberOfProjects();
     publisher.publishStatistic("jetbrains.buildServer.usageStatistics.projectNumber", projectNumber);
+  }
+
+  private void publishNumberOfArchivedProjects(@NotNull final UsageStatisticsPublisher publisher) {
+    final int archivedProjectNumber = myServer.getProjectManager().getArchivedProjects().size();
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.archivedProjectNumber", archivedProjectNumber);
   }
 
   private void publishNumberOfUserGroups(@NotNull final UsageStatisticsPublisher publisher) {

@@ -35,6 +35,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
     final Map<String, Object> statistics = collectStatisticsByProvider(StaticServerUsageStatisticsProvider.class);
 
     assertEquals(myServer.getProjectManager().getNumberOfProjects(), statistics.get("jetbrains.buildServer.usageStatistics.projectNumber"));
+    assertEquals(myServer.getProjectManager().getArchivedProjects().size(), statistics.get("jetbrains.buildServer.usageStatistics.archivedProjectNumber"));
     assertEquals(myServer.getProjectManager().getNumberOfBuildTypes(), statistics.get("jetbrains.buildServer.usageStatistics.buildTypeNumber"));
 
     final BuildAgentManager buildAgentManager = myServer.getBuildAgentManager();
