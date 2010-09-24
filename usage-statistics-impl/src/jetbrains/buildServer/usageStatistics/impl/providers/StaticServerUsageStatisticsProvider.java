@@ -25,14 +25,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProvider {
   @NotNull private static final String ourGroupName = "Static Server Information";
-  @NotNull private final SBuildServer myServer;
   @NotNull private final UserGroupManager myUserGroupManager;
 
   public StaticServerUsageStatisticsProvider(@NotNull final SBuildServer server,
                                              @NotNull final UserGroupManager userGroupManager,
                                              @NotNull final UsageStatisticsPresentationManager presentationManager) {
     super(server, presentationManager);
-    myServer = server;
     myUserGroupManager = userGroupManager;
     applyPresentations(presentationManager);
   }

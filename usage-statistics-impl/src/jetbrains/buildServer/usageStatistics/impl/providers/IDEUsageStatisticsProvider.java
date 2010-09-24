@@ -7,11 +7,10 @@ import jetbrains.buildServer.serverSide.impl.XmlRpcBasedRemoteServer;
 import jetbrains.buildServer.serverSide.impl.XmlRpcDispatcher;
 import jetbrains.buildServer.serverSide.impl.XmlRpcListener;
 import jetbrains.buildServer.serverSide.impl.XmlRpcSession;
-import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
-import jetbrains.buildServer.usageStatistics.presentation.formatters.TypeBasedFormatter;
+import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
 import jetbrains.buildServer.usageStatistics.util.BasePersistentStateComponent;
 import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.util.filters.Filter;
@@ -25,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Maxim.Manuylov
  *         Date: 21.09.2010
  */
-public class IDEUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider implements UsageStatisticsProvider, XmlRpcListener {
+public class IDEUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider implements XmlRpcListener {
   @NonNls @NotNull private static final String IDE_USAGE_GROUP = "IDE Usage";
 
   @NotNull private final Map<String, Set<IDEUsage>> myIDEUsages = new HashMap<String, Set<IDEUsage>>();
@@ -81,14 +80,9 @@ public class IDEUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvid
     return preparedUserAgent.trim();
   }
 
+  @NotNull
   private UsageStatisticsFormatter createFormatter(@NotNull final Map<String, Set<IDEUsage>> usages) {
-    final int totalUsages = getTotalUsagesCount(usages);
-    return new TypeBasedFormatter<Integer>(Integer.class) {
-      @Override
-      protected String doFormat(@NotNull final Integer count) {
-        return totalUsages == 0 ? String.valueOf(count) : count + " (" + (count * 100 / totalUsages) + "%)";
-      }
-    };
+    return new PercentageFormatter(getTotalUsagesCount(usages));
   }
 
   private int getTotalUsagesCount(@NotNull final Map<String, Set<IDEUsage>> usages) {

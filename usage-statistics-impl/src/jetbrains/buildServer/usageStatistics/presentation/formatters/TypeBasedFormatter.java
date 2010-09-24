@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Maxim.Manuylov
  *         Date: 21.09.2010
  */
-public abstract class TypeBasedFormatter<T> implements UsageStatisticsFormatter {
+abstract class TypeBasedFormatter<T> implements UsageStatisticsFormatter {
   @NotNull private final Class<T> myType;
 
   public TypeBasedFormatter(@NotNull final Class<T> type) {

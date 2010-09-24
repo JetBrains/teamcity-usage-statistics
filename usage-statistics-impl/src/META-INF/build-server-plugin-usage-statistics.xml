@@ -36,5 +36,6 @@
   <bean id="ideUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.IDEUsageStatisticsProvider">
     <constructor-arg index="2" ref="xmlRpcDispatcher"/>
   </bean>
+  <bean id="vcsUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.VCSUsageStatisticsProvider"/>
 </beans>
 
