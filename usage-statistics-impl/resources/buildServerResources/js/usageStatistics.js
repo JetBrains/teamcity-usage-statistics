@@ -72,11 +72,11 @@ BS.UsageStatistics = {
     for (var i = 0; i < count; i++) {
       var group = $('group-' + i);
       if (leftHeight <= rightHeight) {
-        group.style['float'] = 'left';
+        group.addClassName('left');
         leftHeight += heights[i];
       }
       else {
-        group.style['float'] = 'right';
+        group.addClassName('right');
         rightHeight += heights[i];
       }
     }
