@@ -35,6 +35,9 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
   @NotNull private static final String UPDATE_INTERVAL = "teamcity.usageStatistics.update.interval";
   private static final int DEFAULT_UPDATE_INTERVAL = 30; // 30 minutes
 
+  @NotNull private static final String PROVIDER_SLEEP_TIME = "teamcity.usageStatistics.provider.sleep.time";
+  private static final int DEFAULT_PROVIDER_SLEEP_TIME = 1000; // 1 second
+
   @NotNull private final ExtensionHolder myExtensionHolder;
 
   @NotNull private final Object myLock = new Object();
@@ -141,7 +144,7 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
   private void collectStatisticsWithProvider(@NotNull final UsageStatisticsProvider provider, @NotNull final UsageStatisticsPublisher publisher) {
     try {
       provider.accept(publisher);
-      Thread.sleep(Dates.ONE_SECOND);
+      Thread.sleep(getProviderSleepTime());
     }
     catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
@@ -169,6 +172,10 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
 
   private long getUpdateInterval() {
     return TeamCityProperties.getInteger(UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL) * Dates.ONE_MINUTE;
+  }
+
+  private long getProviderSleepTime() {
+    return TeamCityProperties.getLong(PROVIDER_SLEEP_TIME, DEFAULT_PROVIDER_SLEEP_TIME);
   }
 
   private boolean serverIsActive() {
