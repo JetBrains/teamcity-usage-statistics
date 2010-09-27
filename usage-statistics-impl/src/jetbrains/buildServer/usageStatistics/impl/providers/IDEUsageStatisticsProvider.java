@@ -17,6 +17,7 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.*;
+import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.impl.XmlRpcBasedRemoteServer;
@@ -41,7 +42,7 @@ public class IDEUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvid
 
   @NotNull private final Map<String, Set<IDEUsage>> myIDEUsages = new HashMap<String, Set<IDEUsage>>();
 
-  public IDEUsageStatisticsProvider(@NotNull final SBuildServer server,
+  public IDEUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                     @NotNull final ServerPaths serverPaths,
                                     @NotNull final XmlRpcDispatcher xmlRpcDispatcher,
                                     @NotNull final UsageStatisticsPresentationManager presentationManager) {

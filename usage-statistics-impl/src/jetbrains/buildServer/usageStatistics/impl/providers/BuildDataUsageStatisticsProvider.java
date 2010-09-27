@@ -18,12 +18,12 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SQLRunner;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
+import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
-import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TimeFormatter;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +73,7 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
 
   @NotNull private final SQLRunner mySQLRunner;
 
-  public BuildDataUsageStatisticsProvider(@NotNull final SBuildServer server,
+  public BuildDataUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                           @NotNull final UsageStatisticsPresentationManager presentationManager) {
     super(server, presentationManager);
     mySQLRunner = server.getSQLRunner();

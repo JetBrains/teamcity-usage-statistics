@@ -65,6 +65,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
     final Collection<String> registeredProviders = myServer.getExtensionSources(UsageStatisticsProvider.class);
 
     assertTrue(registeredProviders.contains(StaticServerUsageStatisticsProvider.class.getName()));
+    assertTrue(registeredProviders.contains(ServerConfigurationUsageStatisticsProvider.class.getName()));
     assertTrue(registeredProviders.contains(BuildDataUsageStatisticsProvider.class.getName()));
     assertTrue(registeredProviders.contains(IDEUsageStatisticsProvider.class.getName()));
     assertTrue(registeredProviders.contains(VCSUsageStatisticsProvider.class.getName()));

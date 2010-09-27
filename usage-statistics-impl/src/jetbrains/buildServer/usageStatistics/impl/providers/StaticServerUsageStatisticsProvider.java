@@ -18,16 +18,16 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
-import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
+import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 
 public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProvider {
   @NotNull private static final String ourGroupName = "Static Server Information";
   @NotNull private final UserGroupManager myUserGroupManager;
 
-  public StaticServerUsageStatisticsProvider(@NotNull final SBuildServer server,
+  public StaticServerUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                              @NotNull final UserGroupManager userGroupManager,
                                              @NotNull final UsageStatisticsPresentationManager presentationManager) {
     super(server, presentationManager);

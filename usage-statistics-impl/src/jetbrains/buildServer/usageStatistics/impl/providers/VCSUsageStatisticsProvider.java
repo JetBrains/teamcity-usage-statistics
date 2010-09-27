@@ -19,7 +19,7 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 public class VCSUsageStatisticsProvider extends BaseUsageStatisticsProvider {
   @NonNls @NotNull private static final String VCS_USAGE_GROUP = "VCS Usage";
 
-  public VCSUsageStatisticsProvider(@NotNull final SBuildServer server, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+  public VCSUsageStatisticsProvider(@NotNull final BuildServerEx server, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     super(server, presentationManager);
   }
 

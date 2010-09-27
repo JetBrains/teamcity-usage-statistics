@@ -16,9 +16,9 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
+import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.util.Dates;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
   @NonNls @NotNull private static final String DAY = "Day";
   @NonNls @NotNull private static final String WEEK = "Week";
 
-  protected BaseDynamicUsageStatisticsProvider(@NotNull final SBuildServer server,
+  protected BaseDynamicUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                                @NotNull final UsageStatisticsPresentationManager presentationManager) {
     super(server, presentationManager);
     applyPresentations(presentationManager);
