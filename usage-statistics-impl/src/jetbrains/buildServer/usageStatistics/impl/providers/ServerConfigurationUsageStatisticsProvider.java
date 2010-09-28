@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatisticsProvider {
   @NotNull private static final String ourGroupName = "Server Configuration";
+  @NotNull private static final String XMX = "-Xmx";
 
   public ServerConfigurationUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                                     @NotNull final UsageStatisticsPresentationManager presentationManager) {
@@ -34,13 +35,15 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
     publishPlatform(publisher);
     publishDatabaseInfo(publisher);
     publishJavaInfo(publisher);
+    publishXmx(publisher);
   }
 
-  protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
+  private void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverPlatform", "Platform", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverJavaVersion", "Java version", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverJavaRuntimeVersion", "Java runtime version", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverDatabaseType", "Database type", ourGroupName, null);
+    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverXmx", "Xmx", ourGroupName, null);
   }
 
   private void publishPlatform(@NotNull final UsageStatisticsPublisher publisher) {
@@ -58,5 +61,21 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
   private void publishJavaInfo(@NotNull final UsageStatisticsPublisher publisher) {
     publisher.publishStatistic("jetbrains.buildServer.usageStatistics.serverJavaVersion", System.getProperty("java.version"));
     publisher.publishStatistic("jetbrains.buildServer.usageStatistics.serverJavaRuntimeVersion", System.getProperty("java.runtime.version"));
+  }
+
+  private void publishXmx(@NotNull final UsageStatisticsPublisher publisher) {
+    String value = null;
+    final String javaOptions = System.getenv("JAVA_OPTS");
+    if (javaOptions != null) {
+      final int startPos = javaOptions.indexOf(XMX);
+      if (startPos != -1) {
+        int endPos = javaOptions.indexOf(' ', startPos);
+        if (endPos == -1) {
+          endPos = javaOptions.length();
+        }
+        value = javaOptions.substring(startPos + XMX.length(), endPos);
+      }
+    }
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.serverXmx", value);
   }
 }
