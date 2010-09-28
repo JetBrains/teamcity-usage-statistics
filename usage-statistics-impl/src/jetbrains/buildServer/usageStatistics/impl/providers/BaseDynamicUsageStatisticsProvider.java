@@ -16,33 +16,54 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.util.Map;
+import java.util.TreeMap;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.util.Dates;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsProvider {
-  @NonNls @NotNull private static final String HOUR = "Hour";
-  @NonNls @NotNull private static final String DAY = "Day";
-  @NonNls @NotNull private static final String WEEK = "Week";
+  @NotNull private final Map<Long, String> myPeriodDescriptions;
+
+  protected BaseDynamicUsageStatisticsProvider(@NotNull final BuildServerEx server,
+                                               @NotNull final UsageStatisticsPresentationManager presentationManager,
+                                               @NotNull final Map<Long, String> periodDescriptions) {
+    super(server, presentationManager);
+    myPeriodDescriptions = periodDescriptions;
+    applyPresentations(presentationManager);
+  }
 
   protected BaseDynamicUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                                @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, presentationManager);
-    applyPresentations(presentationManager);
+    this(server, presentationManager, createDefaultPeriodDescriptions());
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
     final long now = Dates.now().getTime();
-    accept(publisher, HOUR, now - Dates.ONE_HOUR);
-    accept(publisher, DAY, now - Dates.ONE_DAY);
-    accept(publisher, WEEK, now - Dates.ONE_WEEK);
+    for (final Long period : myPeriodDescriptions.keySet()) {
+      accept(publisher, myPeriodDescriptions.get(period), now - period);
+    }
+  }
+
+  @NotNull
+  protected static TreeMap<Long, String> createDefaultPeriodDescriptions() {
+    return new TreeMap<Long, String>() {{
+      put(Dates.ONE_HOUR, "Hour");
+      put(Dates.ONE_DAY, "Day");
+      put(Dates.ONE_WEEK, "Week");
+    }};
   }
 
   protected long getThresholdDate() {
-    return Dates.now().getTime() - Dates.ONE_WEEK;
+    long maxPeriod = 0;
+    for (final Long period : myPeriodDescriptions.keySet()) {
+      if (period > maxPeriod) {
+        maxPeriod = period;
+      }
+    }
+    return Dates.now().getTime() - maxPeriod;
   }
 
   protected abstract void accept(@NotNull UsageStatisticsPublisher publisher, @NotNull String periodDescription, long startDate);
@@ -50,8 +71,8 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
   protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager, @NotNull final String periodDescription) {}
 
   private void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
-    applyPresentations(presentationManager, HOUR);
-    applyPresentations(presentationManager, DAY);
-    applyPresentations(presentationManager, WEEK);
+    for (final String periodDescription : myPeriodDescriptions.values()) {
+      applyPresentations(presentationManager, periodDescription);
+    }
   }
 }

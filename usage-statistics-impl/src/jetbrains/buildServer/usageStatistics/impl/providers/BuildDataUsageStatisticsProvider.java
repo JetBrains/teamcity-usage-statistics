@@ -115,7 +115,7 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
 
   @NotNull
   private String createIdFromat(@NotNull final String periodDescription) {
-    return "jetbrains.buildServer.usageStatistics.%sForTheLast" + periodDescription;
+    return "jetbrains.buildServer.usageStatistics.%s.ForTheLast" + periodDescription;
   }
 
   @Nullable

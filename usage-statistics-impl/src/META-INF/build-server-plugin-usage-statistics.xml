@@ -38,5 +38,6 @@
   </bean>
   <bean id="vcsUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.VCSUsageStatisticsProvider"/>
   <bean id="serverConfigurationUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.ServerConfigurationUsageStatisticsProvider"/>
+  <bean id="webPagesUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.WebPagesUsageStatisticsProvider"/>
 </beans>
 
