@@ -51,11 +51,11 @@
     <div style="height: 10px;"></div>
     <span style="float: left; padding-top: 1px; padding-bottom: 1px;"
       ><c:if test="${statisticsData.collectingNow}"><img src="<c:url value='/img/buildStates/running_green_transparent.gif'/>" class="icon"/> </c:if
-      >Usage statistics were <c:choose
+      >Usage statistics data was <c:choose
         ><c:when test="${statisticsData.statisticsCollected}">collected <bs:date smart="true" value="${statisticsData.lastCollectingFinishDate}"/></c:when
         ><c:otherwise>not collected yet</c:otherwise
       ></c:choose><c:choose
-        ><c:when test="${statisticsData.collectingNow}"> and are being collected now...</span></c:when
+        ><c:when test="${statisticsData.collectingNow}"> and is being collected now...</span></c:when
         ><c:otherwise>.</span> <input type="button" value="Collect Now" class="collectNowButton" onclick="BS.UsageStatistics.forceCollectingNow();"><forms:saving id="usageStatisticsCollectNowProgress" style="float: left;"/></c:otherwise
       ></c:choose>
     <c:if test="${statisticsData.statisticsCollected}">
@@ -77,7 +77,7 @@
         <c:set var="statistics" value="${statisticsData.statistics}"/>
         <c:choose>
           <c:when test="${empty statistics}">
-            <span>No statistics were published.</span>
+            <span>No statistics data was published.</span>
           </c:when>
           <c:otherwise>
             <c:forEach var="group" items="${statistics}" varStatus="status">
