@@ -36,21 +36,15 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     "select" +
     "  count(h.build_id)," +
     "  sum(h.is_personal)," +
-    "  min(h.remove_from_queue_time - h.queued_time)," +
-    "  max(h.remove_from_queue_time - h.queued_time)," +
     "  avg(h.remove_from_queue_time - h.queued_time)," +
-    "  min(h.build_finish_time_server - h.build_start_time_server)," +
-    "  max(h.build_finish_time_server - h.build_start_time_server)," +
     "  avg(h.build_finish_time_server - h.build_start_time_server) " +
     "from (select * from history union select * from light_history) h " +
-    "where h.build_start_time_server > ?"
+    "where h.build_finish_time_server > ?"
   );
 
   @NotNull private static final GenericQuery<Void> ourBuildTestCountQuery = new GenericQuery<Void>(
     "select" +
-    "  min(t.test_count)," +
-    "  max(t.test_count)," +
-    "  avg(t.test_count) " +
+    "  max(t.test_count) " +
     "from (" +
     "  select" +
     "    h.build_id, " +
@@ -90,12 +84,8 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
         if (rs.next()) {
           publish(publisher, idFormat, "buildCount", rs.getLong(1));
           publish(publisher, idFormat, "personalBuildCount", rs.getLong(2));
-          publish(publisher, idFormat, "minBuildWaitInQueueTime", getNullableLong(rs, 3));
-          publish(publisher, idFormat, "maxBuildWaitInQueueTime", getNullableLong(rs, 4));
-          publish(publisher, idFormat, "avgBuildWaitInQueueTime", getNullableLong(rs, 5));
-          publish(publisher, idFormat, "minBuildDuration", getNullableLong(rs, 6));
-          publish(publisher, idFormat, "maxBuildDuration", getNullableLong(rs, 7));
-          publish(publisher, idFormat, "avgBuildDuration", getNullableLong(rs, 8));
+          publish(publisher, idFormat, "avgBuildWaitInQueueTime", getNullableLong(rs, 3));
+          publish(publisher, idFormat, "avgBuildDuration", getNullableLong(rs, 4));
         }
         return null;
       }
@@ -104,9 +94,7 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     ourBuildTestCountQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
-          publish(publisher, idFormat, "minBuildTestCount", getNullableLong(rs, 1));
-          publish(publisher, idFormat, "maxBuildTestCount", getNullableLong(rs, 2));
-          publish(publisher, idFormat, "avgBuildTestCount", getNullableLong(rs, 3));
+          publish(publisher, idFormat, "maxBuildTestCount", getNullableLong(rs, 1));
         }
         return null;
       }
@@ -120,15 +108,9 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
 
     apply(manager, idFormat, nameFormat, "buildCount", "Build count", BUILD_COUNT_GROUP, null);
     apply(manager, idFormat, nameFormat, "personalBuildCount", "Personal build count", BUILD_COUNT_GROUP, null);
-    apply(manager, idFormat, nameFormat, "minBuildWaitInQueueTime", "Minimal build waiting in queue time", BUILD_WAITING_IN_QUEUE_TIME_GROUP, ourTimeFormatter);
-    apply(manager, idFormat, nameFormat, "maxBuildWaitInQueueTime", "Maximal build waiting in queue time", BUILD_WAITING_IN_QUEUE_TIME_GROUP, ourTimeFormatter);
     apply(manager, idFormat, nameFormat, "avgBuildWaitInQueueTime", "Average build waiting in queue time", BUILD_WAITING_IN_QUEUE_TIME_GROUP, ourTimeFormatter);
-    apply(manager, idFormat, nameFormat, "minBuildDuration", "Minimal build duration", BUILD_DURATION_GROUP, ourTimeFormatter);
-    apply(manager, idFormat, nameFormat, "maxBuildDuration", "Maximal build duration", BUILD_DURATION_GROUP, ourTimeFormatter);
     apply(manager, idFormat, nameFormat, "avgBuildDuration", "Average build duration", BUILD_DURATION_GROUP, ourTimeFormatter);
-    apply(manager, idFormat, nameFormat, "minBuildTestCount", "Minimal test count per build", TEST_COUNT_PER_BUILD_GROUP, null);
-    apply(manager, idFormat, nameFormat, "maxBuildTestCount", "Maximal test count per build", TEST_COUNT_PER_BUILD_GROUP, null);
-    apply(manager, idFormat, nameFormat, "avgBuildTestCount", "Average test count per build", TEST_COUNT_PER_BUILD_GROUP, null);
+    apply(manager, idFormat, nameFormat, "maxBuildTestCount", "Maximum test count per build", TEST_COUNT_PER_BUILD_GROUP, null);
   }
 
   @NotNull
