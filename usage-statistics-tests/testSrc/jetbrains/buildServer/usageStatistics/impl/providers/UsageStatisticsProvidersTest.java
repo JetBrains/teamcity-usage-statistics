@@ -70,6 +70,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
     assertTrue(registeredProviders.contains(IDEUsageStatisticsProvider.class.getName()));
     assertTrue(registeredProviders.contains(VCSUsageStatisticsProvider.class.getName()));
     //assertTrue(registeredProviders.contains(WebPagesUsageStatisticsProvider.class.getName()));
+    assertTrue(registeredProviders.contains(NotificatorUsageStatisticsProvider.class.getName()));
   }
 
   private Map<String, Object> collectStatisticsByProvider(final Class<? extends UsageStatisticsProvider> providerClass) {

@@ -41,16 +41,16 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
 
   @NotNull private final Map<String, Set<ToolUsage>> myToolUsages = new TreeMap<String, Set<ToolUsage>>();
 
-  public BaseToolUsersUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                              @NotNull final ServerPaths serverPaths,
-                                              @NotNull final UsageStatisticsPresentationManager presentationManager) {
+  protected BaseToolUsersUsageStatisticsProvider(@NotNull final BuildServerEx server,
+                                                 @NotNull final ServerPaths serverPaths,
+                                                 @NotNull final UsageStatisticsPresentationManager presentationManager) {
     this(server, serverPaths, presentationManager, createDefaultPeriodDescriptions());
   }
 
-  public BaseToolUsersUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                              @NotNull final ServerPaths serverPaths,
-                                              @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                              @NotNull final Map<Long, String> periodDescriptions) {
+  protected BaseToolUsersUsageStatisticsProvider(@NotNull final BuildServerEx server,
+                                                 @NotNull final ServerPaths serverPaths,
+                                                 @NotNull final UsageStatisticsPresentationManager presentationManager,
+                                                 @NotNull final Map<Long, String> periodDescriptions) {
     super(server, presentationManager, periodDescriptions);
     registerPersistor(server, serverPaths);
   }
