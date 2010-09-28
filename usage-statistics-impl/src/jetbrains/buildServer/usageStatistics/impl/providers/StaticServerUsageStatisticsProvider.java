@@ -19,6 +19,7 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
 import jetbrains.buildServer.serverSide.BuildServerEx;
+import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +39,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
     publishNumberOfAgents(publisher);
     publishNumberOfBuildTypes(publisher);
+    publishNumberOfDependencies(publisher);
     publishNumberOfProjects(publisher);
     publishNumberOfArchivedProjects(publisher);
     publishNumberOfUserGroups(publisher);
@@ -48,6 +50,8 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.agentNumber", "Number of agents", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.buildTypeNumber", "Number of build configurations", ourGroupName, null);
+    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.snapshotDependencyNumber", "Number of snapshot dependencies", ourGroupName, null);
+    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.artifactDependencyNumber", "Number of artifact dependencies", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.archivedProjectNumber", "Number of archived projects", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.projectNumber", "Number of projects", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.userGroupNumber", "Number of user groups", ourGroupName, null);
@@ -64,6 +68,16 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   private void publishNumberOfBuildTypes(@NotNull final UsageStatisticsPublisher publisher) {
     final int buildTypeNumber = myServer.getProjectManager().getNumberOfBuildTypes();
     publisher.publishStatistic("jetbrains.buildServer.usageStatistics.buildTypeNumber", buildTypeNumber);
+  }
+
+  private void publishNumberOfDependencies(@NotNull final UsageStatisticsPublisher publisher) {
+    int snapshotDependencies = 0, artifactDependencies = 0;
+    for (final SBuildType buildType : myServer.getProjectManager().getAllBuildTypes()) {
+      snapshotDependencies += buildType.getDependencies().size();
+      artifactDependencies += buildType.getArtifactDependencies().size();
+    }
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.snapshotDependencyNumber", snapshotDependencies);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.artifactDependencyNumber", artifactDependencies);
   }
 
   private void publishNumberOfProjects(@NotNull final UsageStatisticsPublisher publisher) {
