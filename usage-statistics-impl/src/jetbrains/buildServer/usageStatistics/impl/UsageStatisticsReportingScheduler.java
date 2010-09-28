@@ -34,7 +34,7 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
   private static final String CHECKING_INTERVAL = "teamcity.usageStatistics.checking.interval";
   private static final int DEFAULT_CHECKING_INTERVAL = 60; // hour
 
-  @NotNull public static final String REPORTING_PERIOD = "teamcity.usageStatistics.reporting.period";
+  @NotNull private static final String REPORTING_PERIOD = "teamcity.usageStatistics.reporting.period";
   private static final int DEFAULT_REPORTING_PERIOD = 24 * 60; // day
 
   @NotNull private final UsageStatisticsSettingsPersistor mySettingsPersistor;
@@ -72,7 +72,7 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
       }
     }
     catch (final Throwable e) {
-      LOG.error("Cannot report usage statistics: ", e);
+      LOG.debug("Cannot report usage statistics: ", e);
     }
   }
 

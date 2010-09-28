@@ -52,7 +52,7 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
     try {
       final URLConnection urlConnection = new URL(serverUrl).openConnection();
       if (!(urlConnection instanceof HttpURLConnection)) {
-        LOG.error("Invalid protocol: " + serverUrl);
+        LOG.debug("Invalid protocol: " + serverUrl);
         return false;
       }
 
@@ -72,10 +72,10 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
       return connection.getResponseCode() == HttpURLConnection.HTTP_OK;
     }
     catch (final MalformedURLException e) {
-      LOG.error("Invalid usage statistics server URL: " + serverUrl, e);
+      LOG.debug("Invalid usage statistics server URL: " + serverUrl, e);
     }
     catch (final IOException e) {
-      LOG.error("Failed to connect to usage statistics server: " + serverUrl, e);
+      LOG.debug("Failed to connect to usage statistics server: " + serverUrl, e);
     }
     return false;
   }

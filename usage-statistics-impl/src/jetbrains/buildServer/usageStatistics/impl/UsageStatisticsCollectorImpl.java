@@ -148,7 +148,7 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
     }
     catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
-      LOG.error("Usage statistics provider failed", e);
+      LOG.debug("Usage statistics provider failed", e);
     }
   }
 
