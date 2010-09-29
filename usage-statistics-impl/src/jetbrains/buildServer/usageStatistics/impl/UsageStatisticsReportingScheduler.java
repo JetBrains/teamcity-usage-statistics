@@ -31,10 +31,10 @@ import org.jetbrains.annotations.NotNull;
 public class UsageStatisticsReportingScheduler extends BuildServerAdapter implements Runnable {
   @NotNull private static final Logger LOG = Logger.getLogger(UsageStatisticsReportingScheduler.class);
 
-  private static final String CHECKING_INTERVAL = "teamcity.usageStatistics.checking.interval";
+  private static final String CHECKING_INTERVAL = "teamcity.usageStatistics.checking.interval.minutes";
   private static final int DEFAULT_CHECKING_INTERVAL = 60; // hour
 
-  @NotNull private static final String REPORTING_PERIOD = "teamcity.usageStatistics.reporting.period";
+  @NotNull private static final String REPORTING_PERIOD = "teamcity.usageStatistics.reporting.period.minutes";
   private static final int DEFAULT_REPORTING_PERIOD = 24 * 60; // day
 
   @NotNull private final UsageStatisticsSettingsPersistor mySettingsPersistor;

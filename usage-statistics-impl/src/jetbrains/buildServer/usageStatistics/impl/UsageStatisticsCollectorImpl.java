@@ -32,10 +32,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements UsageStatisticsCollector, Runnable {
   @NotNull private static final Logger LOG = Logger.getLogger(UsageStatisticsCollectorImpl.class);
-  @NotNull private static final String UPDATE_INTERVAL = "teamcity.usageStatistics.update.interval";
+  @NotNull private static final String UPDATE_INTERVAL = "teamcity.usageStatistics.update.interval.minutes";
   private static final int DEFAULT_UPDATE_INTERVAL = 30; // 30 minutes
 
-  @NotNull private static final String PROVIDER_SLEEP_TIME = "teamcity.usageStatistics.provider.sleep.time";
+  @NotNull private static final String PROVIDER_SLEEP_TIME = "teamcity.usageStatistics.provider.sleep.time.milliseconds";
   private static final int DEFAULT_PROVIDER_SLEEP_TIME = 1000; // 1 second
 
   @NotNull private final ExtensionHolder myExtensionHolder;
