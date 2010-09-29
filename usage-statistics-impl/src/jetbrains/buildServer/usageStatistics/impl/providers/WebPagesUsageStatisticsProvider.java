@@ -83,7 +83,6 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   private void processGetRequest(@NotNull final HttpServletRequest request) {
     final SUser user = SessionUser.getUser(request);
     if (user == null) return;
-    if (request.getParameter("__fragmentId") != null) return;
     String path = WebUtil.getPathFromUrl(WebUtil.getPathWithoutContext(request));
     if (!path.toLowerCase().endsWith(".html")) return;
     final String tab = request.getParameter("tab");
