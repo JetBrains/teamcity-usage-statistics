@@ -85,7 +85,7 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     if (user == null) return;
     if (request.getParameter("__fragmentId") != null) return;
     String path = WebUtil.getPathFromUrl(WebUtil.getPathWithoutContext(request));
-    if (path.endsWith(".jsp")) return;
+    if (!path.toLowerCase().endsWith(".html")) return;
     final String tab = request.getParameter("tab");
     if (tab != null) {
       path += "?tab=" + tab;
