@@ -50,4 +50,9 @@ public class TriggerUsageStatisticsProvider extends BaseExtensionUsageStatistics
   protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
     return extensionTypeDisplayName + " build configuration count";
   }
+
+  @Override
+  protected int getTotalCount() {
+    return myServer.getProjectManager().getNumberOfBuildTypes();
+  }
 }

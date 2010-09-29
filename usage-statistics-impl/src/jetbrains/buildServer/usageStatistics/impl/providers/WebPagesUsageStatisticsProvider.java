@@ -75,6 +75,11 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     return "Web Pages Usage For The Last " + periodDescription;
   }
 
+  @Override
+  protected int getTotalCount() {
+    return myServer.getUserModel().getNumberOfRegisteredUsers();
+  }
+
   private void processGetRequest(@NotNull final HttpServletRequest request) {
     final SUser user = SessionUser.getUser(request);
     if (user == null) return;

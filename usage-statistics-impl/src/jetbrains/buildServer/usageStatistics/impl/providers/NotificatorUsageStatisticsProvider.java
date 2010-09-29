@@ -69,4 +69,9 @@ public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatis
   protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
     return extensionTypeDisplayName + " user count";
   }
+
+  @Override
+  protected int getTotalCount() {
+    return myServer.getUserModel().getNumberOfRegisteredUsers();
+  }
 }

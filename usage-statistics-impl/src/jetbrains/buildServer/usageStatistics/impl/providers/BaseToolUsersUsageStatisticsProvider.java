@@ -70,11 +70,13 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
   @NotNull
   protected abstract String getGroupName(@NotNull String periodDescription);
 
+  protected abstract int getTotalCount();
+
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long startDate) {
     removeObsoleteUsages();
     final Map<String, Set<ToolUsage>> usages = filterUsages(startDate);
-    final UsageStatisticsFormatter formatter = createFormatter(usages);
+    final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalCount());
     final List<String> toolIds = new ArrayList<String>(usages.keySet());
     Collections.sort(toolIds, STRINGS_COMPARATOR);
     for (final String toolId : toolIds) {
@@ -108,19 +110,6 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
         return usage.getTimestamp() > threshold;
       }
     };
-  }
-
-  @NotNull
-  private UsageStatisticsFormatter createFormatter(@NotNull final Map<String, Set<ToolUsage>> usages) {
-    return new PercentageFormatter(getTotalUsagesCount(usages));
-  }
-
-  private int getTotalUsagesCount(@NotNull final Map<String, Set<ToolUsage>> usages) {
-    int totalUsages = 0;
-    for (final Set<ToolUsage> toolUsages : usages.values()) {
-      totalUsages += toolUsages.size();
-    }
-    return totalUsages;
   }
 
   @NotNull

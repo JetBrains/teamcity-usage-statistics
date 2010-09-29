@@ -50,4 +50,9 @@ public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsP
   protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
     return extensionTypeDisplayName + " build configuration count";
   }
+
+  @Override
+  protected int getTotalCount() {
+    return myServer.getProjectManager().getNumberOfBuildTypes();
+  }
 }
