@@ -18,6 +18,7 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
+import jetbrains.buildServer.serverSide.BuildAgentManagerEx;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -61,7 +62,8 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
 
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher) {
     final BuildAgentManager buildAgentManager = myServer.getBuildAgentManager();
-    final int agentNumber = buildAgentManager.getRegisteredAgents(true).size() + buildAgentManager.getUnregisteredAgents().size();
+    final int agentNumber = buildAgentManager.getRegisteredAgents(true).size()
+                          + ((BuildAgentManagerEx)buildAgentManager).getUnregisteredAgents(true).size();
     publisher.publishStatistic("jetbrains.buildServer.usageStatistics.agentNumber", agentNumber);
   }
 
