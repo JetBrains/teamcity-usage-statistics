@@ -44,7 +44,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverJavaVersion", "Java version", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverJavaRuntimeVersion", "Java runtime version", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverDatabaseType", "Database type", ourGroupName, null);
-    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverMaxMemory", "Max used memory", ourGroupName, new TypeBasedFormatter<Long>(Long.class) {
+    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverMaxMemory", "Maximum used memory", ourGroupName, new TypeBasedFormatter<Long>(Long.class) {
       @Override
       protected String doFormat(@NotNull final Long statisticValue) {
         return String.format("%dMb", statisticValue);
