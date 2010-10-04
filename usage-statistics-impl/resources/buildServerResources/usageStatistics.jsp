@@ -34,6 +34,7 @@
   </bs:refreshable>
 </div>
 <c:if test="${empty param['updateMessages']}">
+  <%--
   <div>
     <div>Please allow us know a bit more about your TeamCity usage. We are not watching you and not collecting any user/project sensitive data, just numbers. Help us improve the tool!</div>
     <div>
@@ -46,9 +47,10 @@
       <forms:saving id="usageStatisticsReportingStatusUpdatingProgress" style="float:left;"/>
       &nbsp;
     </div>
-  </div>
-  <bs:refreshable containerId="usageStatisticsStatus" pageUrl="${pageUrl}">
     <div style="height: 10px;"></div>
+  </div>
+  --%>
+  <bs:refreshable containerId="usageStatisticsStatus" pageUrl="${pageUrl}">
     <span style="float: left; padding-top: 1px; padding-bottom: 1px;"
       ><c:if test="${statisticsData.collectingNow}"><img src="<c:url value='/img/buildStates/running_green_transparent.gif'/>" class="icon"/> </c:if
       >Usage statistics data was <c:choose
