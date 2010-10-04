@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatisticsProvider {
   @NotNull private static final String ourGroupName = "Server Configuration";
-  @NotNull private static final String XMX = "-Xmx";
   private static final long MEGABYTE = 1024 * 1024;
 
   public ServerConfigurationUsageStatisticsProvider(@NotNull final BuildServerEx server,
