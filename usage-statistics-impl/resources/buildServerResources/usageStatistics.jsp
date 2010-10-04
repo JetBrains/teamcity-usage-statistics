@@ -84,15 +84,17 @@
           <c:otherwise>
             <c:forEach var="group" items="${statistics}" varStatus="status">
               <div class="statisticGroup" id="group-${status.index}">
-                <l:settingsBlock title="${group.key}" style="">
-                  <table style="width: 100%" cellspacing="0">
-                    <c:forEach var="statistic" items="${group.value}">
-                      <tr class="highlightRow statisticRow">
-                        <td><c:out value="${statistic.displayName}"/></td>
-                        <td style="width: 13%"><c:out value="${statistic.formattedValue}"/></td>
-                      </tr>
-                    </c:forEach>
-                  </table>
+                <l:settingsBlock title="${group.key}">
+                  <div class="statisticGroupInner">
+                    <table style="width: 99%;" cellspacing="0">
+                      <c:forEach var="statistic" items="${group.value}">
+                        <tr class="highlightRow statisticRow">
+                          <td><c:out value="${statistic.displayName}"/></td>
+                          <td style="width: 13%"><c:out value="${statistic.formattedValue}"/></td>
+                        </tr>
+                      </c:forEach>
+                    </table>
+                  </div>
                 </l:settingsBlock>
               </div>
             </c:forEach>
