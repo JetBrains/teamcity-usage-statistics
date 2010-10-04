@@ -32,8 +32,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements UsageStatisticsCollector, Runnable {
   @NotNull private static final Logger LOG = Logger.getLogger(UsageStatisticsCollectorImpl.class);
-  @NotNull private static final String UPDATE_INTERVAL = "teamcity.usageStatistics.update.interval.minutes";
-  private static final int DEFAULT_UPDATE_INTERVAL = 30; // 30 minutes
 
   @NotNull private static final String PROVIDER_SLEEP_TIME = "teamcity.usageStatistics.provider.sleep.time.milliseconds";
   private static final int DEFAULT_PROVIDER_SLEEP_TIME = 1000; // 1 second
@@ -78,10 +76,12 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
 
   @NotNull
   public Date getLastCollectingFinishDate() {
-    if (myLastCollectingFinishDate == null) {
-      throw createIllegalStateException();
+    synchronized (myLock) {
+      if (myLastCollectingFinishDate == null) {
+        throw createIllegalStateException();
+      }
+      return myLastCollectingFinishDate;
     }
-    return myLastCollectingFinishDate;
   }
 
   public boolean isStatisticsCollected() {
@@ -91,10 +91,22 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
   }
 
   public void forceAsynchronousCollectingNow() {
-    if (isCollectingNow()) return;
     synchronized (myLock) {
+      if (myIsCollectingNow) return;
       myCollectingWasForced = true;
       myLock.notifyAll();
+    }
+  }
+
+  public void collectStatisticsAndWait() {
+    synchronized (myLock) {
+      final Date oldLastCollectingFinishDate = myLastCollectingFinishDate;
+      forceAsynchronousCollectingNow();
+      while (myLastCollectingFinishDate == oldLastCollectingFinishDate) {
+        try {
+          myLock.wait();
+        } catch (final InterruptedException ignore) {}
+      }
     }
   }
 
@@ -107,7 +119,7 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
   }
 
   public void run() {
-    waitForUpdateInterval();
+    waitForEvent();
 
     while (serverIsActive()) {
       synchronized (myLock) {
@@ -122,9 +134,10 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
         myCollectedStatistics = newStatistics;
         myLastCollectingFinishDate = Dates.now();
         myIsCollectingNow = false;
+        myLock.notifyAll();
       }
 
-      waitForUpdateInterval();
+      waitForEvent();
     }
   }
 
@@ -152,26 +165,16 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
     }
   }
 
-  private void waitForUpdateInterval() {
-    final long wakeUpTimestamp = now() + getUpdateInterval();
+  private void waitForEvent() {
     while (true) {
-      final long waitingTime = wakeUpTimestamp - now();
       try {
         synchronized (myLock) {
-          if (!myServerIsActive || myCollectingWasForced || waitingTime <= 0) break;
-          myLock.wait(waitingTime);
+          if (!myServerIsActive || myCollectingWasForced) break;
+          myLock.wait();
         }
       }
       catch (final InterruptedException ignore) {}
     }
-  }
-
-  private long now() {
-    return Dates.now().getTime();
-  }
-
-  private long getUpdateInterval() {
-    return TeamCityProperties.getInteger(UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL) * Dates.ONE_MINUTE;
   }
 
   private long getProviderSleepTime() {

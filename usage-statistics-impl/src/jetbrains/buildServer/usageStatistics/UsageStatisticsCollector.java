@@ -29,5 +29,7 @@ public interface UsageStatisticsCollector {
 
   void forceAsynchronousCollectingNow();
 
+  void collectStatisticsAndWait();
+
   void publishCollectedStatistics(@NotNull UsageStatisticsPublisher publisher);
 }

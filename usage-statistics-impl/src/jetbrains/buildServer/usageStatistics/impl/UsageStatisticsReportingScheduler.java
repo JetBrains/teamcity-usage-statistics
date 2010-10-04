@@ -31,9 +31,6 @@ import org.jetbrains.annotations.NotNull;
 public class UsageStatisticsReportingScheduler extends BuildServerAdapter implements Runnable {
   @NotNull private static final Logger LOG = Logger.getLogger(UsageStatisticsReportingScheduler.class);
 
-  private static final String CHECKING_INTERVAL = "teamcity.usageStatistics.checking.interval.minutes";
-  private static final int DEFAULT_CHECKING_INTERVAL = 60; // hour
-
   @NotNull private static final String REPORTING_PERIOD = "teamcity.usageStatistics.reporting.period.minutes";
   private static final int DEFAULT_REPORTING_PERIOD = 24 * 60; // day
 
@@ -50,7 +47,7 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
     mySettingsPersistor = settingsPersistor;
     myCommonDataPersistor = commonDataPersistor;
     myStatisticsReporter = statisticsReporter;
-    final long checkingInterval = TeamCityProperties.getInteger(CHECKING_INTERVAL, DEFAULT_CHECKING_INTERVAL) * Dates.ONE_MINUTE;
+    final long checkingInterval = Math.max(Dates.ONE_MINUTE, getReportingPeriod() / 100);
     myTask = executor.scheduleAtFixedRate(this, checkingInterval, checkingInterval, TimeUnit.MILLISECONDS);
     server.addListener(this);
   }
@@ -67,6 +64,7 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
         if (lastReportingDate == null || Dates.now().after(Dates.after(lastReportingDate, getReportingPeriod()))) {
           if (myStatisticsReporter.reportStatistics()) {
             myCommonDataPersistor.setLastReportingDate(Dates.now());
+            LOG.debug("Usage statistics was successfully reported to JetBrains.");
           }
         }
       }
@@ -77,6 +75,6 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
   }
 
   private long getReportingPeriod() {
-    return TeamCityProperties.getInteger(REPORTING_PERIOD, DEFAULT_REPORTING_PERIOD) * Dates.ONE_MINUTE;
+    return TeamCityProperties.getLong(REPORTING_PERIOD, DEFAULT_REPORTING_PERIOD) * Dates.ONE_MINUTE;
   }
 }

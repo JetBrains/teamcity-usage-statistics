@@ -43,7 +43,7 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   }
 
   public boolean reportStatistics() {
-    if (!myStatisticsCollector.isStatisticsCollected()) return false;
+    myStatisticsCollector.collectStatisticsAndWait();
     return doReportStatistics(createDataString(collectStatistics()));
   }
 
