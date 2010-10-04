@@ -19,11 +19,13 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
+import jetbrains.buildServer.usageStatistics.presentation.formatters.TypeBasedFormatter;
 import org.jetbrains.annotations.NotNull;
 
 public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatisticsProvider {
   @NotNull private static final String ourGroupName = "Server Configuration";
   @NotNull private static final String XMX = "-Xmx";
+  private static final long MEGABYTE = 1024 * 1024;
 
   public ServerConfigurationUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                                     @NotNull final UsageStatisticsPresentationManager presentationManager) {
@@ -43,7 +45,12 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverJavaVersion", "Java version", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverJavaRuntimeVersion", "Java runtime version", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverDatabaseType", "Database type", ourGroupName, null);
-    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverXmx", "Xmx", ourGroupName, null);
+    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverMaxMemory", "Max used memory", ourGroupName, new TypeBasedFormatter<Long>(Long.class) {
+      @Override
+      protected String doFormat(@NotNull final Long statisticValue) {
+        return String.format("%dMb", statisticValue);
+      }
+    });
   }
 
   private void publishPlatform(@NotNull final UsageStatisticsPublisher publisher) {
@@ -64,18 +71,6 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
   }
 
   private void publishXmx(@NotNull final UsageStatisticsPublisher publisher) {
-    String value = null;
-    final String javaOptions = System.getenv("JAVA_OPTS");
-    if (javaOptions != null) {
-      final int startPos = javaOptions.indexOf(XMX);
-      if (startPos != -1) {
-        int endPos = javaOptions.indexOf(' ', startPos);
-        if (endPos == -1) {
-          endPos = javaOptions.length();
-        }
-        value = javaOptions.substring(startPos + XMX.length(), endPos);
-      }
-    }
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.serverXmx", value);
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.serverMaxMemory", Runtime.getRuntime().maxMemory() / MEGABYTE);
   }
 }

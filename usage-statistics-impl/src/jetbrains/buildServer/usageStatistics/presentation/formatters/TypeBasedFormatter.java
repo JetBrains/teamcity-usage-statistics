@@ -21,7 +21,7 @@ import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-abstract class TypeBasedFormatter<T> implements UsageStatisticsFormatter {
+public abstract class TypeBasedFormatter<T> implements UsageStatisticsFormatter {
   @NotNull private final Class<T> myType;
 
   public TypeBasedFormatter(@NotNull final Class<T> type) {
