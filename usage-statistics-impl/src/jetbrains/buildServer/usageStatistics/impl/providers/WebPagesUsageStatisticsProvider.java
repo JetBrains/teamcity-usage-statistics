@@ -45,6 +45,22 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     registerPageExtension(pagePlaces, pluginDescriptor);
   }
 
+  public void processGetRequest(@NotNull final HttpServletRequest request) {
+    final SUser user = SessionUser.getUser(request);
+    if (user == null) return;
+    final Object pageUrl = request.getAttribute("pageUrl");
+    if (pageUrl != null && !(pageUrl instanceof String)) return;
+    String path = WebUtil.getPathFromUrl(pageUrl == null
+                                         ? WebUtil.getPathWithoutContext(request)
+                                         : WebUtil.getPathWithoutContext(request, (String)pageUrl));
+    if (!path.toLowerCase().endsWith(".html")) return;
+    final String tab = request.getParameter("tab");
+    if (tab != null) {
+      path += "?tab=" + tab;
+    }
+    addUsage(path, user.getId());
+  }
+
   @NotNull
   @Override
   protected String getId() {
@@ -80,20 +96,8 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     return myServer.getUserModel().getNumberOfRegisteredUsers();
   }
 
-  private void processGetRequest(@NotNull final HttpServletRequest request) {
-    final SUser user = SessionUser.getUser(request);
-    if (user == null) return;
-    String path = WebUtil.getPathFromUrl(WebUtil.getPathWithoutContext(request));
-    if (!path.toLowerCase().endsWith(".html")) return;
-    final String tab = request.getParameter("tab");
-    if (tab != null) {
-      path += "?tab=" + tab;
-    }
-    addUsage(path, user.getId());
-  }
-
   private void registerPageExtension(@NotNull final PagePlaces pagePlaces, final PluginDescriptor pluginDescriptor) {
-    final String emptyPagePath = pluginDescriptor.getPluginResourcesPath("empty.jsp");
+    final String emptyPagePath = pluginDescriptor.getPluginResourcesPath("webPagesUsageStatistic.jsp");
     new SimplePageExtension(pagePlaces, PlaceId.ALL_PAGES_FOOTER, "webPagesUsageStatisticsProvider", emptyPagePath) {
       {
         register();
@@ -102,9 +106,7 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
       @Override
       public void fillModel(@NotNull final Map<String, Object> model, @NotNull final HttpServletRequest request) {
         super.fillModel(model, request);
-        if (isGet(request)) {
-          WebPagesUsageStatisticsProvider.this.processGetRequest(request);
-        }
+        model.put("webPagesUsageStatisticsProvider", WebPagesUsageStatisticsProvider.this);
       }
     };
   }
