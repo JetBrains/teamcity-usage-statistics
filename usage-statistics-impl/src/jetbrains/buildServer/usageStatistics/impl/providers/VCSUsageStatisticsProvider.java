@@ -44,9 +44,4 @@ public class VCSUsageStatisticsProvider extends BaseExtensionUsageStatisticsProv
   protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
     return extensionTypeDisplayName + " root count";
   }
-
-  @Override
-  protected int getTotalCount() {
-    return myServer.getVcsManager().getAllRegisteredVcsRoots().size();
-  }
 }

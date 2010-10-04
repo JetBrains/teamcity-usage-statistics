@@ -78,11 +78,6 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
     return "IDE Usage";
   }
 
-  @Override
-  protected int getTotalCount() {
-    return myServer.getUserModel().getNumberOfRegisteredUsers();
-  }
-
   @NotNull
   private static String prepareUserAgent(@NotNull final String userAgent) {
     int endPos = userAgent.indexOf('/');

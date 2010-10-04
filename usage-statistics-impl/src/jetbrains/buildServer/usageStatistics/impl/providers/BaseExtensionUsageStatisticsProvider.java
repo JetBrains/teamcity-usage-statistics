@@ -38,7 +38,7 @@ abstract class BaseExtensionUsageStatisticsProvider extends BaseUsageStatisticsP
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
     final Map<ExtensionType, Integer> extensionUsages = doCollectUsages();
-    final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalCount());
+    final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalUsagesCount(extensionUsages));
     for (final Map.Entry<ExtensionType, Integer> entry : extensionUsages.entrySet()) {
       final ExtensionType type = entry.getKey();
       final String statisticId = "jetbrains.buildServer.usageStatistics." + getId() + "[" + type.getExtensionTypeId() + "]";
@@ -55,7 +55,13 @@ abstract class BaseExtensionUsageStatisticsProvider extends BaseUsageStatisticsP
   @NotNull
   protected abstract String prepareDisplayName(@NotNull String extensionTypeDisplayName);
 
-  protected abstract int getTotalCount();
+  private int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
+    int totalCount = 0;
+    for (final Integer count : extensionUsages.values()) {
+      totalCount += count;
+    }
+    return totalCount;
+  }
 
   @NotNull
   private Map<ExtensionType, Integer> doCollectUsages() {

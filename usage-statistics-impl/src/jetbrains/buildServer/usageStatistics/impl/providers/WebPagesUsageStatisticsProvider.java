@@ -91,14 +91,9 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     return "Web Pages Usage For The Last " + periodDescription;
   }
 
-  @Override
-  protected int getTotalCount() {
-    return myServer.getUserModel().getNumberOfRegisteredUsers();
-  }
-
   private void registerPageExtension(@NotNull final PagePlaces pagePlaces, final PluginDescriptor pluginDescriptor) {
-    final String emptyPagePath = pluginDescriptor.getPluginResourcesPath("webPagesUsageStatistic.jsp");
-    new SimplePageExtension(pagePlaces, PlaceId.ALL_PAGES_FOOTER, "webPagesUsageStatisticsProvider", emptyPagePath) {
+    final String pagePath = pluginDescriptor.getPluginResourcesPath("webPagesUsageStatistic.jsp");
+    new SimplePageExtension(pagePlaces, PlaceId.ALL_PAGES_FOOTER, "webPagesUsageStatisticsProvider", pagePath) {
       {
         register();
       }
