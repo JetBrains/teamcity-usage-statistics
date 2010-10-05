@@ -40,6 +40,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
     publishNumberOfAgents(publisher);
     publishNumberOfBuildTypes(publisher);
+    publishNumberOfActiveBuildTypes(publisher);
     publishNumberOfDependencies(publisher);
     publishNumberOfProjects(publisher);
     publishNumberOfArchivedProjects(publisher);
@@ -51,6 +52,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.agentNumber", "Number of agents", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.buildTypeNumber", "Number of build configurations", ourGroupName, null);
+    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.activeBuildTypeNumber", "Number of active build configurations", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.snapshotDependencyNumber", "Number of snapshot dependencies", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.artifactDependencyNumber", "Number of artifact dependencies", ourGroupName, null);
     presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.archivedProjectNumber", "Number of archived projects", ourGroupName, null);
@@ -72,9 +74,14 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     publisher.publishStatistic("jetbrains.buildServer.usageStatistics.buildTypeNumber", buildTypeNumber);
   }
 
+  private void publishNumberOfActiveBuildTypes(@NotNull final UsageStatisticsPublisher publisher) {
+    final int activeBuildTypeNumber = myServer.getProjectManager().getActiveBuildTypes().size();
+    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.activeBuildTypeNumber", activeBuildTypeNumber);
+  }
+
   private void publishNumberOfDependencies(@NotNull final UsageStatisticsPublisher publisher) {
     int snapshotDependencies = 0, artifactDependencies = 0;
-    for (final SBuildType buildType : myServer.getProjectManager().getAllBuildTypes()) {
+    for (final SBuildType buildType : myServer.getProjectManager().getActiveBuildTypes()) {
       snapshotDependencies += buildType.getDependencies().size();
       artifactDependencies += buildType.getArtifactDependencies().size();
     }

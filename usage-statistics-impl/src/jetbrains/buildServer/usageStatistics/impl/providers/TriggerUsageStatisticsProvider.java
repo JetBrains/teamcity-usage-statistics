@@ -37,7 +37,7 @@ public class TriggerUsageStatisticsProvider extends BaseExtensionUsageStatistics
 
   @Override
   protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
-    for (final SBuildType buildType : myServer.getProjectManager().getAllBuildTypes()) {
+    for (final SBuildType buildType : myServer.getProjectManager().getActiveBuildTypes()) {
       for (final BuildTriggerDescriptor triggerDescriptor : buildType.getBuildTriggersCollection()) {
         final BuildTriggerService triggerService = triggerDescriptor.getBuildTriggerService();
         callback.addUsage(triggerService.getName(), triggerService.getDisplayName());
