@@ -40,11 +40,11 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
   }
 
   private void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
-    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverPlatform", "Platform", ourGroupName, null);
-    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverJavaVersion", "Java version", ourGroupName, null);
-    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverJavaRuntimeVersion", "Java runtime version", ourGroupName, null);
-    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverDatabaseType", "Database type", ourGroupName, null);
-    presentationManager.applyPresentation("jetbrains.buildServer.usageStatistics.serverMaxMemory", "Maximum used memory", ourGroupName, new TypeBasedFormatter<Long>(Long.class) {
+    presentationManager.applyPresentation("jb.serverPlatform", "Platform", ourGroupName, null);
+    presentationManager.applyPresentation("jb.serverJavaVersion", "Java version", ourGroupName, null);
+    presentationManager.applyPresentation("jb.serverJavaRuntimeVersion", "Java runtime version", ourGroupName, null);
+    presentationManager.applyPresentation("jb.serverDatabaseType", "Database type", ourGroupName, null);
+    presentationManager.applyPresentation("jb.serverMaxMemory", "Maximum used memory", ourGroupName, new TypeBasedFormatter<Long>(Long.class) {
       @Override
       protected String doFormat(@NotNull final Long statisticValue) {
         return String.format("%dMb", statisticValue);
@@ -57,19 +57,19 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
     sb.append(System.getProperty("os.name")).append(" ");
     sb.append(System.getProperty("os.version")).append(" ");
     sb.append(System.getProperty("os.arch"));
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.serverPlatform", sb.toString());
+    publisher.publishStatistic("jb.serverPlatform", sb.toString());
   }
 
   private void publishDatabaseInfo(@NotNull final UsageStatisticsPublisher publisher) {
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.serverDatabaseType", myServer.getSQLRunner().getDatabaseType().humanReadableName);
+    publisher.publishStatistic("jb.serverDatabaseType", myServer.getSQLRunner().getDatabaseType().humanReadableName);
   }
 
   private void publishJavaInfo(@NotNull final UsageStatisticsPublisher publisher) {
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.serverJavaVersion", System.getProperty("java.version"));
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.serverJavaRuntimeVersion", System.getProperty("java.runtime.version"));
+    publisher.publishStatistic("jb.serverJavaVersion", System.getProperty("java.version"));
+    publisher.publishStatistic("jb.serverJavaRuntimeVersion", System.getProperty("java.runtime.version"));
   }
 
   private void publishXmx(@NotNull final UsageStatisticsPublisher publisher) {
-    publisher.publishStatistic("jetbrains.buildServer.usageStatistics.serverMaxMemory", Runtime.getRuntime().maxMemory() / MEGABYTE);
+    publisher.publishStatistic("jb.serverMaxMemory", Runtime.getRuntime().maxMemory() / MEGABYTE);
   }
 }

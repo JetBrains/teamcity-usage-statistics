@@ -59,6 +59,9 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
   protected abstract String getId();
 
   @NotNull
+  protected abstract String getExternalId();
+
+  @NotNull
   protected abstract String getToolName();
 
   @NotNull
@@ -78,7 +81,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     final List<String> toolIds = new ArrayList<String>(usages.keySet());
     Collections.sort(toolIds, STRINGS_COMPARATOR);
     for (final String toolId : toolIds) {
-      final String statisticId = "jetbrains.buildServer.usageStatistics." + getId() + "[" + toolId.replace(' ', '.') + "].ForTheLast" + periodDescription;
+      final String statisticId = "jb." + getId() + "." + periodDescription.toLowerCase() + "[" + toolId.replace(' ', '.') + "]";
       myPresentationManager.applyPresentation(statisticId, prepareDisplayName(toolId, periodDescription), getGroupName(periodDescription), formatter);
       publisher.publishStatistic(statisticId, usages.get(toolId).size());
     }
@@ -194,7 +197,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
       @NotNull
       @Override
       protected String getId() {
-        return BaseToolUsersUsageStatisticsProvider.this.getId();
+        return BaseToolUsersUsageStatisticsProvider.this.getExternalId();
       }
 
       @Override

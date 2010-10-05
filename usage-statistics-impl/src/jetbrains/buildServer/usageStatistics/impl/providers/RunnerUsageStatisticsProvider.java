@@ -32,7 +32,7 @@ public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsP
   @NotNull
   @Override
   protected String getId() {
-    return "runnerUsage";
+    return "runner";
   }
 
   @Override

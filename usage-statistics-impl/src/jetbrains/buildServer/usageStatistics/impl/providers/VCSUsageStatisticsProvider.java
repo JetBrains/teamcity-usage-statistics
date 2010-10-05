@@ -29,7 +29,7 @@ public class VCSUsageStatisticsProvider extends BaseExtensionUsageStatisticsProv
   @NotNull
   @Override
   protected String getId() {
-    return "vcsUsage";
+    return "vcs";
   }
 
   @Override

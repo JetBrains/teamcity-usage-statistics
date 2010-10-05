@@ -51,6 +51,12 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
   @NotNull
   @Override
   protected String getId() {
+    return "ide";
+  }
+
+  @NotNull
+  @Override
+  protected String getExternalId() {
     return "ideUsage";
   }
 

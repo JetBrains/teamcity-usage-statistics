@@ -44,7 +44,7 @@ public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatis
   @NotNull
   @Override
   protected String getId() {
-    return "notificatorUsage";
+    return "notificator";
   }
 
   @Override

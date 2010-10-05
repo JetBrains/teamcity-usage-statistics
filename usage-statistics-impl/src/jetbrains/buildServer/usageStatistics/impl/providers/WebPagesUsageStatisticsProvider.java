@@ -64,6 +64,12 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   @NotNull
   @Override
   protected String getId() {
+    return "web";
+  }
+
+  @NotNull
+  @Override
+  protected String getExternalId() {
     return "webPagesUsage";
   }
 

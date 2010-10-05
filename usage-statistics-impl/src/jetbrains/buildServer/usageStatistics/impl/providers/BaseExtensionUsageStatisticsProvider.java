@@ -41,7 +41,7 @@ abstract class BaseExtensionUsageStatisticsProvider extends BaseUsageStatisticsP
     final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalUsagesCount(extensionUsages));
     for (final Map.Entry<ExtensionType, Integer> entry : extensionUsages.entrySet()) {
       final ExtensionType type = entry.getKey();
-      final String statisticId = "jetbrains.buildServer.usageStatistics." + getId() + "[" + type.getExtensionTypeId() + "]";
+      final String statisticId = "jb." + getId() + "[" + type.getExtensionTypeId() + "]";
       myPresentationManager.applyPresentation(statisticId, prepareDisplayName(type.getExtensionTypeDisplayName()), myGroupName, formatter);
       publisher.publishStatistic(statisticId, entry.getValue());
     }

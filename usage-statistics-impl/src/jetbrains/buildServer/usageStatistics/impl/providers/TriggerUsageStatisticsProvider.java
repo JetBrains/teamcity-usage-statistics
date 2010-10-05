@@ -32,7 +32,7 @@ public class TriggerUsageStatisticsProvider extends BaseExtensionUsageStatistics
   @NotNull
   @Override
   protected String getId() {
-    return "triggerUsage";
+    return "trigger";
   }
 
   @Override
