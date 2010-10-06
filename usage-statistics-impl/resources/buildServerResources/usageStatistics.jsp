@@ -54,7 +54,7 @@
     <span style="float: left; padding-top: 1px; padding-bottom: 1px;"
       ><c:if test="${statisticsData.collectingNow}"><img src="<c:url value='/img/buildStates/running_green_transparent.gif'/>" class="icon"/> </c:if
       >Usage statistics data was <c:choose
-        ><c:when test="${statisticsData.statisticsCollected}">collected <bs:date smart="true" value="${statisticsData.lastCollectingFinishDate}"/></c:when
+        ><c:when test="${statisticsData.statisticsCollected}">collected <bs:date smart="true" no_smart_title="true" value="${statisticsData.lastCollectingFinishDate}"/></c:when
         ><c:otherwise>not collected yet</c:otherwise
       ></c:choose><c:choose
         ><c:when test="${statisticsData.collectingNow}"> and is being collected now...</span></c:when
