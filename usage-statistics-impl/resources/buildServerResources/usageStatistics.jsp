@@ -74,30 +74,24 @@
     <c:if test="${statisticsData.statisticsCollected}">
       <br/><br/>
       <div>
-        <c:set var="statistics" value="${statisticsData.statistics}"/>
+        <c:set var="groups" value="${statisticsData.statisticGroups}"/>
         <c:choose>
-          <c:when test="${empty statistics}">
+          <c:when test="${empty groups}">
             <span>No statistics data was published.</span>
           </c:when>
           <c:otherwise>
-            <c:forEach var="group" items="${statistics}" varStatus="status">
+            <c:forEach var="group" items="${groups}" varStatus="status">
               <div class="statisticGroup" id="group-${status.index}">
                 <l:settingsBlock title="${group.key}">
                   <div class="statisticGroupInner">
-                    <table style="width: 99%;" cellspacing="0">
-                      <c:forEach var="statistic" items="${group.value}">
-                        <tr class="highlightRow statisticRow">
-                          <td><c:out value="${statistic.displayName}"/></td>
-                          <td style="width: 13%"><c:out value="${statistic.formattedValue}"/></td>
-                        </tr>
-                      </c:forEach>
-                    </table>
+                    <c:set var="statisticsGroup" value="${group.value}" scope="request"/>
+                    <jsp:include page="${group.value.jspPagePath}"/>
                   </div>
                 </l:settingsBlock>
               </div>
             </c:forEach>
             <script type="text/javascript">
-              BS.UsageStatistics.sortGroups(${fn:length(statistics)});
+              BS.UsageStatistics.sortGroups(${fn:length(groups)});
             </script>
           </c:otherwise>
         </c:choose>

@@ -20,26 +20,26 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticPresenta
 import org.jetbrains.annotations.NotNull;
 
 class UsageStatisticsPresentationImpl implements UsageStatisticPresentation {
+  @NotNull private final String myId;
   @NotNull private final String myDisplayName;
-  @NotNull private final String myGroupName;
   @NotNull private final String myFormattedValue;
 
-  public UsageStatisticsPresentationImpl(@NotNull final String displayName,
-                                         @NotNull final String groupName,
+  public UsageStatisticsPresentationImpl(@NotNull final String id,
+                                         @NotNull final String displayName,
                                          @NotNull final String formattedValue) {
+    myId = id;
     myDisplayName = displayName;
-    myGroupName = groupName;
     myFormattedValue = formattedValue;
+  }
+
+  @NotNull
+  public String getId() {
+    return myId;
   }
 
   @NotNull
   public String getDisplayName() {
     return myDisplayName;
-  }
-
-  @NotNull
-  public String getGroupName() {
-    return myGroupName;
   }
 
   @NotNull

@@ -16,12 +16,13 @@
 
 package jetbrains.buildServer.controllers;
 
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCollectorImpl;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticPresentation;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupExtension;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,7 @@ public class UsageStatisticsBean {
   private final boolean myStatisticsCollected;
   private final String mySizeEstimate;
   private final Date myLastCollectingFinishDate;
-  private final Map<String, List<UsageStatisticPresentation>> myStatistics;
+  private final LinkedHashMap<String, UsageStatisticsGroupExtension> myStatisticGroups;
 
   public UsageStatisticsBean(@NotNull final UsageStatisticsSettingsPersistor settingsPersistor,
                              @NotNull final UsageStatisticsCollector statisticsCollector,
@@ -44,13 +45,11 @@ public class UsageStatisticsBean {
 
     if (myStatisticsCollected) {
       myLastCollectingFinishDate = statisticsCollector.getLastCollectingFinishDate();
-      myStatistics = new TreeMap<String, List<UsageStatisticPresentation>>();
+      myStatisticGroups = presentationManager.groupStatistics(statisticsCollector);
 
       final int[] sizeEstimate = new int[] { 0 };
       statisticsCollector.publishCollectedStatistics(new UsageStatisticsPublisher() {
         public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
-          final UsageStatisticPresentation presentation = presentationManager.createPresentation(id, value);
-          getOrCreateGroup(presentation.getGroupName()).add(presentation);
           sizeEstimate[0] += id.length() + String.valueOf(value).length() + 3;
         }
       });
@@ -59,7 +58,7 @@ public class UsageStatisticsBean {
     }
     else {
       myLastCollectingFinishDate = null;
-      myStatistics = null;
+      myStatisticGroups = null;
       mySizeEstimate = null;
     }
   }
@@ -85,11 +84,11 @@ public class UsageStatisticsBean {
   }
 
   @NotNull
-  public Map<String, List<UsageStatisticPresentation>> getStatistics() {
-    if (myStatistics == null) {
+  public LinkedHashMap<String, UsageStatisticsGroupExtension> getStatisticGroups() {
+    if (myStatisticGroups == null) {
       throw UsageStatisticsCollectorImpl.createIllegalStateException();
     }
-    return myStatistics;
+    return myStatisticGroups;
   }
 
   @NotNull
@@ -98,13 +97,5 @@ public class UsageStatisticsBean {
       throw UsageStatisticsCollectorImpl.createIllegalStateException();
     }
     return mySizeEstimate;
-  }
-
-  @NotNull
-  private List<UsageStatisticPresentation> getOrCreateGroup(@NotNull final String groupName) {
-    if (!myStatistics.containsKey(groupName)) {
-      myStatistics.put(groupName, new ArrayList<UsageStatisticPresentation>());
-    }
-    return myStatistics.get(groupName);
   }
 }

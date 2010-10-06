@@ -16,15 +16,25 @@
 
 package jetbrains.buildServer.usageStatistics.presentation;
 
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public interface UsageStatisticPresentation {
+/**
+ * Defines the custom renderer for showing usage statistics group in UI.
+ *
+ * @since 6.0
+ */
+public interface UsageStatisticsGroupExtension {
+  /**
+   * Returns the path of the jsp page to include as group body.
+   * @return the path of the jsp page to include as group body
+   */
   @NotNull
-  String getDisplayName();
+  String getJspPagePath();
 
-  @NotNull
-  String getGroupName();
-
-  @NotNull
-  String getFormattedValue();
+  /**
+   * Sets the statistics for this group.
+   * @param statistics statistics for the specified group
+   */
+  void setStatistics(@NotNull List<UsageStatisticPresentation> statistics);
 }

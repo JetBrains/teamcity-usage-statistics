@@ -46,19 +46,19 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   public void static_server_usage_statistics_provider_test() {
     final Map<String, Object> statistics = collectStatisticsByProvider(StaticServerUsageStatisticsProvider.class);
 
-    assertEquals(myServer.getProjectManager().getNumberOfProjects(), statistics.get("jetbrains.buildServer.usageStatistics.projectNumber"));
-    assertEquals(myServer.getProjectManager().getArchivedProjects().size(), statistics.get("jetbrains.buildServer.usageStatistics.archivedProjectNumber"));
-    assertEquals(myServer.getProjectManager().getNumberOfBuildTypes(), statistics.get("jetbrains.buildServer.usageStatistics.buildTypeNumber"));
+    assertEquals(myServer.getProjectManager().getNumberOfProjects(), statistics.get("jb.projectNumber"));
+    assertEquals(myServer.getProjectManager().getArchivedProjects().size(), statistics.get("jb.archivedProjectNumber"));
+    assertEquals(myServer.getProjectManager().getNumberOfBuildTypes(), statistics.get("jb.buildTypeNumber"));
 
     final BuildAgentManager buildAgentManager = myServer.getBuildAgentManager();
     final int agentNumber = buildAgentManager.getRegisteredAgents(true).size() + buildAgentManager.getUnregisteredAgents().size();
-    assertEquals(agentNumber, statistics.get("jetbrains.buildServer.usageStatistics.agentNumber"));
+    assertEquals(agentNumber, statistics.get("jb.agentNumber"));
 
-    assertEquals(myServer.getVcsManager().getAllRegisteredVcsRoots().size(), statistics.get("jetbrains.buildServer.usageStatistics.vcsRootNumber"));
-    assertEquals(myServer.getUserModel().getNumberOfRegisteredUsers(), statistics.get("jetbrains.buildServer.usageStatistics.userNumber"));
+    assertEquals(myServer.getVcsManager().getAllRegisteredVcsRoots().size(), statistics.get("jb.vcsRootNumber"));
+    assertEquals(myServer.getUserModel().getNumberOfRegisteredUsers(), statistics.get("jb.userNumber"));
 
     final UserGroupManager userGroupManager = myServer.getSingletonService(UserGroupManager.class);
-    assertEquals(userGroupManager.getUserGroups().size(), statistics.get("jetbrains.buildServer.usageStatistics.userGroupNumber"));
+    assertEquals(userGroupManager.getUserGroups().size(), statistics.get("jb.userGroupNumber"));
   }
 
   public void all_providers_should_be_registered() {

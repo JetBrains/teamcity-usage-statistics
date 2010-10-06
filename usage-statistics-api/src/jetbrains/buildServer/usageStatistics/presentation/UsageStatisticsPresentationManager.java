@@ -21,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Manages the usage statistics UI representation.
+ *
+ * @since 6.0
  */
 public interface UsageStatisticsPresentationManager {
   /**
@@ -38,4 +40,12 @@ public interface UsageStatisticsPresentationManager {
                                 @Nullable String displayName,
                                 @Nullable String groupName,
                                 @Nullable UsageStatisticsFormatter formatter);
+
+  /**
+   * Registers a custom renderer for a specific usage statistics group.
+   *
+   * @param groupName Name of the group.
+   * @param extension Extension to register.
+   */
+  public void registerGroupRenderer(@NotNull String groupName, @NotNull UsageStatisticsGroupExtension extension);
 }

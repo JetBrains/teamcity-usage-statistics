@@ -21,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Extension point for providing custom usage statistics to show it on the statistics page.
+ *
+ * @since 6.0
  */
 public interface UsageStatisticsProvider extends TeamCityExtension {
   /**

@@ -23,29 +23,25 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class UsageStatisticsPresentationFactory {
-  @NotNull private static final String MISCELLANEOUS = "Miscellaneous";
   @NotNull private static final UsageStatisticsFormatter ourDefaultFormatter = new DefaultFormatter();
 
   @NotNull private final String myId;
   @Nullable private final String myDisplayName;
-  @Nullable private final String myGroupName;
   @Nullable private final UsageStatisticsFormatter myFormatter;
 
   public UsageStatisticsPresentationFactory(@NotNull final String id,
                                             @Nullable final String displayName,
-                                            @Nullable final String groupName,
                                             @Nullable final UsageStatisticsFormatter formatter) {
     myId = id;
     myDisplayName = displayName;
-    myGroupName = groupName;
     myFormatter = formatter;
   }
 
   @NotNull
   public UsageStatisticPresentation createFor(@Nullable final Object value) {
     return new UsageStatisticsPresentationImpl(
+      myId,
       getNotNull(myDisplayName, myId),
-      getNotNull(myGroupName, MISCELLANEOUS),
       getNotNull(myFormatter, ourDefaultFormatter).format(value)
     );
   }

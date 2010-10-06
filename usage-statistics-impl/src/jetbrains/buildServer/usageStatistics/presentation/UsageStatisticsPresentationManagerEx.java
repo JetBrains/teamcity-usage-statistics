@@ -16,10 +16,11 @@
 
 package jetbrains.buildServer.usageStatistics.presentation;
 
+import java.util.LinkedHashMap;
+import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public interface UsageStatisticsPresentationManagerEx extends UsageStatisticsPresentationManager {
   @NotNull
-  UsageStatisticPresentation createPresentation(@NotNull String id, @Nullable Object value);
+  LinkedHashMap<String, UsageStatisticsGroupExtension> groupStatistics(@NotNull UsageStatisticsCollector collector);
 }
