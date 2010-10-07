@@ -24,15 +24,20 @@ import jetbrains.buildServer.serverSide.impl.XmlRpcDispatcher;
 import jetbrains.buildServer.serverSide.impl.XmlRpcListener;
 import jetbrains.buildServer.serverSide.impl.XmlRpcSession;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
+import jetbrains.buildServer.web.openapi.PluginDescriptor;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener {
+  @NotNull @NonNls private static final String IDE_USAGE_GROUP = "IDE Usage";
+
   public IDEUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                     @NotNull final ServerPaths serverPaths,
                                     @NotNull final XmlRpcDispatcher xmlRpcDispatcher,
-                                    @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, serverPaths, presentationManager);
+                                    @NotNull final UsageStatisticsPresentationManager presentationManager,
+                                    @NotNull final PluginDescriptor pluginDescriptor) {
+    super(server, serverPaths, presentationManager, pluginDescriptor, IDE_USAGE_GROUP);
     xmlRpcDispatcher.addListener(this);
   }
 
@@ -76,12 +81,6 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
   @Override
   protected String prepareDisplayName(@NotNull final String toolId, @NotNull final String periodDescription) {
     return toolId + " user count for the last " + periodDescription.toLowerCase();
-  }
-
-  @NotNull
-  @Override
-  protected String getGroupName(@NotNull final String periodDescription) {
-    return "IDE Usage";
   }
 
   @NotNull

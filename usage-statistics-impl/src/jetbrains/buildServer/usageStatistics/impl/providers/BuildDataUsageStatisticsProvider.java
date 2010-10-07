@@ -18,6 +18,7 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SQLRunner;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
@@ -25,6 +26,7 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TimeFormatter;
+import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,16 +62,14 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     ") t"
   );
 
-  @NonNls @NotNull private static final String TEST_COUNT_PER_BUILD_GROUP = "Test Count Per Build";
-  @NonNls @NotNull private static final String BUILD_COUNT_GROUP = "Build Count";
-  @NonNls @NotNull private static final String BUILD_WAITING_IN_QUEUE_TIME_GROUP = "Build Waiting In Queue Time";
-  @NonNls @NotNull private static final String BUILD_DURATION_GROUP = "Build Duration";
+  @NonNls @NotNull private static final String BUILD_USAGE_GROUP = "Builds Usage";
 
   @NotNull private final SQLRunner mySQLRunner;
 
   public BuildDataUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                          @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, presentationManager);
+                                          @NotNull final UsageStatisticsPresentationManager presentationManager,
+                                          @NotNull final PluginDescriptor pluginDescriptor) {
+    super(server, presentationManager, pluginDescriptor, Collections.singleton(BUILD_USAGE_GROUP));
     mySQLRunner = server.getSQLRunner();
   }
 
@@ -102,15 +102,19 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
   }
 
   @Override
+  protected boolean mustSortStatistics() {
+    return false;
+  }
+
+  @Override
   protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager manager, @NotNull final String periodDescription) {
     final String idFormat = createIdFromat(periodDescription);
-    final String nameFormat = "%s for the last " + periodDescription.toLowerCase();
 
-    apply(manager, idFormat, nameFormat, "buildCount", "Build count", BUILD_COUNT_GROUP, null);
-    apply(manager, idFormat, nameFormat, "personalBuildCount", "Personal build count", BUILD_COUNT_GROUP, null);
-    apply(manager, idFormat, nameFormat, "avgBuildWaitInQueueTime", "Average build waiting in queue time", BUILD_WAITING_IN_QUEUE_TIME_GROUP, ourTimeFormatter);
-    apply(manager, idFormat, nameFormat, "avgBuildDuration", "Average build duration", BUILD_DURATION_GROUP, ourTimeFormatter);
-    apply(manager, idFormat, nameFormat, "maxBuildTestCount", "Maximum test count per build", TEST_COUNT_PER_BUILD_GROUP, null);
+    apply(manager, idFormat, "buildCount", "Build count", null);
+    apply(manager, idFormat, "personalBuildCount", "Personal build count", null);
+    apply(manager, idFormat, "avgBuildWaitInQueueTime", "Average build waiting in queue time", ourTimeFormatter);
+    apply(manager, idFormat, "avgBuildDuration", "Average build duration", ourTimeFormatter);
+    apply(manager, idFormat, "maxBuildTestCount", "Maximum test count per build", null);
   }
 
   @NotNull
@@ -126,12 +130,10 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
 
   private void apply(@NotNull final UsageStatisticsPresentationManager presentationManager,
                      @NotNull final String idFormat,
-                     @NotNull final String nameFormat,
                      @NotNull final String id,
                      @NotNull final String name,
-                     @NotNull final String groupName,
                      @Nullable final UsageStatisticsFormatter formatter) {
-    presentationManager.applyPresentation(String.format(idFormat, id), String.format(nameFormat, name), groupName, formatter);
+    presentationManager.applyPresentation(String.format(idFormat, id), name, BUILD_USAGE_GROUP, formatter);
   }
 
   private void publish(@NotNull final UsageStatisticsPublisher publisher,

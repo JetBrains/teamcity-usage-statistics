@@ -16,8 +16,8 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.ServerPaths;
@@ -30,18 +30,21 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.SimplePageExtension;
 import jetbrains.buildServer.web.util.SessionUser;
 import jetbrains.buildServer.web.util.WebUtil;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider {
+  @NotNull @NonNls private static final String WEB_PAGES_USAGE_GROUP = "Web Pages Usage";
+
   public WebPagesUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                          @NotNull final ServerPaths serverPaths,
                                          @NotNull final PagePlaces pagePlaces,
                                          @NotNull final PluginDescriptor pluginDescriptor,
                                          @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, serverPaths, presentationManager, new TreeMap<Long, String>() {{
+    super(server, serverPaths, presentationManager, new LinkedHashMap<Long, String>() {{
       put(Dates.ONE_WEEK, "Week");
       put(30 * Dates.ONE_DAY, "Month");
-    }});
+    }}, pluginDescriptor, WEB_PAGES_USAGE_GROUP);
     registerPageExtension(pagePlaces, pluginDescriptor);
   }
 
@@ -89,12 +92,6 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   @Override
   protected String prepareDisplayName(@NotNull final String toolId, @NotNull final String periodDescription) {
     return toolId;
-  }
-
-  @NotNull
-  @Override
-  protected String getGroupName(@NotNull final String periodDescription) {
-    return "Web Pages Usage For The Last " + periodDescription;
   }
 
   private void registerPageExtension(@NotNull final PagePlaces pagePlaces, final PluginDescriptor pluginDescriptor) {

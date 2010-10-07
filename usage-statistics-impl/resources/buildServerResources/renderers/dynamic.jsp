@@ -15,12 +15,21 @@
   --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><jsp:useBean id="statisticsGroup" scope="request" type="jetbrains.buildServer.usageStatistics.presentation.renderers.DefaultUsageStatisticsGroup"
+%><%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
+%><jsp:useBean id="statisticsGroup" scope="request" type="jetbrains.buildServer.usageStatistics.presentation.renderers.DynamicUsageStatisticsGroup"
 /><table style="width: 99%;" cellspacing="0">
+  <tr class="statisticRow">
+    <th>&nbsp;</th>
+    <c:forEach var="period" items="${statisticsGroup.periods}">
+      <th style="text-align:left;"><c:out value="${period}"/></th>
+    </c:forEach>
+  </tr>
   <c:forEach var="statistic" items="${statisticsGroup.statistics}">
     <tr class="highlightRow statisticRow">
       <td><c:out value="${statistic.displayName}"/></td>
-      <td style="width: 13%"><c:out value="${statistic.formattedValue}"/></td>
+      <c:forEach var="value" items="${statistic.values}">
+        <td style="width: 13%"><c:out value="${value}"/></td>
+      </c:forEach>
     </tr>
   </c:forEach>
 </table>

@@ -26,6 +26,7 @@ public class PercentageFormatter extends TypeBasedFormatter<Integer> {
     myTotal = total;
   }
 
+  @NotNull
   @Override
   protected String doFormat(@NotNull final Integer count) {
     return myTotal == 0 ? String.valueOf(count) : count + " (" + (count * 100 / myTotal) + "%)";
