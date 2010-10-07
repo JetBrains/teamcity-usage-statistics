@@ -74,7 +74,7 @@ public class DownloadUsageStatisticsController extends BaseController {
       out = response.getOutputStream();
 
       response.setContentType("text/plain");
-      WebUtil.setContentDisposition(response, fileName, false);
+      WebUtil.setContentDisposition(request, response, fileName, false);
       WebUtil.addCacheHeadersForIE(request, response);
 
       writeStatistics(out, collectingFinishDate);
