@@ -66,8 +66,8 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
 
     assertTrue(registeredProviders.contains(StaticServerUsageStatisticsProvider.class.getName()));
     assertTrue(registeredProviders.contains(ServerConfigurationUsageStatisticsProvider.class.getName()));
-    assertTrue(registeredProviders.contains(BuildDataUsageStatisticsProvider.class.getName()));
-    assertTrue(registeredProviders.contains(IDEUsageStatisticsProvider.class.getName()));
+    //assertTrue(registeredProviders.contains(BuildDataUsageStatisticsProvider.class.getName()));
+    //assertTrue(registeredProviders.contains(IDEUsageStatisticsProvider.class.getName()));
     assertTrue(registeredProviders.contains(VCSUsageStatisticsProvider.class.getName()));
     //assertTrue(registeredProviders.contains(WebPagesUsageStatisticsProvider.class.getName()));
     assertTrue(registeredProviders.contains(NotificatorUsageStatisticsProvider.class.getName()));

@@ -90,7 +90,7 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
 
   @NotNull
   @Override
-  protected String prepareDisplayName(@NotNull final String toolId, @NotNull final String periodDescription) {
+  protected String prepareDisplayName(@NotNull final String toolId) {
     return toolId;
   }
 

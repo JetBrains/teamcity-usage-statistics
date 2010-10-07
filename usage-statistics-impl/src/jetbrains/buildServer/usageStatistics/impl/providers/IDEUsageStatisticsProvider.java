@@ -79,8 +79,8 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
 
   @NotNull
   @Override
-  protected String prepareDisplayName(@NotNull final String toolId, @NotNull final String periodDescription) {
-    return toolId + " user count for the last " + periodDescription.toLowerCase();
+  protected String prepareDisplayName(@NotNull final String toolId) {
+    return toolId + " user count";
   }
 
   @NotNull

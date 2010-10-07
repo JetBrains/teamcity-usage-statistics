@@ -19,8 +19,8 @@ package jetbrains.buildServer.usageStatistics.presentation.renderers;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 
-public class DefaultUsageStatisticsGroup extends BaseSimpleUsageStatisticsGroup {
-  public DefaultUsageStatisticsGroup(@NotNull final PluginDescriptor pluginDescriptor) {
-    super(pluginDescriptor, "renderers/default.jsp");
+public class ListUsageStatisticsGroup extends BaseSimpleUsageStatisticsGroup {
+  public ListUsageStatisticsGroup(@NotNull final PluginDescriptor pluginDescriptor) {
+    super(pluginDescriptor, "renderers/list.jsp");
   }
 }

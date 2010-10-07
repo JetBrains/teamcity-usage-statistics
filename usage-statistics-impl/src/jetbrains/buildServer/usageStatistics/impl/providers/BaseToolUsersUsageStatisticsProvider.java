@@ -75,7 +75,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
   protected abstract String getToolIdName();
 
   @NotNull
-  protected abstract String prepareDisplayName(@NotNull String toolId, @NotNull String periodDescription);
+  protected abstract String prepareDisplayName(@NotNull String toolId);
 
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long startDate) {
@@ -87,7 +87,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     Collections.sort(toolIds, STRINGS_COMPARATOR);
     for (final String toolId : toolIds) {
       final String statisticId = "jb." + getId() + "." + periodDescription.toLowerCase() + "[" + toolId.replace(' ', '.') + "]";
-      myPresentationManager.applyPresentation(statisticId, prepareDisplayName(toolId, periodDescription), myGroupName, formatter);
+      myPresentationManager.applyPresentation(statisticId, prepareDisplayName(toolId), myGroupName, formatter);
       publisher.publishStatistic(statisticId, usages.get(toolId).size());
     }
   }
