@@ -52,12 +52,12 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     "    h.build_id, " +
     "    count(ti.test_id) test_count " +
     "  from (" +
-    "    select build_id, build_start_time_server from history " +
+    "    select build_id, build_finish_time_server from history " +
     "    union " +
-    "    select build_id, build_start_time_server from light_history" +
+    "    select build_id, build_finish_time_server from light_history" +
     "  ) h " +
     "  left outer join test_info ti on h.build_id = ti.build_id " +
-    "  where h.build_start_time_server > ? " +
+    "  where h.build_finish_time_server > ? " +
     "  group by h.build_id" +
     ") t"
   );
