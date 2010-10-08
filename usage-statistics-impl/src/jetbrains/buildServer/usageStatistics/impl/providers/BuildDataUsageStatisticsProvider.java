@@ -36,28 +36,30 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
 
   @NotNull private static final GenericQuery<Void> ourMainBuildDataQuery = new GenericQuery<Void>(
     "select" +
-    "  count(h.build_id)," +
-    "  sum(h.is_personal)," +
-    "  avg(h.remove_from_queue_time - h.queued_time)," +
-    "  avg(h.build_finish_time_server - h.build_start_time_server) " +
-    "from (select * from history union select * from light_history) h " +
+    "  count(h.build_id) as build_count," +
+    "  sum(h.is_personal) as personal_build_count," +
+    "  avg(h.remove_from_queue_time - h.queued_time) as avg_build_queue_time," +
+    "  avg(h.build_finish_time_server - h.build_start_time_server) as avg_build_duration " +
+    "from (select * from history union all select * from light_history) h " +
     "where h.build_finish_time_server > ?"
   );
 
   @NotNull private static final GenericQuery<Void> ourBuildTestCountQuery = new GenericQuery<Void>(
     "select" +
-    "  max(t.test_count) " +
+    "  max(t.test_count) as max_test_count " +
     "from (" +
     "  select" +
-    "    h.build_id, " +
-    "    count(ti.test_id) test_count " +
+    "    count(*) as test_count " +
     "  from (" +
-    "    select build_id, build_finish_time_server from history " +
-    "    union " +
-    "    select build_id, build_finish_time_server from light_history" +
-    "  ) h " +
-    "  left outer join test_info ti on h.build_id = ti.build_id " +
-    "  where h.build_finish_time_server > ? " +
+    "    select build_id " +
+    "      from history " +
+    "      where build_finish_time_server > ? " +
+    "    union all" +
+    "    select build_id " +
+    "      from light_history" +
+    "      where build_finish_time_server > ? " +
+    "    ) h " +
+    "    join test_info ti on h.build_id = ti.build_id " +
     "  group by h.build_id" +
     ") t"
   );
@@ -98,7 +100,7 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
         }
         return null;
       }
-    }, fromDate);
+    }, fromDate, fromDate);
   }
 
   @Override
