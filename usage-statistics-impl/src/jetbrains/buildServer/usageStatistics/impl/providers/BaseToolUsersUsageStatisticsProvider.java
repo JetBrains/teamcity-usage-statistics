@@ -86,7 +86,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     final List<String> toolIds = new ArrayList<String>(usages.keySet());
     Collections.sort(toolIds, STRINGS_COMPARATOR);
     for (final String toolId : toolIds) {
-      final String statisticId = "jb." + getId() + "." + periodDescription.toLowerCase() + "[" + toolId.replace(' ', '.') + "]";
+      final String statisticId = "jb." + getId() + "." + periodDescription.toLowerCase() + "[" + toolId + "]";
       myPresentationManager.applyPresentation(statisticId, prepareDisplayName(toolId), myGroupName, formatter);
       publisher.publishStatistic(statisticId, usages.get(toolId).size());
     }
