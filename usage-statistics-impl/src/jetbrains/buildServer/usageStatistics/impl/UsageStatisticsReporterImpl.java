@@ -22,6 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
@@ -37,9 +38,12 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   @NotNull private static final Logger LOG = Logger.getLogger(UsageStatisticsReporterImpl.class);
 
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
+  @NotNull private final UsageStatisticsCommonDataPersistor myCommonDataPersistor;
 
-  public UsageStatisticsReporterImpl(@NotNull final UsageStatisticsCollector statisticsCollector) {
+  public UsageStatisticsReporterImpl(@NotNull final UsageStatisticsCollector statisticsCollector,
+                                     @NotNull final UsageStatisticsCommonDataPersistor commonDataPersistor) {
     myStatisticsCollector = statisticsCollector;
+    myCommonDataPersistor = commonDataPersistor;
   }
 
   public boolean reportStatistics() {
@@ -92,11 +96,18 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   @NotNull
   private Map<String, String> collectStatistics() {
     final Map<String, String> myStatistics = new HashMap<String, String>();
+
     myStatisticsCollector.publishCollectedStatistics(new UsageStatisticsPublisher() {
       public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
         myStatistics.put(id, String.valueOf(value));
       }
     });
+
+    final Date lastReportingDate = myCommonDataPersistor.getLastReportingDate();
+    if (lastReportingDate != null) {
+      myStatistics.put("jb.previousReportDate", String.valueOf(lastReportingDate.getTime()));
+    }
+
     return myStatistics;
   }
 }

@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class UsageStatisticsCommonDataPersistor extends BasePersistentStateComponent {
   @NotNull private static final String LAST_REPORTING_DATE = "last-reporting-date";
-  @Nullable private Date myLastReportingDate = null;
+  @Nullable private Date myLastReportingDate;
 
   public UsageStatisticsCommonDataPersistor(@NotNull final BuildServerEx server, @NotNull final ServerPaths serverPaths) {
     super(server, serverPaths);
