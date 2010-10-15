@@ -52,7 +52,7 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   }
 
   private boolean doReportStatistics(@NotNull final String data) {
-    final String serverUrl = TeamCityProperties.getProperty("teamcity.usageStatistics.server.url");
+    final String serverUrl = TeamCityProperties.getProperty("teamcity.usageStatistics.server.url", "http://teamcity-stats.jetbrains.net/report.html");
     try {
       final URLConnection urlConnection = new URL(serverUrl).openConnection();
       if (!(urlConnection instanceof HttpURLConnection)) {
