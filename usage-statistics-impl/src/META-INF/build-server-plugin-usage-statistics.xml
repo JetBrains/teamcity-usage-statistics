@@ -42,6 +42,5 @@
   <bean id="notificatorUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.NotificatorUsageStatisticsProvider"/>
   <bean id="runnerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.RunnerUsageStatisticsProvider"/>
   <bean id="triggerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.TriggerUsageStatisticsProvider"/>
-  <bean id="nonBundledPluginsUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.NonBundledPluginsUsageStatisticsProvider"/>
 </beans>
 
