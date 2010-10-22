@@ -16,8 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -72,8 +71,13 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
       outputStream.flush();          
 
       connection.connect();
-      
-      return connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+
+      final int responseCode = connection.getResponseCode();
+
+      LOG.debug("Usage statistics report sent. Server response: " + responseCode + " " + connection.getResponseMessage());
+      logErrorAndClose(connection.getErrorStream());
+
+      return responseCode == HttpURLConnection.HTTP_OK;
     }
     catch (final MalformedURLException e) {
       LOG.debug("Invalid usage statistics server URL: " + serverUrl, e);
@@ -82,6 +86,29 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
       LOG.debug("Failed to connect to usage statistics server: " + serverUrl, e);
     }
     return false;
+  }
+
+  private void logErrorAndClose(@Nullable final InputStream errorStream) {
+    if (errorStream == null) return;
+    final BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+    try {
+      final StringBuilder sb = new StringBuilder("Usage statistics server error response:\n");
+      String line;
+      while ((line = reader.readLine()) != null) {
+        sb.append(line).append("\n");
+      }
+      LOG.debug(sb.toString());
+    }
+    catch (final IOException e) {
+      LOG.debug("Failed to read error stream", e);
+    }
+    finally {
+      try {
+        reader.close();
+      } catch (final IOException e) {
+        LOG.debug("Failed to close error stream", e);
+      }
+    }
   }
 
   @NotNull
