@@ -28,6 +28,7 @@ import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsReporter;
+import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.web.util.WebUtil;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -45,9 +46,15 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
     myCommonDataPersistor = commonDataPersistor;
   }
 
-  public boolean reportStatistics() {
-    myStatisticsCollector.collectStatisticsAndWait();
+  public boolean reportStatistics(final long statisticsExpirationPeriod) {
+    if (!myStatisticsCollector.isStatisticsCollected() || collectedStatisticsExpired(statisticsExpirationPeriod)) {
+      myStatisticsCollector.collectStatisticsAndWait();
+    }
     return doReportStatistics(createDataString(collectStatistics()));
+  }
+
+  private boolean collectedStatisticsExpired(final long statisticsExpirationPeriod) {
+    return Dates.now().getTime() > myStatisticsCollector.getLastCollectingFinishDate().getTime() + statisticsExpirationPeriod;
   }
 
   private boolean doReportStatistics(@NotNull final String data) {
@@ -129,6 +136,8 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
         myStatistics.put(id, String.valueOf(value));
       }
     });
+
+    myStatistics.put("jb.collectingFinishDate", String.valueOf(myStatisticsCollector.getLastCollectingFinishDate().getTime()));
 
     final Date lastReportingDate = myCommonDataPersistor.getLastReportingDate();
     if (lastReportingDate != null) {

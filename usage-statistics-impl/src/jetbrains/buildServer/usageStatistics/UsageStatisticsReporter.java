@@ -17,5 +17,5 @@
 package jetbrains.buildServer.usageStatistics;
 
 public interface UsageStatisticsReporter {
-  boolean reportStatistics();
+  boolean reportStatistics(long statisticsExpirationPeriod);
 }

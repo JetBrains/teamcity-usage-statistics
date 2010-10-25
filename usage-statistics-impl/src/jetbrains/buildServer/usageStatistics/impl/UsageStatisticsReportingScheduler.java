@@ -61,8 +61,9 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
     try {
       if (mySettingsPersistor.loadSettings().isReportingEnabled()) {
         final Date lastReportingDate = myCommonDataPersistor.getLastReportingDate();
-        if (lastReportingDate == null || Dates.now().after(Dates.after(lastReportingDate, getReportingPeriod()))) {
-          if (myStatisticsReporter.reportStatistics()) {
+        final long reportingPeriod = getReportingPeriod();
+        if (lastReportingDate == null || Dates.now().after(Dates.after(lastReportingDate, reportingPeriod))) {
+          if (myStatisticsReporter.reportStatistics(reportingPeriod)) {
             myCommonDataPersistor.setLastReportingDate(Dates.now());
             LOG.debug("Usage statistics was successfully reported to JetBrains.");
           }

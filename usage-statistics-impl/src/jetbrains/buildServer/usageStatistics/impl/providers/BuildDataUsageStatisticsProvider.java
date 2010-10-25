@@ -40,8 +40,15 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     "  sum(h.is_personal) as personal_build_count," +
     "  avg(h.remove_from_queue_time - h.queued_time) as avg_build_queue_time," +
     "  avg(h.build_finish_time_server - h.build_start_time_server) as avg_build_duration " +
-    "from (select * from history union all select * from light_history) h " +
-    "where h.build_finish_time_server > ?"
+    "from (" +
+    "  select *" +
+    "    from history " +
+    "    where build_finish_time_server > ?" +
+    "  union all" +
+    "  select *" +
+    "    from light_history" +
+    "    where build_finish_time_server > ?" +
+    ") h"
   );
 
   @NotNull private static final GenericQuery<Void> ourBuildTestCountQuery = new GenericQuery<Void>(
@@ -91,7 +98,7 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
         }
         return null;
       }
-    }, fromDate);
+    }, fromDate, fromDate);
 
     ourBuildTestCountQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
