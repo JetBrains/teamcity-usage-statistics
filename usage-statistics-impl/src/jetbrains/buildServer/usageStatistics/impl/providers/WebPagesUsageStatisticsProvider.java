@@ -16,8 +16,18 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import javax.servlet.http.HttpServletRequest;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.ServerPaths;
@@ -28,34 +38,38 @@ import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PlaceId;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.SimplePageExtension;
+import jetbrains.buildServer.web.plugins.bean.ServerPluginInfo;
 import jetbrains.buildServer.web.util.SessionUser;
 import jetbrains.buildServer.web.util.WebUtil;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider {
+  @NotNull private static final Logger LOG = Logger.getLogger(WebPagesUsageStatisticsProvider.class);
+
   @NotNull @NonNls private static final String WEB_PAGES_USAGE_GROUP = "Web Pages Usage";
+  @NotNull @NonNls private static final String CONFIG_FILE_PATH = "config/webPagePatterns.txt";
+
+  @NotNull private final List<Pattern> myPathPatterns = new ArrayList<Pattern>();
 
   public WebPagesUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                          @NotNull final ServerPaths serverPaths,
                                          @NotNull final PagePlaces pagePlaces,
-                                         @NotNull final PluginDescriptor pluginDescriptor,
+                                         @NotNull final ServerPluginInfo pluginDescriptor,
                                          @NotNull final UsageStatisticsPresentationManager presentationManager) {
     super(server, serverPaths, presentationManager, new LinkedHashMap<Long, String>() {{
       put(Dates.ONE_WEEK, "Week");
       put(30 * Dates.ONE_DAY, "Month");
     }}, pluginDescriptor, WEB_PAGES_USAGE_GROUP);
+    readWebPagePatterns(pluginDescriptor);
     registerPageExtension(pagePlaces, pluginDescriptor);
   }
 
   public void processGetRequest(@NotNull final HttpServletRequest request) {
     final SUser user = SessionUser.getUser(request);
     if (user == null) return;
-    final Object pageUrl = request.getAttribute("pageUrl");
-    if (pageUrl != null && !(pageUrl instanceof String)) return;
-    String path = WebUtil.getPathFromUrl(pageUrl == null
-                                         ? WebUtil.getPathWithoutContext(request)
-                                         : WebUtil.getPathWithoutContext(request, (String)pageUrl));
+    String path = WebUtil.getPathFromUrl(WebUtil.getPathWithoutContext(request));
     if (!path.toLowerCase().endsWith(".html")) return;
     final String tab = request.getParameter("tab");
     if (tab != null) {
@@ -90,12 +104,22 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
 
   @NotNull
   @Override
-  protected String prepareDisplayName(@NotNull final String toolId) {
-    return toolId;
+  protected String prepareDisplayName(@NotNull final String path) {
+    return path;
+  }
+
+  @Override
+  protected boolean publishToolUsages(@NotNull final String path) {
+    for (final Pattern pathPattern : myPathPatterns) {
+      if (pathPattern.matcher(path).matches()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void registerPageExtension(@NotNull final PagePlaces pagePlaces, final PluginDescriptor pluginDescriptor) {
-    final String pagePath = pluginDescriptor.getPluginResourcesPath("webPagesUsageStatistic.jsp");
+    final String pagePath = pluginDescriptor.getPluginResourcesPath("empty.jsp");
     new SimplePageExtension(pagePlaces, PlaceId.ALL_PAGES_FOOTER, "webPagesUsageStatisticsProvider", pagePath) {
       {
         register();
@@ -104,8 +128,46 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
       @Override
       public void fillModel(@NotNull final Map<String, Object> model, @NotNull final HttpServletRequest request) {
         super.fillModel(model, request);
-        model.put("webPagesUsageStatisticsProvider", WebPagesUsageStatisticsProvider.this);
+        if (isGet(request)) {
+          processGetRequest(request);
+        }
       }
     };
+  }
+
+  private void readWebPagePatterns(@NotNull final ServerPluginInfo pluginDescriptor) {
+    for (final File jarFile : pluginDescriptor.getPluginJarFiles()) {
+      ZipFile zip = null;
+      try {
+        zip = new ZipFile(jarFile);
+        final ZipEntry entry = zip.getEntry(CONFIG_FILE_PATH);
+        if (entry == null) continue;
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(zip.getInputStream(entry)));
+        try {
+          String line;
+          while ((line = reader.readLine()) != null) {
+            try {
+              myPathPatterns.add(Pattern.compile(line));
+            } catch (final PatternSyntaxException e) {
+              LOG.info("Invalid web page path pattern: " + line, e);
+            }
+          }
+          break;
+        }
+        finally {
+          reader.close();
+        }
+      } catch (final IOException e) {
+        LOG.info(e.getLocalizedMessage(), e);
+      } finally {
+        try {
+          if (zip != null) {
+            zip.close();
+          }
+        } catch (final IOException e) {
+          LOG.info(e.getLocalizedMessage(), e);
+        }
+      }
+    }
   }
 }

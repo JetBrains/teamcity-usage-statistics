@@ -79,8 +79,13 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
 
   @NotNull
   @Override
-  protected String prepareDisplayName(@NotNull final String toolId) {
-    return toolId + " user count";
+  protected String prepareDisplayName(@NotNull final String ideName) {
+    return ideName + " user count";
+  }
+
+  @Override
+  protected boolean publishToolUsages(@NotNull final String toolId) {
+    return true;
   }
 
   @NotNull

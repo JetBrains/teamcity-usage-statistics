@@ -77,6 +77,8 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
   @NotNull
   protected abstract String prepareDisplayName(@NotNull String toolId);
 
+  protected abstract boolean publishToolUsages(@NotNull String toolId);
+
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long startDate) {
     removeObsoleteUsages();
@@ -86,6 +88,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     final List<String> toolIds = new ArrayList<String>(usages.keySet());
     Collections.sort(toolIds, STRINGS_COMPARATOR);
     for (final String toolId : toolIds) {
+      if (!publishToolUsages(toolId)) continue;
       final String statisticId = "jb." + getId() + "." + periodDescription.toLowerCase() + "[" + toolId + "]";
       myPresentationManager.applyPresentation(statisticId, prepareDisplayName(toolId), myGroupName, formatter);
       publisher.publishStatistic(statisticId, usages.get(toolId).size());
