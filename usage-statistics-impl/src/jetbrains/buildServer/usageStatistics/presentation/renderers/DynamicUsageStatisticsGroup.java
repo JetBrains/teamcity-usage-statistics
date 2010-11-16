@@ -25,9 +25,11 @@ import org.jetbrains.annotations.NotNull;
 public class DynamicUsageStatisticsGroup implements UsageStatisticsGroupExtension {
   @NotNull private final String myJspPagePath;
   @NotNull private final List<String> myPeriods;
-  @NotNull private final List<DynamicStatistic> myStatistics = new ArrayList<DynamicStatistic>();
   @NotNull private final DefaultValueProvider myDefaultValueProvider;
   private final boolean mySort;
+
+  @NotNull private final Object myStatisticsLock = new Object();
+  @NotNull private List<DynamicStatistic> myStatistics = new ArrayList<DynamicStatistic>();
 
   public DynamicUsageStatisticsGroup(@NotNull final PluginDescriptor pluginDescriptor,
                                      @NotNull final List<String> periods,
@@ -45,33 +47,40 @@ public class DynamicUsageStatisticsGroup implements UsageStatisticsGroupExtensio
   }
 
   public void setStatistics(@NotNull final List<UsageStatisticPresentation> statistics) {
-    final LinkedHashMap<String, DynamicStatistic> dynamicStatistics = new LinkedHashMap<String, DynamicStatistic>();
+    final LinkedHashMap<String, DynamicStatistic> dynamicStatisticsMap = new LinkedHashMap<String, DynamicStatistic>();
     final String defaultValue = myDefaultValueProvider.getDefaultValue();
 
     for (final UsageStatisticPresentation statistic : statistics) {
       final int index = extractIndex(statistic);
       if (index != -1) {
-        getOrCreate(dynamicStatistics, statistic, defaultValue).setValue(index, statistic.getFormattedValue());
+        getOrCreate(dynamicStatisticsMap, statistic, defaultValue).setValue(index, statistic.getFormattedValue());
       }
     }
 
-    myStatistics.clear();
-    for (final Map.Entry<String, DynamicStatistic> entry : dynamicStatistics.entrySet()) {
-      myStatistics.add(entry.getValue());
+
+    final List<DynamicStatistic> dynamicStatistics = new ArrayList<DynamicStatistic>();
+    for (final Map.Entry<String, DynamicStatistic> entry : dynamicStatisticsMap.entrySet()) {
+      dynamicStatistics.add(entry.getValue());
     }
 
     if (mySort) {
-      Collections.sort(myStatistics, new Comparator<DynamicStatistic>() {
+      Collections.sort(dynamicStatistics, new Comparator<DynamicStatistic>() {
         public int compare(final DynamicStatistic ds1, final DynamicStatistic ds2) {
           return ds1.getDisplayName().compareToIgnoreCase(ds2.getDisplayName());
         }
       });
     }
+
+    synchronized (myStatisticsLock) {
+      myStatistics = dynamicStatistics;
+    }
   }
 
   @NotNull
   public List<DynamicStatistic> getStatistics() {
-    return myStatistics;
+    synchronized (myStatisticsLock) {
+      return myStatistics;
+    }
   }
 
   @NotNull
