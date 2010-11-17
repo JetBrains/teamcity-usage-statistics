@@ -26,7 +26,7 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresent
 import org.jetbrains.annotations.NotNull;
 
 public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProvider {
-  @NotNull private static final String ourGroupName = "Static Server Information";
+  @NotNull private static final String ourGroupName = "General (total count)";
   @NotNull private final UserGroupManager myUserGroupManager;
 
   public StaticServerUsageStatisticsProvider(@NotNull final BuildServerEx server,
@@ -50,16 +50,16 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   }
 
   protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
-    presentationManager.applyPresentation("jb.agentNumber", "Number of agents", ourGroupName, null);
-    presentationManager.applyPresentation("jb.buildTypeNumber", "Number of build configurations", ourGroupName, null);
-    presentationManager.applyPresentation("jb.activeBuildTypeNumber", "Number of active build configurations", ourGroupName, null);
-    presentationManager.applyPresentation("jb.snapshotDependencyNumber", "Number of snapshot dependencies", ourGroupName, null);
-    presentationManager.applyPresentation("jb.artifactDependencyNumber", "Number of artifact dependencies", ourGroupName, null);
-    presentationManager.applyPresentation("jb.archivedProjectNumber", "Number of archived projects", ourGroupName, null);
-    presentationManager.applyPresentation("jb.projectNumber", "Number of projects", ourGroupName, null);
-    presentationManager.applyPresentation("jb.userGroupNumber", "Number of user groups", ourGroupName, null);
-    presentationManager.applyPresentation("jb.userNumber", "Number of users", ourGroupName, null);
-    presentationManager.applyPresentation("jb.vcsRootNumber", "Number of VCS roots", ourGroupName, null);
+    presentationManager.applyPresentation("jb.agentNumber", "Agents", ourGroupName, null);
+    presentationManager.applyPresentation("jb.buildTypeNumber", "Build configurations", ourGroupName, null);
+    presentationManager.applyPresentation("jb.activeBuildTypeNumber", "Active build configurations", ourGroupName, null);
+    presentationManager.applyPresentation("jb.snapshotDependencyNumber", "Snapshot dependencies", ourGroupName, null);
+    presentationManager.applyPresentation("jb.artifactDependencyNumber", "Artifact dependencies", ourGroupName, null);
+    presentationManager.applyPresentation("jb.archivedProjectNumber", "Archived projects", ourGroupName, null);
+    presentationManager.applyPresentation("jb.projectNumber", "Projects", ourGroupName, null);
+    presentationManager.applyPresentation("jb.userGroupNumber", "User groups", ourGroupName, null);
+    presentationManager.applyPresentation("jb.userNumber", "Users", ourGroupName, null);
+    presentationManager.applyPresentation("jb.vcsRootNumber", "VCS roots", ourGroupName, null);
   }
 
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher) {

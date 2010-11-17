@@ -71,7 +71,7 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     ") t"
   );
 
-  @NonNls @NotNull private static final String BUILD_USAGE_GROUP = "Builds Usage";
+  @NonNls @NotNull private static final String BUILD_USAGE_GROUP = "Builds";
 
   @NotNull private final SQLRunner mySQLRunner;
 

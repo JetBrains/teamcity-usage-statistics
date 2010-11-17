@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener {
-  @NotNull @NonNls private static final String IDE_USAGE_GROUP = "IDE Usage";
+  @NotNull @NonNls private static final String IDE_USAGE_GROUP = "IDE Plugins (users)";
 
   public IDEUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                     @NotNull final ServerPaths serverPaths,
@@ -80,7 +80,7 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
   @NotNull
   @Override
   protected String prepareDisplayName(@NotNull final String ideName) {
-    return ideName + " user count";
+    return ideName;
   }
 
   @Override

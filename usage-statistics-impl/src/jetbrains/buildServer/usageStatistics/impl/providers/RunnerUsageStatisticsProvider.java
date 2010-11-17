@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
   public RunnerUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                        @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, presentationManager, "Runners Usage");
+    super(server, presentationManager, "Runners (build configurations)");
   }
 
   @NotNull
@@ -48,6 +48,6 @@ public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsP
   @NotNull
   @Override
   protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
-    return extensionTypeDisplayName + " build configuration count";
+    return extensionTypeDisplayName;
   }
 }

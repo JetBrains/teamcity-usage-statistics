@@ -36,7 +36,7 @@ public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatis
                                             @NotNull final UsageStatisticsPresentationManager presentationManager,
                                             @NotNull final NotificatorRegistry notificatorRegistry,
                                             @NotNull final NotificationRulesManager notificationRulesManager) {
-    super(server, presentationManager, "Notificators Usage");
+    super(server, presentationManager, "Notificators (users)");
     myNotificatorRegistry = notificatorRegistry;
     myNotificationRulesManager = notificationRulesManager;
   }
@@ -67,6 +67,6 @@ public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatis
   @NotNull
   @Override
   protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
-    return extensionTypeDisplayName + " user count";
+    return extensionTypeDisplayName;
   }
 }

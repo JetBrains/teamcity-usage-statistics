@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 public class TriggerUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
   public TriggerUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                         @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, presentationManager, "Triggers Usage");
+    super(server, presentationManager, "Triggers (build configurations)");
   }
 
   @NotNull
@@ -48,6 +48,6 @@ public class TriggerUsageStatisticsProvider extends BaseExtensionUsageStatistics
   @NotNull
   @Override
   protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
-    return extensionTypeDisplayName + " build configuration count";
+    return extensionTypeDisplayName;
   }
 }

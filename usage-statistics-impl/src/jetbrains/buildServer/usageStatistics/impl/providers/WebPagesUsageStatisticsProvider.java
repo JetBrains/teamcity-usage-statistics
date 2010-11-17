@@ -48,7 +48,7 @@ import org.jetbrains.annotations.NotNull;
 public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider {
   @NotNull private static final Logger LOG = Logger.getLogger(WebPagesUsageStatisticsProvider.class);
 
-  @NotNull @NonNls private static final String WEB_PAGES_USAGE_GROUP = "Web Pages Usage";
+  @NotNull @NonNls private static final String WEB_PAGES_USAGE_GROUP = "Web Pages Usage (users)";
   @NotNull @NonNls private static final String CONFIG_FILE_PATH = "config/webPagePatterns.txt";
 
   @NotNull private final List<Pattern> myPathPatterns = new ArrayList<Pattern>();

@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class VCSUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
   public VCSUsageStatisticsProvider(@NotNull final BuildServerEx server, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, presentationManager, "VCS Usage");
+    super(server, presentationManager, "VCS Root Types");
   }
 
   @NotNull
@@ -42,6 +42,6 @@ public class VCSUsageStatisticsProvider extends BaseExtensionUsageStatisticsProv
   @NotNull
   @Override
   protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
-    return extensionTypeDisplayName + " root count";
+    return extensionTypeDisplayName;
   }
 }
