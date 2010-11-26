@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
 import jetbrains.buildServer.serverSide.BuildAgentManagerEx;
@@ -28,17 +29,22 @@ import org.jetbrains.annotations.NotNull;
 public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProvider {
   @NotNull private static final String ourGroupName = "General (total count)";
   @NotNull private final UserGroupManager myUserGroupManager;
+  @NotNull private final CloudStatisticsProvider myCloudProvider;
 
   public StaticServerUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                              @NotNull final UserGroupManager userGroupManager,
-                                             @NotNull final UsageStatisticsPresentationManager presentationManager) {
+                                             @NotNull final UsageStatisticsPresentationManager presentationManager,
+                                             @NotNull final CloudStatisticsProvider cloudProvider) {
     super(server, presentationManager);
     myUserGroupManager = userGroupManager;
+    myCloudProvider = cloudProvider;
     applyPresentations(presentationManager);
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
     publishNumberOfAgents(publisher);
+    publishNumberOfVirtualAgents(publisher);
+
     publishNumberOfBuildTypes(publisher);
     publishNumberOfActiveBuildTypes(publisher);
     publishNumberOfDependencies(publisher);
@@ -47,10 +53,14 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     publishNumberOfUserGroups(publisher);
     publishNumberOfUsers(publisher);
     publishNumberOfVcsRoots(publisher);
+
+    publishNumberOfCloudImages(publisher);
+    publishNumberOfCloudProfiles(publisher);
   }
 
   protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
     presentationManager.applyPresentation("jb.agentNumber", "Agents", ourGroupName, null);
+    presentationManager.applyPresentation("jb.virtualAgentNumber", "Virtual Agents", ourGroupName, null);
     presentationManager.applyPresentation("jb.buildTypeNumber", "Build configurations", ourGroupName, null);
     presentationManager.applyPresentation("jb.activeBuildTypeNumber", "Active build configurations", ourGroupName, null);
     presentationManager.applyPresentation("jb.snapshotDependencyNumber", "Snapshot dependencies", ourGroupName, null);
@@ -60,6 +70,8 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     presentationManager.applyPresentation("jb.userGroupNumber", "User groups", ourGroupName, null);
     presentationManager.applyPresentation("jb.userNumber", "Users", ourGroupName, null);
     presentationManager.applyPresentation("jb.vcsRootNumber", "VCS roots", ourGroupName, null);
+    presentationManager.applyPresentation("jb.cloudProfiles", "Cloud profiles", ourGroupName, null);
+    presentationManager.applyPresentation("jb.cloudImages", "Cloud images", ourGroupName, null);
   }
 
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher) {
@@ -67,6 +79,21 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     final int agentNumber = buildAgentManager.getRegisteredAgents(true).size()
                           + ((BuildAgentManagerEx)buildAgentManager).getUnregisteredAgents(true).size();
     publisher.publishStatistic("jb.agentNumber", agentNumber);
+  }
+
+  private void publishNumberOfVirtualAgents(@NotNull final UsageStatisticsPublisher publisher) {
+    final int agentNumber = myCloudProvider.getNumberOfRunningInstances();
+    publisher.publishStatistic("jb.virtualAgentNumber", agentNumber);
+  }
+
+  private void publishNumberOfCloudProfiles(@NotNull final UsageStatisticsPublisher publisher) {
+    final int agentNumber = myCloudProvider.getNumberOfProfiles();
+    publisher.publishStatistic("jb.cloudProfiles", agentNumber);
+  }
+
+  private void publishNumberOfCloudImages(@NotNull final UsageStatisticsPublisher publisher) {
+    final int agentNumber = myCloudProvider.getNumberOfProfiles();
+    publisher.publishStatistic("jb.cloudImages", agentNumber);
   }
 
   private void publishNumberOfBuildTypes(@NotNull final UsageStatisticsPublisher publisher) {

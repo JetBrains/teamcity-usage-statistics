@@ -19,17 +19,49 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test
 public class UsageStatisticsProvidersTest extends BaseServerTestCase {
+  @BeforeMethod
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+
+    myFixture.addService(
+      new StaticServerUsageStatisticsProvider(myServer,
+                                              myFixture.getSingletonService(UserGroupManager.class),
+                                              myFixture.getSingletonService(UsageStatisticsPresentationManager.class),
+                                              new CloudStatisticsProvider() {
+                                                public int getNumberOfProfiles() {
+                                                  return 2;
+                                                }
+
+                                                public int getNumberOfImages() {
+                                                  return 6;
+                                                }
+
+                                                public int getNumberOfRunningInstances() {
+                                                  return 9;
+                                                }
+                                              }));
+
+    myFixture.addService(
+      new ServerConfigurationUsageStatisticsProvider(myServer,
+                                                     myFixture.getSingletonService(UsageStatisticsPresentationManager.class))
+    );
+  }
+
   public void provider_should_not_fail_on_publishing_statistics() {
     final UsageStatisticsPublisher publisher = new UsageStatisticsPublisher() {
       public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
