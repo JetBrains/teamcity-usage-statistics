@@ -34,13 +34,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
-  @NotNull private static final Comparator<String> STRINGS_COMPARATOR = new Comparator<String>() {
-    public int compare(@NotNull final String s1, @NotNull final String s2) {
-      return s1.compareToIgnoreCase(s2);
-    }
-  };
-
-  @NotNull private final Map<String, Set<ToolUsage>> myToolUsages = new TreeMap<String, Set<ToolUsage>>();
+  @NotNull private final Map<ICString, Set<ToolUsage>> myToolUsages = new TreeMap<ICString, Set<ToolUsage>>();
   @NotNull private final String myGroupName;
 
   protected BaseToolUsersUsageStatisticsProvider(@NotNull final BuildServerEx server,
@@ -82,15 +76,16 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long startDate) {
     removeObsoleteUsages();
-    final Map<String, Set<ToolUsage>> usages = filterUsages(startDate);
+    final Map<ICString, Set<ToolUsage>> usages = filterUsages(startDate);
     final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalUsagesCount(usages));
     setDefaultValue(myGroupName, formatter.format(0));
-    final List<String> toolIds = new ArrayList<String>(usages.keySet());
-    Collections.sort(toolIds, STRINGS_COMPARATOR);
-    for (final String toolId : toolIds) {
-      if (!publishToolUsages(toolId)) continue;
-      final String statisticId = "jb." + getId() + "." + periodDescription.toLowerCase() + "[" + toolId + "]";
-      myPresentationManager.applyPresentation(statisticId, prepareDisplayName(toolId), myGroupName, formatter);
+    final List<ICString> toolIds = new ArrayList<ICString>(usages.keySet());
+    Collections.sort(toolIds);
+    for (final ICString toolId : toolIds) {
+      final String toolIdSource = toolId.getSource();
+      if (!publishToolUsages(toolIdSource)) continue;
+      final String statisticId = "jb." + getId() + "." + periodDescription.toLowerCase() + "[" + toolIdSource + "]";
+      myPresentationManager.applyPresentation(statisticId, prepareDisplayName(toolIdSource), myGroupName, formatter);
       publisher.publishStatistic(statisticId, usages.get(toolId).size());
     }
   }
@@ -100,14 +95,28 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     return true;
   }
 
-  protected synchronized void addUsage(@NotNull final String toolId, final long userId) {
-    if (!myToolUsages.containsKey(toolId)) {
+  protected synchronized void addUsage(@NotNull final String toolIdSource, final long userId) {
+    final ICString toolId = new ICString(toolIdSource);
+    if (myToolUsages.containsKey(toolId)) {
+      updateSourceIfNeeded(toolId);
+    } else {
       myToolUsages.put(toolId, new HashSet<ToolUsage>());
     }
     final Set<ToolUsage> toolUsages = myToolUsages.get(toolId);
     final ToolUsage usage = new ToolUsage(String.valueOf(userId), Dates.now().getTime());
     toolUsages.remove(usage);
     toolUsages.add(usage);
+  }
+
+  private void updateSourceIfNeeded(@NotNull final ICString toolId) {
+    for (final ICString currentToolId : myToolUsages.keySet()) {
+      if (currentToolId.equals(toolId)) {
+        if (!publishToolUsages(currentToolId.getSource())) {
+          currentToolId.updateSource(toolId.getSource());
+        }
+        break;
+      }
+    }
   }
 
   private synchronized void removeObsoleteUsages() {
@@ -126,7 +135,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     };
   }
 
-  private int getTotalUsagesCount(@NotNull final Map<String, Set<ToolUsage>> usages) {
+  private int getTotalUsagesCount(@NotNull final Map<ICString, Set<ToolUsage>> usages) {
     int totalUsages = 0;
     for (final Set<ToolUsage> toolUsages : usages.values()) {
       totalUsages += toolUsages.size();
@@ -135,10 +144,10 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
   }
 
   @NotNull
-  private synchronized Map<String, Set<ToolUsage>> filterUsages(final long startDate) {
+  private synchronized Map<ICString, Set<ToolUsage>> filterUsages(final long startDate) {
     final Filter<ToolUsage> filter = createDateFilter(startDate);
-    final Map<String, Set<ToolUsage>> result = new HashMap<String, Set<ToolUsage>>();
-    for (final Map.Entry<String, Set<ToolUsage>> entry : myToolUsages.entrySet()) {
+    final Map<ICString, Set<ToolUsage>> result = new HashMap<ICString, Set<ToolUsage>>();
+    for (final Map.Entry<ICString, Set<ToolUsage>> entry : myToolUsages.entrySet()) {
       final Set<ToolUsage> usages = entry.getValue();
       final HashSet<ToolUsage> filteredUsages = FilterUtil.filterAndCopy(usages, new HashSet<ToolUsage>(), filter);
       if (!filteredUsages.isEmpty() || hasActiveUsage(usages)) {
@@ -164,9 +173,9 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
 
   private synchronized void writeExternal(@NotNull final Element element) {
     final Filter<ToolUsage> filter = createDateFilter(getThresholdDate());
-    for (final Map.Entry<String, Set<ToolUsage>> entry : myToolUsages.entrySet()) {
+    for (final Map.Entry<ICString, Set<ToolUsage>> entry : myToolUsages.entrySet()) {
       final Element toolElement = new Element(getToolName());
-      toolElement.setAttribute(getToolIdName(), entry.getKey());
+      toolElement.setAttribute(getToolIdName(), entry.getKey().getSource());
       element.addContent(toolElement);
       for (final ToolUsage usage : entry.getValue()) {
         if (!filter.accept(usage)) continue;
@@ -184,8 +193,9 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     for (final Object tool : element.getChildren(getToolName())) {
       if (!(tool instanceof Element)) continue;
       final Element toolElement = (Element)tool;
-      final String toolId = toolElement.getAttributeValue(getToolIdName());
-      if (toolId == null) continue;
+      final String toolIdSource = toolElement.getAttributeValue(getToolIdName());
+      if (toolIdSource == null) continue;
+      final ICString toolId = new ICString(toolIdSource);
       myToolUsages.put(toolId, new HashSet<ToolUsage>());
       for (final Object usage : toolElement.getChildren(USAGE)) {
         if (!(usage instanceof Element)) continue;
@@ -253,6 +263,39 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     @Override
     public int hashCode() {
       return myUserId.hashCode();
+    }
+  }
+
+  private static class ICString implements Comparable<ICString> {
+    @NotNull private String mySource;
+
+    public ICString(@NotNull final String source) {
+      mySource = source;
+    }
+
+    public void updateSource(@NotNull final String newSource) {
+      mySource = newSource;
+    }
+
+    @NotNull
+    public String getSource() {
+      return mySource;
+    }
+
+    public int compareTo(final ICString that) {
+      return mySource.compareToIgnoreCase(that.mySource);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+      if (this == o) return true;
+      if (!(o instanceof ICString)) return false;
+      return mySource.equalsIgnoreCase(((ICString)o).mySource);
+    }
+
+    @Override
+    public int hashCode() {
+      return mySource.toLowerCase().hashCode();
     }
   }
 }
