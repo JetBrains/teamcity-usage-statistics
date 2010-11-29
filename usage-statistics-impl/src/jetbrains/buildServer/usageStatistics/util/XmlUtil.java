@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import jetbrains.buildServer.util.ExceptionUtil;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class XmlUtil {
+  @NotNull private static final Logger LOG = Logger.getLogger(XmlUtil.class);
   @NotNull private static final Map<String, Object> ourFileLocks = new HashMap<String, Object>();
 
   public static void saveXml(@NotNull final Element element, @NotNull final File file) {
@@ -45,7 +46,7 @@ public class XmlUtil {
         outputter.output(new Document(element), fos);
       }
       catch (final IOException e) {
-        ExceptionUtil.rethrowAsRuntimeException(e);
+        LOG.warn(e.getLocalizedMessage(), e);
       }
       finally {
         if (fos != null) {
@@ -53,7 +54,7 @@ public class XmlUtil {
               fos.close();
           }
           catch (final IOException e) {
-            ExceptionUtil.rethrowAsRuntimeException(e);
+            LOG.warn(e.getLocalizedMessage(), e);
           }
         }
       }
@@ -68,10 +69,10 @@ public class XmlUtil {
         return new SAXBuilder().build(file).getRootElement();
       }
       catch (final JDOMException e) {
-        ExceptionUtil.rethrowAsRuntimeException(e);
+        LOG.warn(e.getLocalizedMessage(), e);
       }
       catch (final IOException e) {
-        ExceptionUtil.rethrowAsRuntimeException(e);
+        LOG.warn(e.getLocalizedMessage(), e);
       }
     }
     return null;
