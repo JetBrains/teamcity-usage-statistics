@@ -22,6 +22,7 @@ import java.util.Map;
 import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
+import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -58,6 +59,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
 
     myFixture.addService(
       new ServerConfigurationUsageStatisticsProvider(myServer,
+                                                     new TeamCityDatabaseManager(),
                                                      myFixture.getSingletonService(UsageStatisticsPresentationManager.class))
     );
   }

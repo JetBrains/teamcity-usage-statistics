@@ -37,14 +37,12 @@
     <constructor-arg index="2" ref="xmlRpcDispatcher"/>
   </bean>
   <bean id="vcsUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.VCSUsageStatisticsProvider"/>
-  <bean id="serverConfigurationUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.ServerConfigurationUsageStatisticsProvider"/>
+  <bean id="serverConfigurationUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.ServerConfigurationUsageStatisticsProvider">
+    <constructor-arg index="1" ref="dbManager"/>
+  </bean>
   <bean id="webPagesUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.WebPagesUsageStatisticsProvider"/>
   <bean id="notificatorUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.NotificatorUsageStatisticsProvider"/>
   <bean id="runnerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.RunnerUsageStatisticsProvider"/>
   <bean id="triggerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.TriggerUsageStatisticsProvider"/>
-
-  <bean id="databaseUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.DatabaseUsageStatisticsProvider">
-    <constructor-arg index="1" ref="dbManager"/>
-  </bean>
 </beans>
 

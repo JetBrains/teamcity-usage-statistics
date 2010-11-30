@@ -17,6 +17,7 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import jetbrains.buildServer.serverSide.BuildServerEx;
+import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TypeBasedFormatter;
@@ -26,28 +27,36 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
   @NotNull private static final String ourGroupName = "Server Configuration";
   private static final long MEGABYTE = 1024 * 1024;
 
+  @NotNull private final TeamCityDatabaseManager myDBManager;
+
   public ServerConfigurationUsageStatisticsProvider(@NotNull final BuildServerEx server,
+                                                    @NotNull final TeamCityDatabaseManager dbManager,
                                                     @NotNull final UsageStatisticsPresentationManager presentationManager) {
     super(server, presentationManager);
+    myDBManager = dbManager;
     applyPresentations(presentationManager);
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
     publishPlatform(publisher);
+    publishDatabaseInfo(publisher);
     publishJavaInfo(publisher);
     publishXmx(publisher);
   }
 
   private void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
-    presentationManager.applyPresentation("jb.serverPlatform", "Platform", ourGroupName, null);
-    presentationManager.applyPresentation("jb.serverJavaVersion", "Java version", ourGroupName, null);
-    presentationManager.applyPresentation("jb.serverJavaRuntimeVersion", "Java runtime version", ourGroupName, null);
-    presentationManager.applyPresentation("jb.serverMaxMemory", "Maximum used memory", ourGroupName, new TypeBasedFormatter<Long>(Long.class) {
-      @Override
-      protected String doFormat(@NotNull final Long statisticValue) {
-        return String.format("%dMb", statisticValue);
-      }
-    });
+    presentationManager.applyPresentation("jb.server.platform", "Platform", ourGroupName, null);
+    presentationManager.applyPresentation("jb.server.database", "Database version", ourGroupName, null);
+    presentationManager.applyPresentation("jb.server.jdbc", "JDBC driver version", ourGroupName, null);
+    presentationManager.applyPresentation("jb.server.java", "Java version", ourGroupName, null);
+    presentationManager.applyPresentation("jb.server.javaRuntime", "Java runtime version", ourGroupName, null);
+    presentationManager.applyPresentation("jb.server.maxMemory", "Maximum used memory", ourGroupName,
+                                          new TypeBasedFormatter<Long>(Long.class) {
+                                            @Override
+                                            protected String doFormat(@NotNull final Long statisticValue) {
+                                              return String.format("%dMb", statisticValue);
+                                            }
+                                          });
   }
 
   private void publishPlatform(@NotNull final UsageStatisticsPublisher publisher) {
@@ -55,15 +64,20 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
     sb.append(System.getProperty("os.name")).append(" ");
     sb.append(System.getProperty("os.version")).append(" ");
     sb.append(System.getProperty("os.arch"));
-    publisher.publishStatistic("jb.serverPlatform", sb.toString());
+    publisher.publishStatistic("jb.server.platform", sb.toString());
   }
 
   private void publishJavaInfo(@NotNull final UsageStatisticsPublisher publisher) {
-    publisher.publishStatistic("jb.serverJavaVersion", System.getProperty("java.version"));
-    publisher.publishStatistic("jb.serverJavaRuntimeVersion", System.getProperty("java.runtime.version"));
+    publisher.publishStatistic("jb.server.java", System.getProperty("java.version"));
+    publisher.publishStatistic("jb.server.javaRuntime", System.getProperty("java.runtime.version"));
+  }
+
+  private void publishDatabaseInfo(@NotNull final UsageStatisticsPublisher publisher) {
+    publisher.publishStatistic("jb.server.database", myDBManager.getDatabaseProductName() + ' ' + myDBManager.getDatabaseMajorVersion() + '.' + myDBManager.getDatabaseMinorVersion());
+    publisher.publishStatistic("jb.server.jdbc", myDBManager.getDriverName() + ' ' + myDBManager.getDriverMajorVersion() + '.' + myDBManager.getDriverMinorVersion());
   }
 
   private void publishXmx(@NotNull final UsageStatisticsPublisher publisher) {
-    publisher.publishStatistic("jb.serverMaxMemory", Runtime.getRuntime().maxMemory() / MEGABYTE);
+    publisher.publishStatistic("jb.server.maxMemory", Runtime.getRuntime().maxMemory() / MEGABYTE);
   }
 }
