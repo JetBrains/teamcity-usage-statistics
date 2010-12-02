@@ -44,5 +44,6 @@
   <bean id="notificatorUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.NotificatorUsageStatisticsProvider"/>
   <bean id="runnerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.RunnerUsageStatisticsProvider"/>
   <bean id="triggerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.TriggerUsageStatisticsProvider"/>
+  <bean id="agentsJavaUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.AgentsJavaUsageStatisticsProvider"/>
 </beans>
 
