@@ -21,6 +21,9 @@ import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.Used;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.audit.ActionType;
+import jetbrains.buildServer.serverSide.audit.AuditLog;
+import jetbrains.buildServer.serverSide.audit.AuditLogFactory;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettings;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
@@ -36,6 +39,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
   @NotNull private final UsageStatisticsSettingsPersistor mySettingsPersistor;
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
   @NotNull private final UsageStatisticsPresentationManagerEx myPresentationManager;
+  @NotNull private final AuditLog myAuditLog;
   @NotNull private final String myJspPath;
 
   @Used("spring")
@@ -44,6 +48,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
                                    @NotNull final WebControllerManager webControllerManager,
                                    @NotNull final PluginDescriptor pluginDescriptor,
                                    @NotNull final PagePlaces pagePlaces,
+                                   @NotNull final AuditLogFactory auditLogFactory,
                                    @NotNull final UsageStatisticsSettingsPersistor settingsPersistor,
                                    @NotNull final UsageStatisticsCollector statisticsCollector,
                                    @NotNull final UsageStatisticsPresentationManagerEx presentationManager) {
@@ -51,6 +56,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
     mySettingsPersistor = settingsPersistor;
     myStatisticsCollector = statisticsCollector;
     myPresentationManager = presentationManager;
+    myAuditLog = auditLogFactory.createForServer();
     myJspPath = pluginDescriptor.getPluginResourcesPath("usageStatistics.jsp");
 
     UsageStatisticsControllerUtil.register(this, authInterceptor, webControllerManager, "/admin/usageStatistics.html");
@@ -76,6 +82,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
   protected void doPost(final HttpServletRequest request, final HttpServletResponse response, final Element xmlResponse) {
     if (request.getParameter("forceCollectingNow") != null) {
       myStatisticsCollector.forceAsynchronousCollectingNow();
+      myAuditLog.logUserAction(ActionType.USAGE_STATISTICS_COLLECTING_STARTED, null, null);
       return;
     }
 
@@ -101,5 +108,6 @@ public class UsageStatisticsController extends BaseFormXmlController {
     final UsageStatisticsSettings settings = mySettingsPersistor.loadSettings();
     settings.setReportingEnabled(reportingEnabled);
     mySettingsPersistor.saveSettings(settings);
+    myAuditLog.logUserAction(reportingEnabled ? ActionType.USAGE_STATISTICS_REPORTING_ENABLED : ActionType.USAGE_STATISTICS_REPORTING_DISABLED, null, null);
   }
 }
