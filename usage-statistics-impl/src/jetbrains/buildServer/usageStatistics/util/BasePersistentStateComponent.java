@@ -34,6 +34,10 @@ public abstract class BasePersistentStateComponent extends BuildServerAdapter {
     myServer = server;
     myFile = new File(getDataDir(serverPaths), getId() + ".xml");
     myServer.addListener(this);
+  }
+
+  @Override
+  public void serverStartup() {
     loadState();
   }
 
