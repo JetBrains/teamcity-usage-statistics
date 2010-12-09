@@ -13,7 +13,7 @@
 /searchResults\.html
 /viewArtifactsPopup\.html
 /viewDependentArtifactsPopup\.html
-/viewLog\.html\?tab=(buildLog|dependencies|Duplicator|Inspection|testsInfo)
+/viewLog\.html\?tab=(buildLog|dependencies|Duplicator|Inspection|testsInfo|buildResultsDiv)
 /viewModification\.html(\?tab=(vcsModificationBuilds|vcsModificationFiles|vcsModificationTests))?
 /viewType.html
 /viewType\.html(\?tab=buildTypeChangeLog|buildTypeHistoryList|buildTypeIssueLog|buildTypeSettings|buildTypeStatistics|buildTypeStatusDiv|maven|pendingChangesDiv)?
