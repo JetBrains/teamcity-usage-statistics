@@ -22,7 +22,6 @@ import jetbrains.buildServer.notification.NotificationRule;
 import jetbrains.buildServer.notification.NotificationRulesManager;
 import jetbrains.buildServer.notification.Notificator;
 import jetbrains.buildServer.notification.NotificatorRegistry;
-import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.util.filters.Filter;
 import jetbrains.buildServer.util.filters.FilterUtil;
@@ -32,19 +31,12 @@ public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatis
   @NotNull private final NotificatorRegistry myNotificatorRegistry;
   @NotNull private final NotificationRulesManager myNotificationRulesManager;
 
-  public NotificatorUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                            @NotNull final UsageStatisticsPresentationManager presentationManager,
+  public NotificatorUsageStatisticsProvider(@NotNull final UsageStatisticsPresentationManager presentationManager,
                                             @NotNull final NotificatorRegistry notificatorRegistry,
                                             @NotNull final NotificationRulesManager notificationRulesManager) {
-    super(server, presentationManager, "Notificators (users)");
+    super(presentationManager);
     myNotificatorRegistry = notificatorRegistry;
     myNotificationRulesManager = notificationRulesManager;
-  }
-
-  @NotNull
-  @Override
-  protected String getId() {
-    return "notificator";
   }
 
   @Override
@@ -62,11 +54,5 @@ public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatis
         callback.setUsagesCount(notificatorType, notificator.getDisplayName(), count);
       }
     }
-  }
-
-  @NotNull
-  @Override
-  protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
-    return extensionTypeDisplayName;
   }
 }

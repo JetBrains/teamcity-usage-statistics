@@ -17,7 +17,7 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.Vector;
-import jetbrains.buildServer.serverSide.BuildServerEx;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.impl.XmlRpcBasedRemoteServer;
 import jetbrains.buildServer.serverSide.impl.XmlRpcDispatcher;
@@ -25,19 +25,16 @@ import jetbrains.buildServer.serverSide.impl.XmlRpcListener;
 import jetbrains.buildServer.serverSide.impl.XmlRpcSession;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener {
-  @NotNull @NonNls private static final String IDE_USAGE_GROUP = "IDE Plugins (users)";
-
-  public IDEUsageStatisticsProvider(@NotNull final BuildServerEx server,
+  public IDEUsageStatisticsProvider(@NotNull final SBuildServer server,
                                     @NotNull final ServerPaths serverPaths,
                                     @NotNull final XmlRpcDispatcher xmlRpcDispatcher,
                                     @NotNull final UsageStatisticsPresentationManager presentationManager,
                                     @NotNull final PluginDescriptor pluginDescriptor) {
-    super(server, serverPaths, presentationManager, pluginDescriptor, IDE_USAGE_GROUP);
+    super(server, serverPaths, presentationManager, pluginDescriptor);
     xmlRpcDispatcher.addListener(this);
   }
 
@@ -51,12 +48,6 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
         addUsage(prepareUserAgent(session.getUserAgent()), userId);
       }
     }
-  }
-
-  @NotNull
-  @Override
-  protected String getId() {
-    return "ide";
   }
 
   @NotNull
@@ -75,12 +66,6 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
   @Override
   protected String getToolIdName() {
     return "name";
-  }
-
-  @NotNull
-  @Override
-  protected String prepareDisplayName(@NotNull final String ideName) {
-    return ideName;
   }
 
   @Override

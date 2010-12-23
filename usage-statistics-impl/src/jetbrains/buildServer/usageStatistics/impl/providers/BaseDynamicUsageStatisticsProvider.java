@@ -17,7 +17,6 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.*;
-import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.DefaultFormatter;
@@ -27,32 +26,35 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 
 abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsProvider {
+  @NotNull protected final UsageStatisticsPresentationManager myPresentationManager;
+  @NotNull private final PluginDescriptor myPluginDescriptor;
   @NotNull private final LinkedHashMap<Long, String> myPeriodDescriptions;
   @NotNull private final Map<String, String> myDefaultValues; // group name -> default value
 
-  protected BaseDynamicUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                               @NotNull final UsageStatisticsPresentationManager presentationManager,
+  protected BaseDynamicUsageStatisticsProvider(@NotNull final UsageStatisticsPresentationManager presentationManager,
                                                @NotNull final PluginDescriptor pluginDescriptor,
-                                               @NotNull final LinkedHashMap<Long, String> periodDescriptions,
-                                               @NotNull final Set<String> dynamicGroupNames) {
-    super(server, presentationManager);
+                                               @NotNull final LinkedHashMap<Long, String> periodDescriptions) {
+    myPresentationManager = presentationManager;
     myPeriodDescriptions = periodDescriptions;
+    myPluginDescriptor = pluginDescriptor;
     myDefaultValues = new HashMap<String, String>();
-    applyPresentations(presentationManager);
-    registerGroupRenderers(presentationManager, pluginDescriptor, periodDescriptions, dynamicGroupNames);
   }
 
-  protected BaseDynamicUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                               @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                               @NotNull final PluginDescriptor pluginDescriptor,
-                                               @NotNull final Set<String> dynamicGroupNames) {
-    this(server, presentationManager, pluginDescriptor, createDefaultPeriodDescriptions(), dynamicGroupNames);
+  protected BaseDynamicUsageStatisticsProvider(@NotNull final UsageStatisticsPresentationManager presentationManager,
+                                               @NotNull final PluginDescriptor pluginDescriptor) {
+    this(presentationManager, pluginDescriptor, createDefaultPeriodDescriptions());
+  }
+
+  @Override
+  public void setGroupName(@NotNull final String groupName) {
+    super.setGroupName(groupName);
+    registerGroupRenderer(myPresentationManager, myPluginDescriptor, myPeriodDescriptions, groupName);
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
     final long now = Dates.now().getTime();
     for (final Long period : myPeriodDescriptions.keySet()) {
-      accept(publisher, myPeriodDescriptions.get(period), now - period);
+      accept(publisher, myPeriodDescriptions.get(period).toLowerCase(), now - period);
     }
   }
 
@@ -83,31 +85,20 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
 
   protected abstract boolean mustSortStatistics();
 
-  protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager, @NotNull final String periodDescription) {}
-
-  private void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
-    for (final String periodDescription : myPeriodDescriptions.values()) {
-      applyPresentations(presentationManager, periodDescription);
-    }
-  }
-
-  private void registerGroupRenderers(@NotNull final UsageStatisticsPresentationManager presentationManager,
-                                      @NotNull final PluginDescriptor pluginDescriptor,
-                                      @NotNull final LinkedHashMap<Long, String> periodDescriptions,
-                                      @NotNull final Set<String> dynamicGroupNames) {
+  private void registerGroupRenderer(@NotNull final UsageStatisticsPresentationManager presentationManager,
+                                     @NotNull final PluginDescriptor pluginDescriptor,
+                                     @NotNull final LinkedHashMap<Long, String> periodDescriptions,
+                                     @NotNull final String groupName) {
     final List<String> periods = new ArrayList<String>(periodDescriptions.size());
 
     for (final Map.Entry<Long, String> entry : periodDescriptions.entrySet()) {
       periods.add(entry.getValue());
     }
 
-    final String defaultDefaultValue = new DefaultFormatter().format(null);
+    final DynamicUsageStatisticsGroup.DefaultValueProvider defaultValueProvider = createDefaultValueProvider(groupName, new DefaultFormatter().format(null));
+    final DynamicUsageStatisticsGroup group = new DynamicUsageStatisticsGroup(pluginDescriptor, periods, defaultValueProvider, mustSortStatistics());
 
-    for (final String groupName : dynamicGroupNames) {
-      final DynamicUsageStatisticsGroup.DefaultValueProvider defaultValueProvider = createDefaultValueProvider(groupName, defaultDefaultValue);
-      final DynamicUsageStatisticsGroup group = new DynamicUsageStatisticsGroup(pluginDescriptor, periods, defaultValueProvider, mustSortStatistics());
-      presentationManager.registerGroupRenderer(groupName, group);
-    }
+    presentationManager.registerGroupRenderer(groupName, group);
   }
 
   private DynamicUsageStatisticsGroup.DefaultValueProvider createDefaultValueProvider(@NotNull final String groupName, @NotNull final String defaultDefaultValue) {

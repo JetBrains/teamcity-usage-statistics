@@ -18,7 +18,6 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.Map;
 import java.util.TreeMap;
-import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
@@ -27,13 +26,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 abstract class BaseExtensionUsageStatisticsProvider extends BaseUsageStatisticsProvider {
-  @NotNull private final String myGroupName;
+  @NotNull private final UsageStatisticsPresentationManager myPresentationManager;
 
-  protected BaseExtensionUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                                 @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                                 @NotNull final String groupName) {
-    super(server, presentationManager);
-    myGroupName = groupName;
+  protected BaseExtensionUsageStatisticsProvider(@NotNull final UsageStatisticsPresentationManager presentationManager) {
+    myPresentationManager = presentationManager;
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
@@ -41,19 +37,13 @@ abstract class BaseExtensionUsageStatisticsProvider extends BaseUsageStatisticsP
     final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalUsagesCount(extensionUsages));
     for (final Map.Entry<ExtensionType, Integer> entry : extensionUsages.entrySet()) {
       final ExtensionType type = entry.getKey();
-      final String statisticId = "jb." + getId() + "[" + type.getExtensionTypeId() + "]";
-      myPresentationManager.applyPresentation(statisticId, prepareDisplayName(type.getExtensionTypeDisplayName()), myGroupName, formatter);
+      final String statisticId = makeId(type.getExtensionTypeId());
+      myPresentationManager.applyPresentation(statisticId, type.getExtensionTypeDisplayName(), myGroupName, formatter);
       publisher.publishStatistic(statisticId, entry.getValue());
     }
   }
 
-  @NotNull
-  protected abstract String getId();
-
   protected abstract void collectUsages(@NotNull UsagesCollectorCallback callback);
-
-  @NotNull
-  protected abstract String prepareDisplayName(@NotNull String extensionTypeDisplayName);
 
   private int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
     int totalCount = 0;
@@ -104,6 +94,7 @@ abstract class BaseExtensionUsageStatisticsProvider extends BaseUsageStatisticsP
       return myExtensionTypeId;
     }
 
+    @SuppressWarnings({"NullableProblems"})
     @NotNull
     public String getExtensionTypeDisplayName() {
       return myExtensionTypeDisplayName == null ? myExtensionTypeId : myExtensionTypeDisplayName;

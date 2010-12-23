@@ -29,7 +29,7 @@ import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.servlet.http.HttpServletRequest;
-import jetbrains.buildServer.serverSide.BuildServerEx;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.users.SUser;
@@ -42,18 +42,15 @@ import jetbrains.buildServer.web.plugins.bean.ServerPluginInfo;
 import jetbrains.buildServer.web.util.SessionUser;
 import jetbrains.buildServer.web.util.WebUtil;
 import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider {
   @NotNull private static final Logger LOG = Logger.getLogger(WebPagesUsageStatisticsProvider.class);
 
-  @NotNull @NonNls private static final String WEB_PAGES_USAGE_GROUP = "Web Pages Usage (users)";
-  @NotNull @NonNls private static final String CONFIG_FILE_PATH = "config/webPagePatterns.txt";
-
   @NotNull private final List<Pattern> myPathPatterns = new ArrayList<Pattern>();
+  @NotNull private final ServerPluginInfo myPluginDescriptor;
 
-  public WebPagesUsageStatisticsProvider(@NotNull final BuildServerEx server,
+  public WebPagesUsageStatisticsProvider(@NotNull final SBuildServer server,
                                          @NotNull final ServerPaths serverPaths,
                                          @NotNull final PagePlaces pagePlaces,
                                          @NotNull final ServerPluginInfo pluginDescriptor,
@@ -61,9 +58,13 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     super(server, serverPaths, presentationManager, new LinkedHashMap<Long, String>() {{
       put(Dates.ONE_WEEK, "Week");
       put(30 * Dates.ONE_DAY, "Month");
-    }}, pluginDescriptor, WEB_PAGES_USAGE_GROUP);
-    readWebPagePatterns(pluginDescriptor);
+    }}, pluginDescriptor);
+    myPluginDescriptor = pluginDescriptor;
     registerPageExtension(pagePlaces, pluginDescriptor);
+  }
+
+  public void setConfigFilePath(@NotNull final String configFilePath) {
+    readWebPagePatterns(configFilePath);
   }
 
   public void processGetRequest(@NotNull final HttpServletRequest request) {
@@ -76,12 +77,6 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
       path += "?tab=" + tab;
     }
     addUsage(path, user.getId());
-  }
-
-  @NotNull
-  @Override
-  protected String getId() {
-    return "web";
   }
 
   @NotNull
@@ -100,12 +95,6 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   @Override
   protected String getToolIdName() {
     return "path";
-  }
-
-  @NotNull
-  @Override
-  protected String prepareDisplayName(@NotNull final String path) {
-    return path;
   }
 
   @Override
@@ -135,12 +124,12 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     };
   }
 
-  private void readWebPagePatterns(@NotNull final ServerPluginInfo pluginDescriptor) {
-    for (final File jarFile : pluginDescriptor.getPluginJarFiles()) {
+  private void readWebPagePatterns(@NotNull final String configFilePath) {
+    for (final File jarFile : myPluginDescriptor.getPluginJarFiles()) {
       ZipFile zip = null;
       try {
         zip = new ZipFile(jarFile);
-        final ZipEntry entry = zip.getEntry(CONFIG_FILE_PATH);
+        final ZipEntry entry = zip.getEntry(configFilePath);
         if (entry == null) continue;
         final BufferedReader reader = new BufferedReader(new InputStreamReader(zip.getInputStream(entry)));
         try {

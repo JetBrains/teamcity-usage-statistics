@@ -16,20 +16,17 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import jetbrains.buildServer.serverSide.BuildServerEx;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.vcs.SVcsRoot;
 import org.jetbrains.annotations.NotNull;
 
 public class VCSUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
-  public VCSUsageStatisticsProvider(@NotNull final BuildServerEx server, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, presentationManager, "VCS Root Types");
-  }
+  @NotNull private final SBuildServer myServer;
 
-  @NotNull
-  @Override
-  protected String getId() {
-    return "vcs";
+  public VCSUsageStatisticsProvider(@NotNull final SBuildServer server, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    super(presentationManager);
+    myServer = server;
   }
 
   @Override
@@ -37,11 +34,5 @@ public class VCSUsageStatisticsProvider extends BaseExtensionUsageStatisticsProv
     for (final SVcsRoot vcsRoot : myServer.getVcsManager().getAllRegisteredVcsRoots()) {
       callback.addUsage(vcsRoot.getVcsName(), vcsRoot.getVcsDisplayName());
     }
-  }
-
-  @NotNull
-  @Override
-  protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
-    return extensionTypeDisplayName;
   }
 }

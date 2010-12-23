@@ -27,13 +27,11 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BasePersistentStateComponent extends BuildServerAdapter {
-  @NotNull protected final SBuildServer myServer;
   @NotNull private final File myFile;
 
   public BasePersistentStateComponent(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
-    myServer = server;
     myFile = new File(getDataDir(serverPaths), getId() + ".xml");
-    myServer.addListener(this);
+    server.addListener(this);
   }
 
   @Override

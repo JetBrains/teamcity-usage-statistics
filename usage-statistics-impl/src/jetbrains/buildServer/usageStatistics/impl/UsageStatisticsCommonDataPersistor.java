@@ -17,7 +17,7 @@
 package jetbrains.buildServer.usageStatistics.impl;
 
 import java.util.Date;
-import jetbrains.buildServer.serverSide.BuildServerEx;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.usageStatistics.util.BasePersistentStateComponent;
 import org.jdom.Element;
@@ -28,7 +28,7 @@ public class UsageStatisticsCommonDataPersistor extends BasePersistentStateCompo
   @NotNull private static final String LAST_REPORTING_DATE = "last-reporting-date";
   @Nullable private Date myLastReportingDate;
 
-  public UsageStatisticsCommonDataPersistor(@NotNull final BuildServerEx server, @NotNull final ServerPaths serverPaths) {
+  public UsageStatisticsCommonDataPersistor(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
     super(server, serverPaths);
   }
 
@@ -37,6 +37,7 @@ public class UsageStatisticsCommonDataPersistor extends BasePersistentStateCompo
     return myLastReportingDate;
   }
 
+  @SuppressWarnings({"NullableProblems"})
   public void setLastReportingDate(@NotNull final Date date) {
     myLastReportingDate = date;
   }

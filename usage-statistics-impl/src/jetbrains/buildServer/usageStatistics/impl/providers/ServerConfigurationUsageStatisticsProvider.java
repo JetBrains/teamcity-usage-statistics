@@ -16,7 +16,6 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
@@ -24,39 +23,39 @@ import jetbrains.buildServer.usageStatistics.presentation.formatters.TypeBasedFo
 import org.jetbrains.annotations.NotNull;
 
 public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatisticsProvider {
-  @NotNull private static final String ourGroupName = "Server Configuration";
   private static final long MEGABYTE = 1024 * 1024;
 
   @NotNull private final TeamCityDatabaseManager myDBManager;
+  @NotNull private final UsageStatisticsPresentationManager myPresentationManager;
 
-  public ServerConfigurationUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                                    @NotNull final TeamCityDatabaseManager dbManager,
+  public ServerConfigurationUsageStatisticsProvider(@NotNull final TeamCityDatabaseManager dbManager,
                                                     @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, presentationManager);
     myDBManager = dbManager;
-    applyPresentations(presentationManager);
+    myPresentationManager = presentationManager;
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
+    applyPresentations();
+
     publishPlatform(publisher);
     publishDatabaseInfo(publisher);
     publishJavaInfo(publisher);
     publishXmx(publisher);
   }
 
-  private void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
-    presentationManager.applyPresentation("jb.server.platform", "Platform", ourGroupName, null);
-    presentationManager.applyPresentation("jb.server.database", "Database version", ourGroupName, null);
-    presentationManager.applyPresentation("jb.server.jdbc", "JDBC driver version", ourGroupName, null);
-    presentationManager.applyPresentation("jb.server.java", "Java version", ourGroupName, null);
-    presentationManager.applyPresentation("jb.server.javaRuntime", "Java runtime version", ourGroupName, null);
-    presentationManager.applyPresentation("jb.server.maxMemory", "Maximum used memory", ourGroupName,
-                                          new TypeBasedFormatter<Long>(Long.class) {
-                                            @Override
-                                            protected String doFormat(@NotNull final Long statisticValue) {
-                                              return String.format("%dMb", statisticValue);
-                                            }
-                                          });
+  private void applyPresentations() {
+    myPresentationManager.applyPresentation(makeId("platform"), "Platform", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("database"), "Database version", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("jdbc"), "JDBC driver version", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("java"), "Java version", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("javaRuntime"), "Java runtime version", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("maxMemory"), "Maximum used memory", myGroupName,
+                                            new TypeBasedFormatter<Long>(Long.class) {
+                                              @Override
+                                              protected String doFormat(@NotNull final Long statisticValue) {
+                                                return String.format("%dMb", statisticValue);
+                                              }
+                                            });
   }
 
   private void publishPlatform(@NotNull final UsageStatisticsPublisher publisher) {

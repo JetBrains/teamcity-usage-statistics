@@ -17,7 +17,6 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.*;
-import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -35,29 +34,22 @@ import org.jetbrains.annotations.NotNull;
 
 abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
   @NotNull private final Map<ICString, Set<ToolUsage>> myToolUsages = new TreeMap<ICString, Set<ToolUsage>>();
-  @NotNull private final String myGroupName;
 
-  protected BaseToolUsersUsageStatisticsProvider(@NotNull final BuildServerEx server,
+  protected BaseToolUsersUsageStatisticsProvider(@NotNull final SBuildServer server,
                                                  @NotNull final ServerPaths serverPaths,
                                                  @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                                 @NotNull final PluginDescriptor pluginDescriptor,
-                                                 @NotNull final String groupName) {
-    this(server, serverPaths, presentationManager, createDefaultPeriodDescriptions(), pluginDescriptor, groupName);
+                                                 @NotNull final PluginDescriptor pluginDescriptor) {
+    this(server, serverPaths, presentationManager, createDefaultPeriodDescriptions(), pluginDescriptor);
   }
 
-  protected BaseToolUsersUsageStatisticsProvider(@NotNull final BuildServerEx server,
+  protected BaseToolUsersUsageStatisticsProvider(@NotNull final SBuildServer server,
                                                  @NotNull final ServerPaths serverPaths,
                                                  @NotNull final UsageStatisticsPresentationManager presentationManager,
                                                  @NotNull final LinkedHashMap<Long, String> periodDescriptions,
-                                                 @NotNull final PluginDescriptor pluginDescriptor,
-                                                 @NotNull final String groupName) {
-    super(server, presentationManager, pluginDescriptor, periodDescriptions, Collections.singleton(groupName));
-    myGroupName = groupName;
+                                                 @NotNull final PluginDescriptor pluginDescriptor) {
+    super(presentationManager, pluginDescriptor, periodDescriptions);
     registerPersistor(server, serverPaths);
   }
-
-  @NotNull
-  protected abstract String getId();
 
   @NotNull
   protected abstract String getExternalId();
@@ -67,9 +59,6 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
 
   @NotNull
   protected abstract String getToolIdName();
-
-  @NotNull
-  protected abstract String prepareDisplayName(@NotNull String toolId);
 
   protected abstract boolean publishToolUsages(@NotNull String toolId);
 
@@ -84,8 +73,8 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     for (final ICString toolId : toolIds) {
       final String toolIdSource = toolId.getSource();
       if (!publishToolUsages(toolIdSource)) continue;
-      final String statisticId = "jb." + getId() + "." + periodDescription.toLowerCase() + "[" + toolIdSource + "]";
-      myPresentationManager.applyPresentation(statisticId, prepareDisplayName(toolIdSource), myGroupName, formatter);
+      final String statisticId = makeId(periodDescription, toolIdSource);
+      myPresentationManager.applyPresentation(statisticId, toolIdSource, myGroupName, formatter);
       publisher.publishStatistic(statisticId, usages.get(toolId).size());
     }
   }

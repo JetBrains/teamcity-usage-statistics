@@ -16,19 +16,23 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 
 abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider {
-  @NotNull protected final BuildServerEx myServer;
-  @NotNull protected final UsageStatisticsPresentationManager myPresentationManager;
+  @NotNull private String myIdFormat;
+  @NotNull protected String myGroupName;
 
-  protected BaseUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                        @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    myServer = server;
-    myPresentationManager = presentationManager;
-    server.registerExtension(UsageStatisticsProvider.class, getClass().getName(), this);
+  public void setIdFormat(@NotNull final String idFormat) {
+    myIdFormat = idFormat;
+  }
+
+  public void setGroupName(@NotNull final String groupName) {
+    myGroupName = groupName;
+  }
+
+  @NotNull
+  protected String makeId(@NotNull final String... params) {
+    return String.format(myIdFormat, params);
   }
 }

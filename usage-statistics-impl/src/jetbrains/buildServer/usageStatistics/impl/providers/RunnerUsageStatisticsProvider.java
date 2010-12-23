@@ -16,38 +16,35 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import jetbrains.buildServer.serverSide.BuildServerEx;
+import java.util.HashSet;
+import java.util.Set;
 import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.SBuildRunnerDescriptor;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 
 public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
-  public RunnerUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                       @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, presentationManager, "Runners (build configurations)");
-  }
+  @NotNull private final SBuildServer myServer;
 
-  @NotNull
-  @Override
-  protected String getId() {
-    return "runner";
+  public RunnerUsageStatisticsProvider(@NotNull final SBuildServer server, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    super(presentationManager);
+    myServer = server;
   }
 
   @Override
   protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
     for (final SBuildType buildType : myServer.getProjectManager().getActiveBuildTypes()) {
+      final Set<String> collectedTypes = new HashSet<String>();
       for (final SBuildRunnerDescriptor runnerDescriptor : buildType.getBuildRunners()) {
         final RunType runType = runnerDescriptor.getRunType();
-        callback.addUsage(runType.getType(), runType.getDisplayName());
+        final String type = runType.getType();
+        if (!collectedTypes.contains(type)) {
+          callback.addUsage(type, runType.getDisplayName());
+          collectedTypes.add(type);
+        }
       }
     }
-  }
-
-  @NotNull
-  @Override
-  protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
-    return extensionTypeDisplayName;
   }
 }

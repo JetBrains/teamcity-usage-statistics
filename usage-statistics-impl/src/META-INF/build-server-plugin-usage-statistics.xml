@@ -18,11 +18,14 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans default-autowire="constructor">
+
   <!-- Web -->
+
   <bean id="usageStatisticsController" class="jetbrains.buildServer.controllers.UsageStatisticsController"/>
   <bean id="downloadUsageStatisticsController" class="jetbrains.buildServer.controllers.DownloadUsageStatisticsController"/>
 
   <!-- Core -->
+
   <bean id="usageStatisticsManager" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCollectorImpl"/>
   <bean id="usageStatisticsReporter" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsReporterImpl"/>
   <bean id="usageStatisticsReportingScheduler" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsReportingScheduler"/>
@@ -31,19 +34,60 @@
   <bean id="usageStatisticsPresentationManger" class="jetbrains.buildServer.usageStatistics.presentation.impl.UsageStatisticsPresentationManagerImpl"/>
 
   <!-- Providers -->
-  <bean id="buildDataUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.BuildDataUsageStatisticsProvider"/>
-  <bean id="staticServerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.StaticServerUsageStatisticsProvider"/>
+
+  <bean id="buildDataUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.BuildDataUsageStatisticsProvider">
+    <property name="idFormat" value="jb.%s.%s"/>
+    <property name="groupName" value="Builds"/>
+  </bean>
+
+  <bean id="staticServerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.StaticServerUsageStatisticsProvider">
+    <property name="idFormat" value="jb.%s"/>
+    <property name="groupName" value="General (total count)"/>
+  </bean>
+
   <bean id="ideUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.IDEUsageStatisticsProvider">
     <constructor-arg index="2" ref="xmlRpcDispatcher"/>
+    <property name="idFormat" value="jb.ide.%s[%s]"/>
+    <property name="groupName" value="IDE Plugins (users)"/>
   </bean>
-  <bean id="vcsUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.VCSUsageStatisticsProvider"/>
+
+  <bean id="webPagesUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.WebPagesUsageStatisticsProvider">
+    <property name="configFilePath" value="config/webPagePatterns.txt"/>
+    <property name="idFormat" value="jb.web.%s[%s]"/>
+    <property name="groupName" value="Web Pages Usage (users)"/>
+  </bean>
+
   <bean id="serverConfigurationUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.ServerConfigurationUsageStatisticsProvider">
-    <constructor-arg index="1" ref="dbManager"/>
+    <constructor-arg index="0" ref="dbManager"/>
+    <property name="idFormat" value="jb.server.%s"/>
+    <property name="groupName" value="Server Configuration"/>
   </bean>
-  <bean id="webPagesUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.WebPagesUsageStatisticsProvider"/>
-  <bean id="notificatorUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.NotificatorUsageStatisticsProvider"/>
-  <bean id="runnerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.RunnerUsageStatisticsProvider"/>
-  <bean id="triggerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.TriggerUsageStatisticsProvider"/>
-  <bean id="agentsJavaUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.AgentsJavaUsageStatisticsProvider"/>
+
+  <bean id="vcsUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.VCSUsageStatisticsProvider">
+    <property name="idFormat" value="jb.vcs[%s]"/>
+    <property name="groupName" value="VCS Root Types"/>
+  </bean>
+
+  <bean id="notificatorUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.NotificatorUsageStatisticsProvider">
+    <property name="idFormat" value="jb.notificator[%s]"/>
+    <property name="groupName" value="Notificators (users)"/>
+  </bean>
+
+  <bean id="runnerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.RunnerUsageStatisticsProvider">
+    <property name="idFormat" value="jb.runner[%s]"/>
+    <property name="groupName" value="Runners (build configurations)"/>
+  </bean>
+
+  <bean id="triggerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.TriggerUsageStatisticsProvider">
+    <property name="idFormat" value="jb.trigger[%s]"/>
+    <property name="groupName" value="Triggers (build configurations)"/>
+  </bean>
+
+  <bean id="agentsJavaUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.AgentsJavaUsageStatisticsProvider">
+    <property name="parameterName" value="teamcity.agent.jvm.version"/>
+    <property name="idFormat" value="jb.agent.java[%s]"/>
+    <property name="groupName" value="Agent Java Versions (agents)"/>
+  </bean>
+
 </beans>
 

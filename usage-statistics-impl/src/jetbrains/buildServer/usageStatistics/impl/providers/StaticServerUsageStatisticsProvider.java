@@ -19,29 +19,31 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
-import jetbrains.buildServer.serverSide.BuildAgentManagerEx;
-import jetbrains.buildServer.serverSide.BuildServerEx;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 
 public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProvider {
-  @NotNull private static final String ourGroupName = "General (total count)";
+  @NotNull private final SBuildServer myServer;
   @NotNull private final UserGroupManager myUserGroupManager;
+  @NotNull private final UsageStatisticsPresentationManager myPresentationManager;
   @NotNull private final CloudStatisticsProvider myCloudProvider;
 
-  public StaticServerUsageStatisticsProvider(@NotNull final BuildServerEx server,
+  public StaticServerUsageStatisticsProvider(@NotNull final SBuildServer server,
                                              @NotNull final UserGroupManager userGroupManager,
                                              @NotNull final UsageStatisticsPresentationManager presentationManager,
                                              @NotNull final CloudStatisticsProvider cloudProvider) {
-    super(server, presentationManager);
+    myServer = server;
     myUserGroupManager = userGroupManager;
+    myPresentationManager = presentationManager;
     myCloudProvider = cloudProvider;
-    applyPresentations(presentationManager);
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
+    applyPresentations();
+
     publishNumberOfAgents(publisher);
     publishNumberOfVirtualAgents(publisher);
 
@@ -58,52 +60,53 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     publishNumberOfCloudProfiles(publisher);
   }
 
-  protected void applyPresentations(@NotNull final UsageStatisticsPresentationManager presentationManager) {
-    presentationManager.applyPresentation("jb.agentNumber", "Agents", ourGroupName, null);
-    presentationManager.applyPresentation("jb.virtualAgentNumber", "Virtual Agents", ourGroupName, null);
-    presentationManager.applyPresentation("jb.buildTypeNumber", "Build configurations", ourGroupName, null);
-    presentationManager.applyPresentation("jb.activeBuildTypeNumber", "Active build configurations", ourGroupName, null);
-    presentationManager.applyPresentation("jb.snapshotDependencyNumber", "Snapshot dependencies", ourGroupName, null);
-    presentationManager.applyPresentation("jb.artifactDependencyNumber", "Artifact dependencies", ourGroupName, null);
-    presentationManager.applyPresentation("jb.archivedProjectNumber", "Archived projects", ourGroupName, null);
-    presentationManager.applyPresentation("jb.projectNumber", "Projects", ourGroupName, null);
-    presentationManager.applyPresentation("jb.userGroupNumber", "User groups", ourGroupName, null);
-    presentationManager.applyPresentation("jb.userNumber", "Users", ourGroupName, null);
-    presentationManager.applyPresentation("jb.vcsRootNumber", "VCS roots", ourGroupName, null);
-    presentationManager.applyPresentation("jb.cloudProfiles", "Cloud profiles", ourGroupName, null);
-    presentationManager.applyPresentation("jb.cloudImages", "Cloud images", ourGroupName, null);
+  protected void applyPresentations() {
+    myPresentationManager.applyPresentation(makeId("allRegisteredAgentNumber"), "Registered agents (all)", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("authorizedRegisteredAgentNumber"), "Registered agents (authorized only)", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("agentNumber"), "Agents", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("virtualAgentNumber"), "Virtual Agents", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("buildTypeNumber"), "Build configurations", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("activeBuildTypeNumber"), "Active build configurations", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("snapshotDependencyNumber"), "Snapshot dependencies", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("artifactDependencyNumber"), "Artifact dependencies", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("archivedProjectNumber"), "Archived projects", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("projectNumber"), "Projects", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("userGroupNumber"), "User groups", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("userNumber"), "Users", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("vcsRootNumber"), "VCS roots", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("cloudProfiles"), "Cloud profiles", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("cloudImages"), "Cloud images", myGroupName, null);
   }
 
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher) {
     final BuildAgentManager buildAgentManager = myServer.getBuildAgentManager();
-    final int agentNumber = buildAgentManager.getRegisteredAgents(true).size()
-                          + ((BuildAgentManagerEx)buildAgentManager).getUnregisteredAgents(true).size();
-    publisher.publishStatistic("jb.agentNumber", agentNumber);
+    publisher.publishStatistic(makeId("allRegisteredAgentNumber"), buildAgentManager.getRegisteredAgents(true).size());
+    publisher.publishStatistic(makeId("authorizedRegisteredAgentNumber"), buildAgentManager.getRegisteredAgents(false).size());
   }
 
   private void publishNumberOfVirtualAgents(@NotNull final UsageStatisticsPublisher publisher) {
     final int agentNumber = myCloudProvider.getNumberOfRunningInstances();
-    publisher.publishStatistic("jb.virtualAgentNumber", agentNumber);
+    publisher.publishStatistic(makeId("virtualAgentNumber"), agentNumber);
   }
 
   private void publishNumberOfCloudProfiles(@NotNull final UsageStatisticsPublisher publisher) {
     final int agentNumber = myCloudProvider.getNumberOfProfiles();
-    publisher.publishStatistic("jb.cloudProfiles", agentNumber);
+    publisher.publishStatistic(makeId("cloudProfiles"), agentNumber);
   }
 
   private void publishNumberOfCloudImages(@NotNull final UsageStatisticsPublisher publisher) {
     final int agentNumber = myCloudProvider.getNumberOfProfiles();
-    publisher.publishStatistic("jb.cloudImages", agentNumber);
+    publisher.publishStatistic(makeId("cloudImages"), agentNumber);
   }
 
   private void publishNumberOfBuildTypes(@NotNull final UsageStatisticsPublisher publisher) {
     final int buildTypeNumber = myServer.getProjectManager().getNumberOfBuildTypes();
-    publisher.publishStatistic("jb.buildTypeNumber", buildTypeNumber);
+    publisher.publishStatistic(makeId("buildTypeNumber"), buildTypeNumber);
   }
 
   private void publishNumberOfActiveBuildTypes(@NotNull final UsageStatisticsPublisher publisher) {
     final int activeBuildTypeNumber = myServer.getProjectManager().getActiveBuildTypes().size();
-    publisher.publishStatistic("jb.activeBuildTypeNumber", activeBuildTypeNumber);
+    publisher.publishStatistic(makeId("activeBuildTypeNumber"), activeBuildTypeNumber);
   }
 
   private void publishNumberOfDependencies(@NotNull final UsageStatisticsPublisher publisher) {
@@ -112,32 +115,32 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
       snapshotDependencies += buildType.getDependencies().size();
       artifactDependencies += buildType.getArtifactDependencies().size();
     }
-    publisher.publishStatistic("jb.snapshotDependencyNumber", snapshotDependencies);
-    publisher.publishStatistic("jb.artifactDependencyNumber", artifactDependencies);
+    publisher.publishStatistic(makeId("snapshotDependencyNumber"), snapshotDependencies);
+    publisher.publishStatistic(makeId("artifactDependencyNumber"), artifactDependencies);
   }
 
   private void publishNumberOfProjects(@NotNull final UsageStatisticsPublisher publisher) {
     final int projectNumber = myServer.getProjectManager().getNumberOfProjects();
-    publisher.publishStatistic("jb.projectNumber", projectNumber);
+    publisher.publishStatistic(makeId("projectNumber"), projectNumber);
   }
 
   private void publishNumberOfArchivedProjects(@NotNull final UsageStatisticsPublisher publisher) {
     final int archivedProjectNumber = myServer.getProjectManager().getArchivedProjects().size();
-    publisher.publishStatistic("jb.archivedProjectNumber", archivedProjectNumber);
+    publisher.publishStatistic(makeId("archivedProjectNumber"), archivedProjectNumber);
   }
 
   private void publishNumberOfUserGroups(@NotNull final UsageStatisticsPublisher publisher) {
     final int userGroupNumber = myUserGroupManager.getUserGroups().size();
-    publisher.publishStatistic("jb.userGroupNumber", userGroupNumber);
+    publisher.publishStatistic(makeId("userGroupNumber"), userGroupNumber);
   }
 
   private void publishNumberOfUsers(@NotNull final UsageStatisticsPublisher publisher) {
     final int userNumber = myServer.getUserModel().getNumberOfRegisteredUsers();
-    publisher.publishStatistic("jb.userNumber", userNumber);
+    publisher.publishStatistic(makeId("userNumber"), userNumber);
   }
 
   private void publishNumberOfVcsRoots(@NotNull final UsageStatisticsPublisher publisher) {
     final int vcsRootNumber = myServer.getVcsManager().getAllRegisteredVcsRoots().size();
-    publisher.publishStatistic("jb.vcsRootNumber", vcsRootNumber);
+    publisher.publishStatistic(makeId("vcsRootNumber"), vcsRootNumber);
   }
 }

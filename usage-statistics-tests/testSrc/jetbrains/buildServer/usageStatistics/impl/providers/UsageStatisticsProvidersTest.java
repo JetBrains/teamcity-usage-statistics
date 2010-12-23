@@ -58,8 +58,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
                                               }));
 
     myFixture.addService(
-      new ServerConfigurationUsageStatisticsProvider(myServer,
-                                                     new TeamCityDatabaseManager(),
+      new ServerConfigurationUsageStatisticsProvider(new TeamCityDatabaseManager(),
                                                      myFixture.getSingletonService(UsageStatisticsPresentationManager.class))
     );
   }

@@ -16,38 +16,36 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.util.HashSet;
+import java.util.Set;
 import jetbrains.buildServer.buildTriggers.BuildTriggerDescriptor;
 import jetbrains.buildServer.buildTriggers.BuildTriggerService;
-import jetbrains.buildServer.serverSide.BuildServerEx;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 
 public class TriggerUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
-  public TriggerUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                        @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, presentationManager, "Triggers (build configurations)");
-  }
+  @NotNull private final SBuildServer myServer;
 
-  @NotNull
-  @Override
-  protected String getId() {
-    return "trigger";
+  public TriggerUsageStatisticsProvider(@NotNull final SBuildServer server,
+                                        @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    super(presentationManager);
+    myServer = server;
   }
 
   @Override
   protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
     for (final SBuildType buildType : myServer.getProjectManager().getActiveBuildTypes()) {
+      final Set<String> collectedNames = new HashSet<String>();
       for (final BuildTriggerDescriptor triggerDescriptor : buildType.getBuildTriggersCollection()) {
         final BuildTriggerService triggerService = triggerDescriptor.getBuildTriggerService();
-        callback.addUsage(triggerService.getName(), triggerService.getDisplayName());
+        final String name = triggerService.getName();
+        if (!collectedNames.contains(name)) {
+          callback.addUsage(name, triggerService.getDisplayName());
+          collectedNames.add(name);
+        }
       }
     }
-  }
-
-  @NotNull
-  @Override
-  protected String prepareDisplayName(@NotNull final String extensionTypeDisplayName) {
-    return extensionTypeDisplayName;
   }
 }
