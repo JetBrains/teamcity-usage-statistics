@@ -21,7 +21,7 @@
     <orderEntry type="module" module-name="test-core" />
     <orderEntry type="module" module-name="usage-statistics-api" />
     <orderEntry type="module" module-name="server" />
-    <orderEntry type="module" module-name="cloud-server" />
+    <orderEntry type="module" module-name="remote-api-impl" />
   </component>
 </module>
 

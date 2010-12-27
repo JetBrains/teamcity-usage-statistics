@@ -16,53 +16,21 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
-import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test
 public class UsageStatisticsProvidersTest extends BaseServerTestCase {
-  @BeforeMethod
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-
-    myFixture.addService(
-      new StaticServerUsageStatisticsProvider(myServer,
-                                              myFixture.getSingletonService(UserGroupManager.class),
-                                              myFixture.getSingletonService(UsageStatisticsPresentationManager.class),
-                                              new CloudStatisticsProvider() {
-                                                public int getNumberOfProfiles() {
-                                                  return 2;
-                                                }
-
-                                                public int getNumberOfImages() {
-                                                  return 6;
-                                                }
-
-                                                public int getNumberOfRunningInstances() {
-                                                  return 9;
-                                                }
-                                              }));
-
-    myFixture.addService(
-      new ServerConfigurationUsageStatisticsProvider(new TeamCityDatabaseManager(),
-                                                     myFixture.getSingletonService(UsageStatisticsPresentationManager.class))
-    );
-  }
-
   public void provider_should_not_fail_on_publishing_statistics() {
     final UsageStatisticsPublisher publisher = new UsageStatisticsPublisher() {
       public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
@@ -70,47 +38,51 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
       }
     };
 
-    final Collection<UsageStatisticsProvider> providers = myServer.getExtensions(UsageStatisticsProvider.class);
-    for (final UsageStatisticsProvider provider : providers) {
+    for (final BaseUsageStatisticsProvider provider : getAllProviders()) {
+      provider.setIdFormat("");
+      provider.setGroupName("");
       provider.accept(publisher);
     }
   }
 
   public void static_server_usage_statistics_provider_test() {
-    final Map<String, Object> statistics = collectStatisticsByProvider(StaticServerUsageStatisticsProvider.class);
+    final StaticServerUsageStatisticsProvider provider = myServer.getSingletonService(StaticServerUsageStatisticsProvider.class);
+    provider.setIdFormat("%s");
 
-    assertEquals(myServer.getProjectManager().getNumberOfProjects(), statistics.get("jb.projectNumber"));
-    assertEquals(myServer.getProjectManager().getArchivedProjects().size(), statistics.get("jb.archivedProjectNumber"));
-    assertEquals(myServer.getProjectManager().getNumberOfBuildTypes(), statistics.get("jb.buildTypeNumber"));
+    final Map<String, Object> statistics = collectStatisticsByProvider(provider);
+
+    assertEquals(myServer.getProjectManager().getNumberOfProjects(), statistics.get("projectNumber"));
+    assertEquals(myServer.getProjectManager().getArchivedProjects().size(), statistics.get("archivedProjectNumber"));
+    assertEquals(myServer.getProjectManager().getNumberOfBuildTypes(), statistics.get("buildTypeNumber"));
 
     final BuildAgentManager buildAgentManager = myServer.getBuildAgentManager();
-    final int agentNumber = buildAgentManager.getRegisteredAgents(true).size() + buildAgentManager.getUnregisteredAgents().size();
-    assertEquals(agentNumber, statistics.get("jb.agentNumber"));
+    assertEquals(buildAgentManager.getRegisteredAgents(true).size(), statistics.get("allRegisteredAgentNumber"));
+    assertEquals(buildAgentManager.getRegisteredAgents(false).size(), statistics.get("authorizedRegisteredAgentNumber"));
 
-    assertEquals(myServer.getVcsManager().getAllRegisteredVcsRoots().size(), statistics.get("jb.vcsRootNumber"));
-    assertEquals(myServer.getUserModel().getNumberOfRegisteredUsers(), statistics.get("jb.userNumber"));
+    assertEquals(myServer.getVcsManager().getAllRegisteredVcsRoots().size(), statistics.get("vcsRootNumber"));
+    assertEquals(myServer.getUserModel().getNumberOfRegisteredUsers(), statistics.get("userNumber"));
 
     final UserGroupManager userGroupManager = myServer.getSingletonService(UserGroupManager.class);
-    assertEquals(userGroupManager.getUserGroups().size(), statistics.get("jb.userGroupNumber"));
+    assertEquals(userGroupManager.getUserGroups().size(), statistics.get("userGroupNumber"));
   }
 
-  public void all_providers_should_be_registered() {
-    final Collection<String> registeredProviders = myServer.getExtensionSources(UsageStatisticsProvider.class);
-
-    assertTrue(registeredProviders.contains(StaticServerUsageStatisticsProvider.class.getName()));
-    assertTrue(registeredProviders.contains(ServerConfigurationUsageStatisticsProvider.class.getName()));
-    //assertTrue(registeredProviders.contains(BuildDataUsageStatisticsProvider.class.getName()));
-    //assertTrue(registeredProviders.contains(IDEUsageStatisticsProvider.class.getName()));
-    assertTrue(registeredProviders.contains(VCSUsageStatisticsProvider.class.getName()));
-    //assertTrue(registeredProviders.contains(WebPagesUsageStatisticsProvider.class.getName()));
-    assertTrue(registeredProviders.contains(NotificatorUsageStatisticsProvider.class.getName()));
-    assertTrue(registeredProviders.contains(RunnerUsageStatisticsProvider.class.getName()));
-    assertTrue(registeredProviders.contains(TriggerUsageStatisticsProvider.class.getName()));
+  private Collection<? extends BaseUsageStatisticsProvider> getAllProviders() {
+    return Arrays.asList(
+      myServer.getSingletonService(AgentsJavaUsageStatisticsProvider.class),
+      myServer.getSingletonService(BuildDataUsageStatisticsProvider.class),
+      myServer.getSingletonService(IDEUsageStatisticsProvider.class),
+      myServer.getSingletonService(NotificatorUsageStatisticsProvider.class),
+      myServer.getSingletonService(RunnerUsageStatisticsProvider.class),
+      myServer.getSingletonService(ServerConfigurationUsageStatisticsProvider.class),
+      myServer.getSingletonService(StaticServerUsageStatisticsProvider.class),
+      myServer.getSingletonService(TriggerUsageStatisticsProvider.class),
+      myServer.getSingletonService(VCSUsageStatisticsProvider.class)
+//    myServer.getSingletonService(WebPagesUsageStatisticsProvider.class)
+    );
   }
 
-  private Map<String, Object> collectStatisticsByProvider(final Class<? extends UsageStatisticsProvider> providerClass) {
+  private Map<String, Object> collectStatisticsByProvider(@NotNull final UsageStatisticsProvider provider) {
     final Map<String, Object> statistics = new HashMap<String, Object>();
-    final UsageStatisticsProvider provider = myServer.getSingletonService(providerClass);
     provider.accept(new UsageStatisticsPublisher() {
       public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
         statistics.put(id, value);
