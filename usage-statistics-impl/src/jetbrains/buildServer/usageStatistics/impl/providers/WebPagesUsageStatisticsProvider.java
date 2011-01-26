@@ -29,6 +29,7 @@ import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.servlet.http.HttpServletRequest;
+import jetbrains.buildServer.plugins.bean.ServerPluginInfo;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
@@ -38,7 +39,6 @@ import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PlaceId;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.SimplePageExtension;
-import jetbrains.buildServer.web.plugins.bean.ServerPluginInfo;
 import jetbrains.buildServer.web.util.SessionUser;
 import jetbrains.buildServer.web.util.WebUtil;
 import org.apache.log4j.Logger;
@@ -125,7 +125,7 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   }
 
   private void readWebPagePatterns(@NotNull final String configFilePath) {
-    for (final File jarFile : myPluginDescriptor.getPluginJarFiles()) {
+    for (final File jarFile : myPluginDescriptor.getPluginJars()) {
       ZipFile zip = null;
       try {
         zip = new ZipFile(jarFile);
