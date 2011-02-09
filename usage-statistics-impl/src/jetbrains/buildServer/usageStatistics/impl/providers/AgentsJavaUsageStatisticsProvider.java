@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class AgentsJavaUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
   @NotNull private final SBuildServer myServer;
-  @NotNull private String myParameterName;
+  @NotNull private String myParameterName = "";
 
   public AgentsJavaUsageStatisticsProvider(@NotNull final SBuildServer server,
                                            @NotNull final UsageStatisticsPresentationManager presentationManager) {
