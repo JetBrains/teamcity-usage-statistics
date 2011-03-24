@@ -15,4 +15,4 @@
   --%>
 
 <%@ include file="/include.jsp"%>
-<p><forms:checkbox name="sendUsageStatistics" checked="true"/><label for="sendUsageStatistics" class="rightLabel">Send usage statistics anonymously</label></p>
+<p><forms:checkbox name="sendUsageStatistics" checked="true"/><label for="sendUsageStatistics" class="rightLabel">Send anonymous usage statistics to TeamCity development team</label></p>
