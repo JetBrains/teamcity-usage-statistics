@@ -28,6 +28,5 @@
 /changeExpandedView\.html
 /changes\.html
 /promoDetailsPopup\.html
-/showJsp\.html
 /systemProblems\.html
 /stacktrace\.html
