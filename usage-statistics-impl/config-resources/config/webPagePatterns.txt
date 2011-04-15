@@ -24,7 +24,6 @@
 /agentDetails\.html(\?tab=.*)?
 /allProjects\.html
 /buildGraph\.html
-/carpetPopup\.html
 /changeExpandedView\.html
 /changes\.html
 /promoDetailsPopup\.html
