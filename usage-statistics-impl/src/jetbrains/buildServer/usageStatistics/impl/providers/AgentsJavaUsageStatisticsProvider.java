@@ -42,6 +42,15 @@ public class AgentsJavaUsageStatisticsProvider extends BaseExtensionUsageStatist
       if (javaVersion == null) {
         javaVersion = "Unknown";
       }
+      else {
+        final int firstDotPos = javaVersion.indexOf('.');
+        if (firstDotPos != -1) {
+          final int secondDotPos = javaVersion.indexOf('.', firstDotPos + 1);
+          if (secondDotPos != -1) {
+            javaVersion = javaVersion.substring(0, secondDotPos);
+          }
+        }
+      }
       callback.addUsage(javaVersion, javaVersion);
     }
   }
