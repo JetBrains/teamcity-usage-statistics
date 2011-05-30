@@ -20,7 +20,7 @@
   <c:forEach var="statistic" items="${statisticsGroup.statistics}">
     <tr class="highlightRow statisticRow">
       <td><c:out value="${statistic.displayName}"/></td>
-      <td style="width: 13%"><c:out value="${statistic.formattedValue}"/></td>
+      <td style="width: 13%; white-space: nowrap;"><c:out value="${statistic.formattedValue}"/></td>
     </tr>
   </c:forEach>
 </table>
