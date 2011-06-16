@@ -60,6 +60,16 @@
     <property name="groupName" value="Web Pages Usage (users)"/>
   </bean>
 
+  <bean id="muteUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.MuteUsageStatisticsProvider">
+    <property name="idFormat" value="jb.mute.%s.%s"/>
+    <property name="groupName" value="Investigation / Mute"/>
+  </bean>
+
+  <bean id="investigationUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.InvestigationUsageStatisticsProvider">
+    <property name="idFormat" value="jb.investigation.%s.%s"/>
+    <property name="groupName" value="Investigation / Mute"/>
+  </bean>
+
   <bean id="serverConfigurationUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.ServerConfigurationUsageStatisticsProvider">
     <constructor-arg index="0" ref="dbManager"/>
     <property name="idFormat" value="jb.server.%s"/>

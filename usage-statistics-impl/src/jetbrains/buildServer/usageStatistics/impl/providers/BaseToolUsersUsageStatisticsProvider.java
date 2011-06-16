@@ -39,7 +39,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
                                                  @NotNull final ServerPaths serverPaths,
                                                  @NotNull final UsageStatisticsPresentationManager presentationManager,
                                                  @NotNull final PluginDescriptor pluginDescriptor) {
-    this(server, serverPaths, presentationManager, createDefaultPeriodDescriptions(), pluginDescriptor);
+    this(server, serverPaths, presentationManager, createHDWPeriodDescriptions(), pluginDescriptor);
   }
 
   protected BaseToolUsersUsageStatisticsProvider(@NotNull final SBuildServer server,

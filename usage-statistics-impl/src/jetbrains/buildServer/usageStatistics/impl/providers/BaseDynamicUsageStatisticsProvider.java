@@ -42,7 +42,7 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
 
   protected BaseDynamicUsageStatisticsProvider(@NotNull final UsageStatisticsPresentationManager presentationManager,
                                                @NotNull final PluginDescriptor pluginDescriptor) {
-    this(presentationManager, pluginDescriptor, createDefaultPeriodDescriptions());
+    this(presentationManager, pluginDescriptor, createHDWPeriodDescriptions());
   }
 
   @Override
@@ -59,11 +59,20 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
   }
 
   @NotNull
-  protected static LinkedHashMap<Long, String> createDefaultPeriodDescriptions() {
+  protected static LinkedHashMap<Long, String> createHDWPeriodDescriptions() {
     return new LinkedHashMap<Long, String>() {{
       put(Dates.ONE_HOUR, "Hour");
       put(Dates.ONE_DAY, "Day");
       put(Dates.ONE_WEEK, "Week");
+    }};
+  }
+
+  @NotNull
+  protected static LinkedHashMap<Long, String> createDWMPeriodDescriptions() {
+    return new LinkedHashMap<Long, String>() {{
+      put(Dates.ONE_DAY, "Day");
+      put(Dates.ONE_WEEK, "Week");
+      put(30 * Dates.ONE_DAY, "Month");
     }};
   }
 
