@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.controllers;
 
+import com.intellij.openapi.diagnostic.Logger;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,13 +33,12 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCollectorImpl;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildServer.web.util.WebUtil;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.web.servlet.ModelAndView;
 
 public class DownloadUsageStatisticsController extends BaseController {
-  @NotNull private static final Logger LOG = Logger.getLogger(DownloadUsageStatisticsController.class);
+  @NotNull private static final Logger LOG = Logger.getInstance(DownloadUsageStatisticsController.class.getName());
   @NotNull private static final SimpleDateFormat FILE_NAME_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HHmmss");
   @NotNull private static final SimpleDateFormat FILE_CONTENT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
@@ -62,7 +62,7 @@ public class DownloadUsageStatisticsController extends BaseController {
     if (!myStatisticsCollector.isStatisticsCollected()) {
       //noinspection ThrowableResultOfMethodCallIgnored
       final String cause = UsageStatisticsCollectorImpl.createIllegalStateException().getLocalizedMessage().toLowerCase();
-      WebUtil.notFound(response, "Failed to download usage statistics: " + cause, LOG);
+      WebUtil.notFound(request, response, "Failed to download usage statistics: " + cause, LOG);
       return null;
     }
 
