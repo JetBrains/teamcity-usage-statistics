@@ -40,7 +40,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
   @NotNull private final UsageStatisticsPresentationManagerEx myPresentationManager;
   @NotNull private final AuditLog myAuditLog;
-  @NotNull private final String myJspPath;
+  @NotNull private final PluginDescriptor myPluginDescriptor;
 
   @Used("spring")
   public UsageStatisticsController(@NotNull final SBuildServer server,
@@ -57,7 +57,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
     myStatisticsCollector = statisticsCollector;
     myPresentationManager = presentationManager;
     myAuditLog = auditLogFactory.createForServer();
-    myJspPath = pluginDescriptor.getPluginResourcesPath("usageStatistics.jsp");
+    myPluginDescriptor = pluginDescriptor;
 
     UsageStatisticsControllerUtil.register(this, authInterceptor, webControllerManager, "/admin/usageStatistics.html");
 
@@ -72,9 +72,9 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
   @Override
   protected ModelAndView doGet(final HttpServletRequest request, final HttpServletResponse response) {
-    final ModelAndView modelAndView = new ModelAndView(myJspPath);
+    final ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("usageStatistics.jsp"));
     //noinspection unchecked
-    modelAndView.getModel().put("statisticsData", new UsageStatisticsBean(mySettingsPersistor, myStatisticsCollector, myPresentationManager));
+    modelAndView.getModel().put("statisticsData", new UsageStatisticsBean(mySettingsPersistor, myStatisticsCollector, myPresentationManager, myPluginDescriptor));
     return modelAndView;
   }
 

@@ -18,9 +18,11 @@ package jetbrains.buildServer.usageStatistics.presentation;
 
 import java.util.LinkedHashMap;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
+import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 
 public interface UsageStatisticsPresentationManagerEx extends UsageStatisticsPresentationManager {
   @NotNull
-  LinkedHashMap<String, UsageStatisticsGroupExtension> groupStatistics(@NotNull UsageStatisticsCollector collector);
+  LinkedHashMap<String, UsageStatisticsGroupExtension> groupStatistics(@NotNull UsageStatisticsCollector collector,
+                                                                       @NotNull PluginDescriptor pluginDescriptor);
 }

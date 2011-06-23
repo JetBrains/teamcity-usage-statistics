@@ -31,7 +31,6 @@
   <bean id="usageStatisticsReportingScheduler" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsReportingScheduler"/>
   <bean id="usageStatisticsSettingsPersistor" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor"/>
   <bean id="usageStatisticsCommonDataPersistor" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCommonDataPersistor"/>
-  <bean id="usageStatisticsPresentationManger" class="jetbrains.buildServer.usageStatistics.presentation.impl.UsageStatisticsPresentationManagerImpl"/>
   <bean id="usageStatisticsLicenseAgreementListener" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsLicenseAgreementListener">
     <constructor-arg index="3" ref="licenseAgreementDispatcher"/>
   </bean>

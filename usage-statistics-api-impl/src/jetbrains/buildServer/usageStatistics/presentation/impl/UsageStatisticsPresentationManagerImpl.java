@@ -34,15 +34,9 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
     }
   };
 
-  @NotNull private final PluginDescriptor myPluginDescriptor;
-
   @NotNull private final Map<String, String> myStatisticGroups = new HashMap<String, String>(); // statistic id -> group name
   @NotNull private final Map<String, UsageStatisticsGroupExtension> myGroupExtensions = new HashMap<String, UsageStatisticsGroupExtension>(); // group name -> extension
   @NotNull private final Map<String, UsageStatisticsPresentationFactory> myPresentationFactories = new HashMap<String, UsageStatisticsPresentationFactory>(); // statistic id -> factory
-
-  public UsageStatisticsPresentationManagerImpl(@NotNull final PluginDescriptor pluginDescriptor) {
-    myPluginDescriptor = pluginDescriptor;
-  }
 
   public void applyPresentation(@NotNull final String id,
                                 @Nullable final String displayName,
@@ -59,7 +53,8 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
   }
 
   @NotNull
-  public LinkedHashMap<String, UsageStatisticsGroupExtension> groupStatistics(@NotNull final UsageStatisticsCollector collector) {
+  public LinkedHashMap<String, UsageStatisticsGroupExtension> groupStatistics(@NotNull final UsageStatisticsCollector collector,
+                                                                              @NotNull final PluginDescriptor pluginDescriptor) {
     final MultiMap<String, UsageStatisticPresentation> groupedStatistics = new MultiMap<String, UsageStatisticPresentation>(); // group name -> collection of statistics
     collector.publishCollectedStatistics(new UsageStatisticsPublisher() {
       public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
@@ -73,7 +68,7 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
     final LinkedHashMap<String, UsageStatisticsGroupExtension> groups = new LinkedHashMap<String, UsageStatisticsGroupExtension>();
 
     for (final String groupName : groupNames) {
-      final UsageStatisticsGroupExtension group = getGroupExtension(groupName);
+      final UsageStatisticsGroupExtension group = getGroupExtension(groupName, pluginDescriptor);
       group.setStatistics(groupedStatistics.get(groupName));
       groups.put(groupName, group);
     }
@@ -90,9 +85,9 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
   }
 
   @NotNull
-  private UsageStatisticsGroupExtension getGroupExtension(@NotNull final String groupName) {
+  private UsageStatisticsGroupExtension getGroupExtension(@NotNull final String groupName, @NotNull final PluginDescriptor pluginDescriptor) {
     if (!myGroupExtensions.containsKey(groupName)) {
-      registerGroupRenderer(groupName, new DefaultUsageStatisticsGroup(myPluginDescriptor));
+      registerGroupRenderer(groupName, new DefaultUsageStatisticsGroup(pluginDescriptor));
     }
     return myGroupExtensions.get(groupName);
   }

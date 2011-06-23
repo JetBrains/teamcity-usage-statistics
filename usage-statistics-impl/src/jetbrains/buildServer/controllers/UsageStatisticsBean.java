@@ -25,6 +25,7 @@ import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersist
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupExtension;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
 import jetbrains.buildServer.util.StringUtil;
+import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,14 +39,15 @@ public class UsageStatisticsBean {
 
   public UsageStatisticsBean(@NotNull final UsageStatisticsSettingsPersistor settingsPersistor,
                              @NotNull final UsageStatisticsCollector statisticsCollector,
-                             @NotNull final UsageStatisticsPresentationManagerEx presentationManager) {
+                             @NotNull final UsageStatisticsPresentationManagerEx presentationManager,
+                             @NotNull final PluginDescriptor pluginDescriptor) {
     myReportingEnabled = settingsPersistor.loadSettings().isReportingEnabled();
     myCollectingNow = statisticsCollector.isCollectingNow();
     myStatisticsCollected = statisticsCollector.isStatisticsCollected();
 
     if (myStatisticsCollected) {
       myLastCollectingFinishDate = statisticsCollector.getLastCollectingFinishDate();
-      myStatisticGroups = presentationManager.groupStatistics(statisticsCollector);
+      myStatisticGroups = presentationManager.groupStatistics(statisticsCollector, pluginDescriptor);
 
       final int[] sizeEstimate = new int[] { 0 };
       statisticsCollector.publishCollectedStatistics(new UsageStatisticsPublisher() {
