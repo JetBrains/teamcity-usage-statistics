@@ -47,6 +47,11 @@
     <property name="groupName" value="General (total count)"/>
   </bean>
 
+  <bean id="onlineUsersUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.OnlineUsersUsageStatisticsProvider">
+    <property name="idFormat" value="jb.%s.%s"/>
+    <property name="groupName" value="User Logins"/>
+  </bean>
+
   <bean id="ideUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.IDEUsageStatisticsProvider">
     <constructor-arg index="2" ref="xmlRpcDispatcher"/>
     <property name="idFormat" value="jb.ide.%s[%s]"/>

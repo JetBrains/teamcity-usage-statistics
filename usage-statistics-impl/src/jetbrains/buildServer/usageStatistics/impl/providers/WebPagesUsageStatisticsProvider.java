@@ -67,8 +67,8 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     readWebPagePatterns(configFilePath);
   }
 
-  public int getWebUsersCount() {
-    return getUsersCount();
+  public int getWebUsersCount(final long fromTimestamp) {
+    return getUsersCount(fromTimestamp);
   }
 
   public void processGetRequest(@NotNull final HttpServletRequest request) {

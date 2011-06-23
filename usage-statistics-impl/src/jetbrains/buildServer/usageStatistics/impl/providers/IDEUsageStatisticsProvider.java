@@ -38,8 +38,8 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
     xmlRpcDispatcher.addListener(this);
   }
 
-  public int getIDEUsersCount() {
-    return getUsersCount();
+  public int getIDEUsersCount(final long fromTimestamp) {
+    return getUsersCount(fromTimestamp);
   }
 
   public void remoteMethodCalled(@NotNull final Class targetClass,

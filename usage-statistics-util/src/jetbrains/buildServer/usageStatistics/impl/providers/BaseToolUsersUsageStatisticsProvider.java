@@ -90,12 +90,15 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     toolUsages.add(usage);
   }
 
-  protected synchronized int getUsersCount() {
-    removeObsoleteUsages();
+  protected int getUsersCount(final long fromTimestamp) {
+    return getUsersCount(filterUsages(fromTimestamp));
+  }
+
+  private static int getUsersCount(@NotNull final Map<ICString, Set<ToolUsage>> usages) {
     final Set<String> userIds = new HashSet<String>();
-    for (final Set<ToolUsage> usages : myToolUsages.values()) {
-      for (final ToolUsage usage : usages) {
-        userIds.add(usage.getUserId());
+    for (final Set<ToolUsage> toolUsages : usages.values()) {
+      for (final ToolUsage toolUsage : toolUsages) {
+        userIds.add(toolUsage.getUserId());
       }
     }
     return userIds.size();

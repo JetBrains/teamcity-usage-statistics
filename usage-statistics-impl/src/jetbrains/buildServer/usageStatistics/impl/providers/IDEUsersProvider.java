@@ -17,5 +17,5 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 public interface IDEUsersProvider {
-  int getIDEUsersCount();
+  int getIDEUsersCount(long fromTimestamp);
 }
