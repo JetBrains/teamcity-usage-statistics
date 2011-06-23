@@ -38,13 +38,6 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
   protected BaseToolUsersUsageStatisticsProvider(@NotNull final SBuildServer server,
                                                  @NotNull final ServerPaths serverPaths,
                                                  @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                                 @NotNull final PluginDescriptor pluginDescriptor) {
-    this(server, serverPaths, presentationManager, createHDWPeriodDescriptions(), pluginDescriptor);
-  }
-
-  protected BaseToolUsersUsageStatisticsProvider(@NotNull final SBuildServer server,
-                                                 @NotNull final ServerPaths serverPaths,
-                                                 @NotNull final UsageStatisticsPresentationManager presentationManager,
                                                  @NotNull final LinkedHashMap<Long, String> periodDescriptions,
                                                  @NotNull final PluginDescriptor pluginDescriptor) {
     super(presentationManager, pluginDescriptor, periodDescriptions);
@@ -95,6 +88,17 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     final ToolUsage usage = new ToolUsage(String.valueOf(userId), Dates.now().getTime());
     toolUsages.remove(usage);
     toolUsages.add(usage);
+  }
+
+  protected synchronized int getUsersCount() {
+    removeObsoleteUsages();
+    final Set<String> userIds = new HashSet<String>();
+    for (final Set<ToolUsage> usages : myToolUsages.values()) {
+      for (final ToolUsage usage : usages) {
+        userIds.add(usage.getUserId());
+      }
+    }
+    return userIds.size();
   }
 
   private void updateSourceIfNeeded(@NotNull final ICString toolId) {

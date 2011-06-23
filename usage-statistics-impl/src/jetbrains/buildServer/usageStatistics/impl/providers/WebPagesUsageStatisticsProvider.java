@@ -44,7 +44,7 @@ import jetbrains.buildServer.web.util.WebUtil;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider {
+public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements WebUsersProvider {
   @NotNull private static final Logger LOG = Logger.getLogger(WebPagesUsageStatisticsProvider.class);
 
   @NotNull private final List<Pattern> myPathPatterns = new ArrayList<Pattern>();
@@ -65,6 +65,10 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
 
   public void setConfigFilePath(@NotNull final String configFilePath) {
     readWebPagePatterns(configFilePath);
+  }
+
+  public int getWebUsersCount() {
+    return getUsersCount();
   }
 
   public void processGetRequest(@NotNull final HttpServletRequest request) {

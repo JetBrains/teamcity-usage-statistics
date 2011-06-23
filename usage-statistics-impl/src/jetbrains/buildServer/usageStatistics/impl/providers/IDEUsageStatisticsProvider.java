@@ -28,14 +28,18 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener {
+public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener, IDEUsersProvider {
   public IDEUsageStatisticsProvider(@NotNull final SBuildServer server,
                                     @NotNull final ServerPaths serverPaths,
                                     @NotNull final XmlRpcDispatcher xmlRpcDispatcher,
                                     @NotNull final UsageStatisticsPresentationManager presentationManager,
                                     @NotNull final PluginDescriptor pluginDescriptor) {
-    super(server, serverPaths, presentationManager, pluginDescriptor);
+    super(server, serverPaths, presentationManager, createDWMPeriodDescriptions(), pluginDescriptor);
     xmlRpcDispatcher.addListener(this);
+  }
+
+  public int getIDEUsersCount() {
+    return getUsersCount();
   }
 
   public void remoteMethodCalled(@NotNull final Class targetClass,

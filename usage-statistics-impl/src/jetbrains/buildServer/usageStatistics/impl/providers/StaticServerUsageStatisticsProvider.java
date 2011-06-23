@@ -30,15 +30,21 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   @NotNull private final UserGroupManager myUserGroupManager;
   @NotNull private final UsageStatisticsPresentationManager myPresentationManager;
   @NotNull private final CloudStatisticsProvider myCloudProvider;
+  @NotNull private final WebUsersProvider myWebUsersProvider;
+  @NotNull private final IDEUsersProvider myIDEUsersProvider;
 
   public StaticServerUsageStatisticsProvider(@NotNull final SBuildServer server,
                                              @NotNull final UserGroupManager userGroupManager,
                                              @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                             @NotNull final CloudStatisticsProvider cloudProvider) {
+                                             @NotNull final CloudStatisticsProvider cloudProvider,
+                                             @NotNull final WebUsersProvider webUsersProvider,
+                                             @NotNull final IDEUsersProvider ideUsersProvider) {
     myServer = server;
     myUserGroupManager = userGroupManager;
     myPresentationManager = presentationManager;
     myCloudProvider = cloudProvider;
+    myWebUsersProvider = webUsersProvider;
+    myIDEUsersProvider = ideUsersProvider;
   }
 
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
@@ -54,6 +60,8 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     publishNumberOfArchivedProjects(publisher);
     publishNumberOfUserGroups(publisher);
     publishNumberOfUsers(publisher);
+    publishNumberOfWebUsers(publisher);
+    publishNumberOfIDEUsers(publisher);
     publishNumberOfVcsRoots(publisher);
 
     publishNumberOfCloudImages(publisher);
@@ -73,6 +81,8 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     myPresentationManager.applyPresentation(makeId("projectNumber"), "Projects", myGroupName, null);
     myPresentationManager.applyPresentation(makeId("userGroupNumber"), "User groups", myGroupName, null);
     myPresentationManager.applyPresentation(makeId("userNumber"), "Users", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("webUserNumber.month"), "Web users (last month)", myGroupName, null);
+    myPresentationManager.applyPresentation(makeId("ideUserNumber.month"), "IDE users (last month)", myGroupName, null);
     myPresentationManager.applyPresentation(makeId("vcsRootNumber"), "VCS roots", myGroupName, null);
     myPresentationManager.applyPresentation(makeId("cloudProfiles"), "Cloud profiles", myGroupName, null);
     myPresentationManager.applyPresentation(makeId("cloudImages"), "Cloud images", myGroupName, null);
@@ -137,6 +147,14 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   private void publishNumberOfUsers(@NotNull final UsageStatisticsPublisher publisher) {
     final int userNumber = myServer.getUserModel().getNumberOfRegisteredUsers();
     publisher.publishStatistic(makeId("userNumber"), userNumber);
+  }
+
+  private void publishNumberOfWebUsers(@NotNull final UsageStatisticsPublisher publisher) {
+    publisher.publishStatistic(makeId("webUserNumber.month"), myWebUsersProvider.getWebUsersCount());
+  }
+
+  private void publishNumberOfIDEUsers(@NotNull final UsageStatisticsPublisher publisher) {
+    publisher.publishStatistic(makeId("ideUserNumber.month"), myIDEUsersProvider.getIDEUsersCount());
   }
 
   private void publishNumberOfVcsRoots(@NotNull final UsageStatisticsPublisher publisher) {
