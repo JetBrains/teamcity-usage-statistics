@@ -17,6 +17,7 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.SBuildRunnerDescriptor;
@@ -46,5 +47,10 @@ public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsP
         }
       }
     }
+  }
+
+  @Override
+  protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
+    return myServer.getProjectManager().getActiveBuildTypes().size();
   }
 }

@@ -45,7 +45,7 @@ abstract class BaseExtensionUsageStatisticsProvider extends BaseUsageStatisticsP
 
   protected abstract void collectUsages(@NotNull UsagesCollectorCallback callback);
 
-  private int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
+  protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
     int totalCount = 0;
     for (final Integer count : extensionUsages.values()) {
       totalCount += count;
@@ -80,7 +80,7 @@ abstract class BaseExtensionUsageStatisticsProvider extends BaseUsageStatisticsP
     void setUsagesCount(@NotNull String extensionTypeId, @Nullable String extensionTypeDisplayName, int count);
   }
 
-  private static class ExtensionType implements Comparable<ExtensionType> {
+  protected static class ExtensionType implements Comparable<ExtensionType> {
     @NotNull private final String myExtensionTypeId;
     @Nullable private final String myExtensionTypeDisplayName;
 

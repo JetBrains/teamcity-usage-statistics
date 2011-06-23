@@ -22,19 +22,23 @@ import jetbrains.buildServer.notification.NotificationRule;
 import jetbrains.buildServer.notification.NotificationRulesManager;
 import jetbrains.buildServer.notification.Notificator;
 import jetbrains.buildServer.notification.NotificatorRegistry;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.util.filters.Filter;
 import jetbrains.buildServer.util.filters.FilterUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
+  @NotNull private final SBuildServer myServer;
   @NotNull private final NotificatorRegistry myNotificatorRegistry;
   @NotNull private final NotificationRulesManager myNotificationRulesManager;
 
-  public NotificatorUsageStatisticsProvider(@NotNull final UsageStatisticsPresentationManager presentationManager,
+  public NotificatorUsageStatisticsProvider(@NotNull final SBuildServer server,
+                                            @NotNull final UsageStatisticsPresentationManager presentationManager,
                                             @NotNull final NotificatorRegistry notificatorRegistry,
                                             @NotNull final NotificationRulesManager notificationRulesManager) {
     super(presentationManager);
+    myServer = server;
     myNotificatorRegistry = notificatorRegistry;
     myNotificationRulesManager = notificationRulesManager;
   }
@@ -54,5 +58,10 @@ public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatis
         callback.setUsagesCount(notificatorType, notificator.getDisplayName(), count);
       }
     }
+  }
+
+  @Override
+  protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
+    return myServer.getUserModel().getNumberOfRegisteredUsers();
   }
 }

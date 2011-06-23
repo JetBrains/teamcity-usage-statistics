@@ -17,6 +17,7 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import jetbrains.buildServer.buildTriggers.BuildTriggerDescriptor;
 import jetbrains.buildServer.buildTriggers.BuildTriggerService;
@@ -47,5 +48,10 @@ public class TriggerUsageStatisticsProvider extends BaseExtensionUsageStatistics
         }
       }
     }
+  }
+
+  @Override
+  protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
+    return myServer.getProjectManager().getActiveBuildTypes().size();
   }
 }

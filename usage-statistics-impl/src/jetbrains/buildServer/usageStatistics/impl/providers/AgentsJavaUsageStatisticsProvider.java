@@ -37,7 +37,7 @@ public class AgentsJavaUsageStatisticsProvider extends BaseExtensionUsageStatist
 
   @Override
   protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
-    for (final SBuildAgent agent : myServer.getBuildAgentManager().getRegisteredAgents(true)) {
+    for (final SBuildAgent agent : myServer.getBuildAgentManager().getRegisteredAgents(false)) {
       String javaVersion = agent.getConfigurationParameters().get(myParameterName);
       if (javaVersion == null) {
         javaVersion = "Unknown";

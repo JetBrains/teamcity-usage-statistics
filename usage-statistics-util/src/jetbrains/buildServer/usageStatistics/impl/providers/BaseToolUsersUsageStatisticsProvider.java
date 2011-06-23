@@ -59,7 +59,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long startDate) {
     removeObsoleteUsages();
     final Map<ICString, Set<ToolUsage>> usages = filterUsages(startDate);
-    final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalUsagesCount(usages));
+    final UsageStatisticsFormatter formatter = new PercentageFormatter(getUsersCount(usages));
     setDefaultValue(myGroupName, formatter.format(0));
     final List<ICString> toolIds = new ArrayList<ICString>(usages.keySet());
     Collections.sort(toolIds);
@@ -129,14 +129,6 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
         return usage.getTimestamp() > threshold;
       }
     };
-  }
-
-  private int getTotalUsagesCount(@NotNull final Map<ICString, Set<ToolUsage>> usages) {
-    int totalUsages = 0;
-    for (final Set<ToolUsage> toolUsages : usages.values()) {
-      totalUsages += toolUsages.size();
-    }
-    return totalUsages;
   }
 
   @NotNull
