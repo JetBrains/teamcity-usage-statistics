@@ -18,6 +18,8 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import com.intellij.openapi.util.Condition;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SQLRunner;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
@@ -25,6 +27,9 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TimeFormatter;
+import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.vcs.SVcsModification;
+import jetbrains.buildServer.vcs.VcsModificationHistory;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,12 +75,14 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
   );
 
   @NotNull private final SQLRunner mySQLRunner;
+  @NotNull private final VcsModificationHistory myVcsHistory;
 
   public BuildDataUsageStatisticsProvider(@NotNull final SBuildServer server,
                                           @NotNull final UsageStatisticsPresentationManager presentationManager,
                                           @NotNull final PluginDescriptor pluginDescriptor) {
     super(presentationManager, pluginDescriptor);
     mySQLRunner = server.getSQLRunner();
+    myVcsHistory = server.getVcsHistory();
   }
 
   @Override
@@ -104,6 +111,12 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
         return null;
       }
     }, fromDate, fromDate);
+
+    publish(publisher, periodDescription, "vcsChanges", CollectionsUtil.binarySearch(myVcsHistory.getAllModifications(), new Condition<SVcsModification>() {
+      public boolean value(final SVcsModification modification) {
+        return modification.getVcsDate().getTime() <= fromDate;
+      }
+    }));
   }
 
   @Override
@@ -117,6 +130,7 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     apply(periodDescription, "avgBuildWaitInQueueTime", "Average build waiting in queue time", ourTimeFormatter);
     apply(periodDescription, "avgBuildDuration", "Average build duration", ourTimeFormatter);
     apply(periodDescription, "maxBuildTestCount", "Maximum test count per build", null);
+    apply(periodDescription, "vcsChanges", "VCS changes", null);
   }
 
   @Nullable

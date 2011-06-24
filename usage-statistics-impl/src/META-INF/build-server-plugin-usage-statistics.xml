@@ -39,7 +39,7 @@
 
   <bean id="buildDataUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.BuildDataUsageStatisticsProvider">
     <property name="idFormat" value="jb.%s.%s"/>
-    <property name="groupName" value="Builds"/>
+    <property name="groupName" value="Server Load"/>
   </bean>
 
   <bean id="staticServerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.StaticServerUsageStatisticsProvider">
