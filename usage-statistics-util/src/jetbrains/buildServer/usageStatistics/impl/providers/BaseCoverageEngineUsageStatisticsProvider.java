@@ -58,4 +58,9 @@ abstract class BaseCoverageEngineUsageStatisticsProvider extends BaseExtensionUs
       }
     }
   }
+
+  @Override
+  protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
+    return myServer.getProjectManager().getActiveBuildTypes().size();
+  }
 }
