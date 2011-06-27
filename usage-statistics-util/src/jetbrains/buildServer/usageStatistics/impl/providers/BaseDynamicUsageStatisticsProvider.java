@@ -40,11 +40,6 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
     myDefaultValues = new HashMap<String, String>();
   }
 
-  protected BaseDynamicUsageStatisticsProvider(@NotNull final UsageStatisticsPresentationManager presentationManager,
-                                               @NotNull final PluginDescriptor pluginDescriptor) {
-    this(presentationManager, pluginDescriptor, createHDWPeriodDescriptions());
-  }
-
   @Override
   public void setGroupName(@NotNull final String groupName) {
     super.setGroupName(groupName);
@@ -56,15 +51,6 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
     for (final Long period : myPeriodDescriptions.keySet()) {
       accept(publisher, myPeriodDescriptions.get(period).toLowerCase(), now - period);
     }
-  }
-
-  @NotNull
-  protected static LinkedHashMap<Long, String> createHDWPeriodDescriptions() {
-    return new LinkedHashMap<Long, String>() {{
-      put(Dates.ONE_HOUR, "Hour");
-      put(Dates.ONE_DAY, "Day");
-      put(Dates.ONE_WEEK, "Week");
-    }};
   }
 
   @NotNull

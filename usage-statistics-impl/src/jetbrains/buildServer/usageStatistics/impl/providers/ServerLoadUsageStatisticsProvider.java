@@ -18,23 +18,24 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
 
 import com.intellij.openapi.util.Condition;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.SQLRunner;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
+import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TimeFormatter;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.vcs.SVcsModification;
-import jetbrains.buildServer.vcs.VcsModificationHistory;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
+public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
   @NotNull private static final UsageStatisticsFormatter ourTimeFormatter = new TimeFormatter();
 
   @NotNull private static final GenericQuery<Void> ourMainBuildDataQuery = new GenericQuery<Void>(
@@ -74,24 +75,38 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
     ") t"
   );
 
-  @NotNull private final SQLRunner mySQLRunner;
-  @NotNull private final VcsModificationHistory myVcsHistory;
+  @NotNull private final SBuildServer myServer;
+  @NotNull private final WebUsersProvider myWebUsersProvider;
+  @NotNull private final IDEUsersProvider myIDEUsersProvider;
 
-  public BuildDataUsageStatisticsProvider(@NotNull final SBuildServer server,
-                                          @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                          @NotNull final PluginDescriptor pluginDescriptor) {
-    super(presentationManager, pluginDescriptor);
-    mySQLRunner = server.getSQLRunner();
-    myVcsHistory = server.getVcsHistory();
+  public ServerLoadUsageStatisticsProvider(@NotNull final SBuildServer server,
+                                           @NotNull final UsageStatisticsPresentationManager presentationManager,
+                                           @NotNull final PluginDescriptor pluginDescriptor,
+                                           @NotNull final WebUsersProvider webUsersProvider,
+                                           @NotNull final IDEUsersProvider ideUsersProvider) {
+    super(presentationManager, pluginDescriptor, createDWMPeriodDescriptions());
+    myServer = server;
+    myWebUsersProvider = webUsersProvider;
+    myIDEUsersProvider = ideUsersProvider;
   }
 
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher,
                         @NotNull final String periodDescription,
                         final long fromDate) {
-    applyPresentations(periodDescription);
+    publishBuildData(publisher, periodDescription, fromDate);
+    publishOnlineUsers(publisher, periodDescription, fromDate);
+    publishVcsChanges(publisher, periodDescription, fromDate);
+  }
 
-    ourMainBuildDataQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
+  private void publishBuildData(final UsageStatisticsPublisher publisher, final String periodDescription, final long fromDate) {
+    apply(periodDescription, "buildCount", "Build count", null);
+    apply(periodDescription, "personalBuildCount", "Personal build count", null);
+    apply(periodDescription, "avgBuildWaitInQueueTime", "Average build waiting in queue time", ourTimeFormatter);
+    apply(periodDescription, "avgBuildDuration", "Average build duration", ourTimeFormatter);
+    apply(periodDescription, "maxBuildTestCount", "Maximum test count per build", null);
+
+    ourMainBuildDataQuery.execute(myServer.getSQLRunner(), new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
           publish(publisher, periodDescription, "buildCount", rs.getLong(1));
@@ -103,7 +118,7 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
       }
     }, fromDate, fromDate);
 
-    ourBuildTestCountQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
+    ourBuildTestCountQuery.execute(myServer.getSQLRunner(), new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
           publish(publisher, periodDescription, "maxBuildTestCount", getNullableLong(rs, 1));
@@ -111,8 +126,35 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
         return null;
       }
     }, fromDate, fromDate);
+  }
 
-    publish(publisher, periodDescription, "vcsChanges", CollectionsUtil.binarySearch(myVcsHistory.getAllModifications(), new Condition<SVcsModification>() {
+  private void publishOnlineUsers(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long fromDate) {
+    final String webUsersId = "webUsers";
+    final String ideUsersId = "ideUsers";
+    final String webOnlyUsersId = "webOnlyUsers";
+    final String ideOnlyUsersId = "ideOnlyUsers";
+
+    final UsageStatisticsFormatter formatter = new PercentageFormatter(myServer.getUserModel().getNumberOfRegisteredUsers());
+
+    apply(periodDescription, webUsersId, "Web users", formatter);
+    apply(periodDescription, ideUsersId, "IDE users", formatter);
+    apply(periodDescription, webOnlyUsersId, "Web only users", formatter);
+    apply(periodDescription, ideOnlyUsersId, "IDE only users", formatter);
+
+    final Set<String> webUsers = myWebUsersProvider.getWebUsers(fromDate);
+    final Set<String> ideUsers = myIDEUsersProvider.getIDEUsers(fromDate);
+
+    publish(publisher, periodDescription, webUsersId, webUsers.size());
+    publish(publisher, periodDescription, ideUsersId, ideUsers.size());
+    publish(publisher, periodDescription, webOnlyUsersId, CollectionsUtil.minus(webUsers, ideUsers).size());
+    publish(publisher, periodDescription, ideOnlyUsersId, CollectionsUtil.minus(ideUsers, webUsers).size());
+  }
+
+  private void publishVcsChanges(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long fromDate) {
+    final String vcsChangesId = "vcsChanges";
+    apply(periodDescription, vcsChangesId, "VCS changes", null);
+    final List<SVcsModification> allModifications = myServer.getVcsHistory().getAllModifications();
+    publish(publisher, periodDescription, vcsChangesId, CollectionsUtil.binarySearch(allModifications, new Condition<SVcsModification>() {
       public boolean value(final SVcsModification modification) {
         return modification.getVcsDate().getTime() <= fromDate;
       }
@@ -122,15 +164,6 @@ public class BuildDataUsageStatisticsProvider extends BaseDynamicUsageStatistics
   @Override
   protected boolean mustSortStatistics() {
     return false;
-  }
-
-  private void applyPresentations(@NotNull final String periodDescription) {
-    apply(periodDescription, "buildCount", "Build count", null);
-    apply(periodDescription, "personalBuildCount", "Personal build count", null);
-    apply(periodDescription, "avgBuildWaitInQueueTime", "Average build waiting in queue time", ourTimeFormatter);
-    apply(periodDescription, "avgBuildDuration", "Average build duration", ourTimeFormatter);
-    apply(periodDescription, "maxBuildTestCount", "Maximum test count per build", null);
-    apply(periodDescription, "vcsChanges", "VCS changes", null);
   }
 
   @Nullable

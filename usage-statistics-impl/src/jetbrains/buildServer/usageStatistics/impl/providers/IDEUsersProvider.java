@@ -16,6 +16,11 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
+
 public interface IDEUsersProvider {
-  int getIDEUsersCount(long fromTimestamp);
+  @NotNull
+  Set<String> getIDEUsers(long fromTimestamp);
 }

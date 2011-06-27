@@ -37,9 +37,7 @@ public class MuteUsageStatisticsProvider extends BaseFeatureUsageStatisticsProvi
     server.addListener(new BuildServerAdapter() {
       @Override
       public void testsMuted(@NotNull final MuteInfo muteInfo) {
-        for (int i = 0, count = muteInfo.getTestNameIds().size(); i < count; i++) {
-          addUsage(TESTS);
-        }
+        addUsage(TESTS);
       }
     });
   }

@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.util.Set;
 import java.util.Vector;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
@@ -38,8 +39,9 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
     xmlRpcDispatcher.addListener(this);
   }
 
-  public int getIDEUsersCount(final long fromTimestamp) {
-    return getUsersCount(fromTimestamp);
+  @NotNull
+  public Set<String> getIDEUsers(final long fromTimestamp) {
+    return getUsers(fromTimestamp);
   }
 
   public void remoteMethodCalled(@NotNull final Class targetClass,

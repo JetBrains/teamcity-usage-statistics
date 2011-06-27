@@ -41,25 +41,17 @@ public class InvestigationUsageStatisticsProvider extends BaseFeatureUsageStatis
     server.addListener(new BuildServerAdapter() {
       @Override
       public void responsibleChanged(@NotNull final SBuildType bt, @NotNull final ResponsibilityInfo oldValue, @NotNull final ResponsibilityInfo newValue, final boolean isUserAction) {
-        if (isUserAction && newValue.getState().isActive()) {
-          addUsage(BUILD_TYPES);
-        }
+        addUsageIfNeeded(newValue.getState(), BUILD_TYPES, isUserAction);
       }
 
       @Override
       public void responsibleChanged(@NotNull final SProject project, @Nullable final TestNameResponsibilityEntry oldValue, @NotNull final TestNameResponsibilityEntry newValue, final boolean isUserAction) {
-        if (isUserAction && newValue.getState().isActive()) {
-          addUsage(TESTS);
-        }
+        addUsageIfNeeded(newValue.getState(), TESTS, isUserAction);
       }
 
       @Override
       public void responsibleChanged(@NotNull final SProject project, @NotNull final Collection<TestName> testNames, @NotNull final ResponsibilityEntry entry, final boolean isUserAction) {
-        if (isUserAction && entry.getState().isActive()) {
-          for (int i = 0, count = testNames.size(); i < count; i++) {
-            addUsage(TESTS);
-          }
-        }
+        addUsageIfNeeded(entry.getState(), TESTS, isUserAction);
       }
     });
   }
@@ -74,5 +66,13 @@ public class InvestigationUsageStatisticsProvider extends BaseFeatureUsageStatis
   @Override
   protected Feature[] getFeatures() {
     return FEATURES;
+  }
+
+  private void addUsageIfNeeded(@NotNull final ResponsibilityEntry.State state,
+                                @NotNull final String featureName,
+                                final boolean isUserAction) {
+    if (isUserAction && state.isActive()) {
+      addUsage(featureName);
+    }
   }
 }

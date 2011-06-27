@@ -59,7 +59,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long startDate) {
     removeObsoleteUsages();
     final Map<ICString, Set<ToolUsage>> usages = filterUsages(startDate);
-    final UsageStatisticsFormatter formatter = new PercentageFormatter(getUsersCount(usages));
+    final UsageStatisticsFormatter formatter = new PercentageFormatter(getUsers(usages).size());
     setDefaultValue(myGroupName, formatter.format(0));
     final List<ICString> toolIds = new ArrayList<ICString>(usages.keySet());
     Collections.sort(toolIds);
@@ -90,18 +90,20 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     toolUsages.add(usage);
   }
 
-  protected int getUsersCount(final long fromTimestamp) {
-    return getUsersCount(filterUsages(fromTimestamp));
+  @NotNull
+  protected Set<String> getUsers(final long fromTimestamp) {
+    return getUsers(filterUsages(fromTimestamp));
   }
 
-  private static int getUsersCount(@NotNull final Map<ICString, Set<ToolUsage>> usages) {
+  @NotNull
+  private static Set<String> getUsers(@NotNull final Map<ICString, Set<ToolUsage>> usages) {
     final Set<String> userIds = new HashSet<String>();
     for (final Set<ToolUsage> toolUsages : usages.values()) {
       for (final ToolUsage toolUsage : toolUsages) {
         userIds.add(toolUsage.getUserId());
       }
     }
-    return userIds.size();
+    return userIds;
   }
 
   private void updateSourceIfNeeded(@NotNull final ICString toolId) {

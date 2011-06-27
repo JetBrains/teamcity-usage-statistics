@@ -20,10 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
@@ -67,8 +64,9 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     readWebPagePatterns(configFilePath);
   }
 
-  public int getWebUsersCount(final long fromTimestamp) {
-    return getUsersCount(fromTimestamp);
+  @NotNull
+  public Set<String> getWebUsers(final long fromTimestamp) {
+    return getUsers(fromTimestamp);
   }
 
   public void processGetRequest(@NotNull final HttpServletRequest request) {

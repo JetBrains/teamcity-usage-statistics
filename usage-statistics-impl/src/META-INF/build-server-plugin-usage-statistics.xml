@@ -37,7 +37,7 @@
 
   <!-- Providers -->
 
-  <bean id="buildDataUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.BuildDataUsageStatisticsProvider">
+  <bean id="serverLoadUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.ServerLoadUsageStatisticsProvider">
     <property name="idFormat" value="jb.%s.%s"/>
     <property name="groupName" value="Server Load"/>
   </bean>
@@ -45,11 +45,6 @@
   <bean id="staticServerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.StaticServerUsageStatisticsProvider">
     <property name="idFormat" value="jb.%s"/>
     <property name="groupName" value="General (total count)"/>
-  </bean>
-
-  <bean id="onlineUsersUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.OnlineUsersUsageStatisticsProvider">
-    <property name="idFormat" value="jb.%s.%s"/>
-    <property name="groupName" value="User Logins"/>
   </bean>
 
   <bean id="ideUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.IDEUsageStatisticsProvider">

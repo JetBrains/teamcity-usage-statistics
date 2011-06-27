@@ -69,7 +69,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   private Collection<? extends BaseUsageStatisticsProvider> getAllProviders() {
     return Arrays.asList(
       myServer.getSingletonService(AgentsJavaUsageStatisticsProvider.class),
-      myServer.getSingletonService(BuildDataUsageStatisticsProvider.class),
+      myServer.getSingletonService(ServerLoadUsageStatisticsProvider.class),
       myServer.getSingletonService(IDEUsageStatisticsProvider.class),
       myServer.getSingletonService(NotificatorUsageStatisticsProvider.class),
       myServer.getSingletonService(RunnerUsageStatisticsProvider.class),
