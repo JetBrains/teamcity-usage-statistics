@@ -42,6 +42,25 @@ public interface UsageStatisticsPresentationManager {
                                 @Nullable UsageStatisticsFormatter formatter);
 
   /**
+   * Registers a UI representation for specified usage statistic.
+   *
+   * @param id Statistic identifier.
+   * @param displayName The string to use in UI for displaying this statistic. If it is null the identifier is used.
+   * @param groupName This parameter is used to group the statistics in UI. Statistics with equal group names are put
+   *                  in one group. Statistics with the null group name are put in group "Miscellaneous".
+   * @param formatter This object determines how the values of this statistic will be shown in UI. If formatter is null, the default
+   *                  behavior is used: if the value is not null the {@link java.lang.String#valueOf(Object) String.valueOf(Object)}
+   *                  method is used to show the value in UI, otherwise the string "N/A" is used.
+   * @param valueTooltip tooltip for the statistic value
+   * @since 6.5.2
+   */
+  public void applyPresentation(@NotNull String id,
+                                @Nullable String displayName,
+                                @Nullable String groupName,
+                                @Nullable UsageStatisticsFormatter formatter,
+                                @Nullable String valueTooltip);
+
+  /**
    * Registers a custom renderer for a specific usage statistics group.
    *
    * @param groupName Name of the group.

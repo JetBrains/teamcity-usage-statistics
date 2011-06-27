@@ -20,7 +20,8 @@
   <c:forEach var="statistic" items="${statisticsGroup.statistics}">
     <tr class="highlightRow statisticRow">
       <td><c:out value="${statistic.displayName}"/></td>
-      <td style="width: 13%; white-space: nowrap;"><c:out value="${statistic.formattedValue}"/></td>
+      <c:set var="tooltip" value="${statistic.valueTooltip}"/>
+      <td style="width: 13%; white-space: nowrap;" <c:if test="${not empty tooltip}">title="${tooltip}"</c:if>><c:out value="${statistic.formattedValue}"/></td>
     </tr>
   </c:forEach>
 </table>

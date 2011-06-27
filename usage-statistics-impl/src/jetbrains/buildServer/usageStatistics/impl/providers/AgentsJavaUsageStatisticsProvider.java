@@ -21,6 +21,9 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+import java.util.Map;
+
 public class AgentsJavaUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
   @NotNull private final SBuildServer myServer;
   @NotNull private String myParameterName = "";
@@ -37,7 +40,7 @@ public class AgentsJavaUsageStatisticsProvider extends BaseExtensionUsageStatist
 
   @Override
   protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
-    for (final SBuildAgent agent : myServer.getBuildAgentManager().getRegisteredAgents(false)) {
+    for (final SBuildAgent agent : getAuthorizedAgents()) {
       String javaVersion = agent.getConfigurationParameters().get(myParameterName);
       if (javaVersion == null) {
         javaVersion = "Unknown";
@@ -53,5 +56,21 @@ public class AgentsJavaUsageStatisticsProvider extends BaseExtensionUsageStatist
       }
       callback.addUsage(javaVersion, javaVersion);
     }
+  }
+
+  @NotNull
+  @Override
+  protected String getValueTooltip() {
+    return "Agent count (% of authorized agents)";
+  }
+
+  @Override
+  protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
+    return getAuthorizedAgents().size();
+  }
+
+  @NotNull
+  private List<SBuildAgent> getAuthorizedAgents() {
+    return myServer.getBuildAgentManager().getRegisteredAgents(false);
   }
 }

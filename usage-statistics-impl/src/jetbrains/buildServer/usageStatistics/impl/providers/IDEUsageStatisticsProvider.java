@@ -80,6 +80,12 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
   }
 
   @NotNull
+  @Override
+  protected String getValueTooltip() {
+    return "User count (% of IDE users)";
+  }
+
+  @NotNull
   private static String prepareUserAgent(@NotNull final String userAgent) {
     int endPos = userAgent.indexOf('/');
     if (endPos == -1) {

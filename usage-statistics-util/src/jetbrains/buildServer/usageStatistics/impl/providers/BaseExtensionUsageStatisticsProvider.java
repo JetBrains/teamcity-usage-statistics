@@ -38,12 +38,15 @@ abstract class BaseExtensionUsageStatisticsProvider extends BaseUsageStatisticsP
     for (final Map.Entry<ExtensionType, Integer> entry : extensionUsages.entrySet()) {
       final ExtensionType type = entry.getKey();
       final String statisticId = makeId(type.getExtensionTypeId());
-      myPresentationManager.applyPresentation(statisticId, type.getExtensionTypeDisplayName(), myGroupName, formatter);
+      myPresentationManager.applyPresentation(statisticId, type.getExtensionTypeDisplayName(), myGroupName, formatter, getValueTooltip());
       publisher.publishStatistic(statisticId, entry.getValue());
     }
   }
 
   protected abstract void collectUsages(@NotNull UsagesCollectorCallback callback);
+
+  @NotNull
+  protected abstract String getValueTooltip();
 
   protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
     int totalCount = 0;

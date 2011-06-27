@@ -60,6 +60,12 @@ public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatis
     }
   }
 
+  @NotNull
+  @Override
+  protected String getValueTooltip() {
+    return "User count (% of all users)";
+  }
+
   @Override
   protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
     return myServer.getUserModel().getNumberOfRegisteredUsers();

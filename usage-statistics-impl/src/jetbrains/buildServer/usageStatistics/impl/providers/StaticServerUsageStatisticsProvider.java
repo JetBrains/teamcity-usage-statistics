@@ -67,7 +67,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     myPresentationManager.applyPresentation(allRegisteredAgentNumberId, "Registered agents (all)", myGroupName, null);
     publisher.publishStatistic(allRegisteredAgentNumberId, allRegisteredAgentsNumber);
 
-    myPresentationManager.applyPresentation(authorizedRegisteredAgentNumberId, "Registered agents (authorized only)", myGroupName, new PercentageFormatter(allRegisteredAgentsNumber));
+    myPresentationManager.applyPresentation(authorizedRegisteredAgentNumberId, "Registered agents (authorized only)", myGroupName, new PercentageFormatter(allRegisteredAgentsNumber), "Agent count (% of all agents)");
     publisher.publishStatistic(authorizedRegisteredAgentNumberId, buildAgentManager.getRegisteredAgents(false).size());
   }
 
@@ -98,7 +98,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     myPresentationManager.applyPresentation(buildTypeNumberId, "Build configurations", myGroupName, null);
     publisher.publishStatistic(buildTypeNumberId, buildTypeNumber);
 
-    myPresentationManager.applyPresentation(activeBuildTypeNumberId, "Active build configurations", myGroupName, new PercentageFormatter(buildTypeNumber));
+    myPresentationManager.applyPresentation(activeBuildTypeNumberId, "Active build configurations", myGroupName, new PercentageFormatter(buildTypeNumber), "Build configuration count (% of all build configurations)");
     publisher.publishStatistic(activeBuildTypeNumberId, myServer.getProjectManager().getActiveBuildTypes().size());
   }
 
@@ -128,7 +128,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     myPresentationManager.applyPresentation(projectNumberId, "Projects", myGroupName, null);
     publisher.publishStatistic(projectNumberId, projectNumber);
 
-    myPresentationManager.applyPresentation(archivedProjectNumberId, "Archived projects", myGroupName, new PercentageFormatter(projectNumber));
+    myPresentationManager.applyPresentation(archivedProjectNumberId, "Archived projects", myGroupName, new PercentageFormatter(projectNumber), "Project count (% of all projects)");
     publisher.publishStatistic(archivedProjectNumberId, myServer.getProjectManager().getArchivedProjects().size());
   }
 

@@ -109,6 +109,12 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     return false;
   }
 
+  @NotNull
+  @Override
+  protected String getValueTooltip() {
+    return "User count (% of web users)";
+  }
+
   private void registerPageExtension(@NotNull final PagePlaces pagePlaces, final PluginDescriptor pluginDescriptor) {
     final String pagePath = pluginDescriptor.getPluginResourcesPath("empty.jsp");
     new SimplePageExtension(pagePlaces, PlaceId.ALL_PAGES_FOOTER, "webPagesUsageStatisticsProvider", pagePath) {

@@ -35,4 +35,10 @@ public class VCSUsageStatisticsProvider extends BaseExtensionUsageStatisticsProv
       callback.addUsage(vcsRoot.getVcsName(), vcsRoot.getVcsDisplayName());
     }
   }
+
+  @NotNull
+  @Override
+  protected String getValueTooltip() {
+    return "VCS root count (% of all VCS roots)";
+  }
 }

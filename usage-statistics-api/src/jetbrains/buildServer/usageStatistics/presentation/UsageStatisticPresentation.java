@@ -17,6 +17,7 @@
 package jetbrains.buildServer.usageStatistics.presentation;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents usage statistic in UI.
@@ -44,4 +45,12 @@ public interface UsageStatisticPresentation {
    */
   @NotNull
   String getFormattedValue();
+
+  /**
+   * Returns the tooltip for the statistic value.
+   * @return the tooltip for the statistic value
+   * @since 6.5.2
+   */
+  @Nullable
+  String getValueTooltip();
 }

@@ -55,6 +55,9 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
 
   protected abstract boolean publishToolUsages(@NotNull String toolId);
 
+  @NotNull
+  protected abstract String getValueTooltip();
+
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long startDate) {
     removeObsoleteUsages();
@@ -67,7 +70,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
       final String toolIdSource = toolId.getSource();
       if (!publishToolUsages(toolIdSource)) continue;
       final String statisticId = makeId(periodDescription, toolIdSource);
-      myPresentationManager.applyPresentation(statisticId, toolIdSource, myGroupName, formatter);
+      myPresentationManager.applyPresentation(statisticId, toolIdSource, myGroupName, formatter, getValueTooltip());
       publisher.publishStatistic(statisticId, usages.get(toolId).size());
     }
   }

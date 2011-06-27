@@ -100,11 +100,11 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
   }
 
   private void publishBuildData(final UsageStatisticsPublisher publisher, final String periodDescription, final long fromDate) {
-    apply(periodDescription, "buildCount", "Build count", null);
-    apply(periodDescription, "personalBuildCount", "Personal build count", null);
-    apply(periodDescription, "avgBuildWaitInQueueTime", "Average build waiting in queue time", ourTimeFormatter);
-    apply(periodDescription, "avgBuildDuration", "Average build duration", ourTimeFormatter);
-    apply(periodDescription, "maxBuildTestCount", "Maximum test count per build", null);
+    apply(periodDescription, "buildCount", "Build count", null, null);
+    apply(periodDescription, "personalBuildCount", "Personal build count", null, null);
+    apply(periodDescription, "avgBuildWaitInQueueTime", "Average build waiting in queue time", ourTimeFormatter, null);
+    apply(periodDescription, "avgBuildDuration", "Average build duration", ourTimeFormatter, null);
+    apply(periodDescription, "maxBuildTestCount", "Maximum test count per build", null, null);
 
     ourMainBuildDataQuery.execute(myServer.getSQLRunner(), new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
@@ -135,11 +135,12 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     final String ideOnlyUsersId = "ideOnlyUsers";
 
     final UsageStatisticsFormatter formatter = new PercentageFormatter(myServer.getUserModel().getNumberOfRegisteredUsers());
+    final String valueTooltip = "User count (% of all users)";
 
-    apply(periodDescription, webUsersId, "Web users", formatter);
-    apply(periodDescription, ideUsersId, "IDE users", formatter);
-    apply(periodDescription, webOnlyUsersId, "Web only users", formatter);
-    apply(periodDescription, ideOnlyUsersId, "IDE only users", formatter);
+    apply(periodDescription, webUsersId, "Web users", formatter, valueTooltip);
+    apply(periodDescription, ideUsersId, "IDE users", formatter, valueTooltip);
+    apply(periodDescription, webOnlyUsersId, "Web only users", formatter, valueTooltip);
+    apply(periodDescription, ideOnlyUsersId, "IDE only users", formatter, valueTooltip);
 
     final Set<String> webUsers = myWebUsersProvider.getWebUsers(fromDate);
     final Set<String> ideUsers = myIDEUsersProvider.getIDEUsers(fromDate);
@@ -152,7 +153,7 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
 
   private void publishVcsChanges(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long fromDate) {
     final String vcsChangesId = "vcsChanges";
-    apply(periodDescription, vcsChangesId, "VCS changes", null);
+    apply(periodDescription, vcsChangesId, "VCS changes", null, null);
     final List<SVcsModification> allModifications = myServer.getVcsHistory().getAllModifications();
     publish(publisher, periodDescription, vcsChangesId, CollectionsUtil.binarySearch(allModifications, new Condition<SVcsModification>() {
       public boolean value(final SVcsModification modification) {
@@ -175,8 +176,9 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
   private void apply(@NotNull final String periodDescription,
                      @NotNull final String id,
                      @NotNull final String name,
-                     @Nullable final UsageStatisticsFormatter formatter) {
-    myPresentationManager.applyPresentation(makeId(id, periodDescription), name, myGroupName, formatter);
+                     @Nullable final UsageStatisticsFormatter formatter,
+                     @Nullable final String valueTooltip) {
+    myPresentationManager.applyPresentation(makeId(id, periodDescription), name, myGroupName, formatter, valueTooltip);
   }
 
   private void publish(@NotNull final UsageStatisticsPublisher publisher,

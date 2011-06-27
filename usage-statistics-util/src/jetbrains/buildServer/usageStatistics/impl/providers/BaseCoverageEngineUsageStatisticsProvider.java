@@ -59,6 +59,12 @@ abstract class BaseCoverageEngineUsageStatisticsProvider extends BaseExtensionUs
     }
   }
 
+  @NotNull
+  @Override
+  protected String getValueTooltip() {
+    return "Build configuration count (% of active build configurations)";
+  }
+
   @Override
   protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
     return myServer.getProjectManager().getActiveBuildTypes().size();

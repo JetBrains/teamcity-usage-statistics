@@ -17,10 +17,13 @@
 package jetbrains.buildServer.usageStatistics.presentation.renderers;
 
 import java.util.*;
+
+import com.intellij.openapi.util.Pair;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticPresentation;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupExtension;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class DynamicUsageStatisticsGroup implements UsageStatisticsGroupExtension {
   @NotNull private final String myJspPagePath;
@@ -53,10 +56,9 @@ public class DynamicUsageStatisticsGroup implements UsageStatisticsGroupExtensio
     for (final UsageStatisticPresentation statistic : statistics) {
       final int index = extractIndex(statistic);
       if (index != -1) {
-        getOrCreate(dynamicStatisticsMap, statistic, defaultValue).setValue(index, statistic.getFormattedValue());
+        getOrCreate(dynamicStatisticsMap, statistic, defaultValue).setValue(index, statistic.getFormattedValue(), statistic.getValueTooltip());
       }
     }
-
 
     final List<DynamicStatistic> dynamicStatistics = new ArrayList<DynamicStatistic>();
     for (final Map.Entry<String, DynamicStatistic> entry : dynamicStatisticsMap.entrySet()) {
@@ -117,12 +119,12 @@ public class DynamicUsageStatisticsGroup implements UsageStatisticsGroupExtensio
 
   public static class DynamicStatistic {
     private final String myDisplayName;
-    private final String[] myValues;
+    private final StatisticValueInfo[] myValueInfos;
 
     DynamicStatistic(@NotNull final String displayName, final int valuesCount, @NotNull final String defaultValue) {
       myDisplayName = displayName;
-      myValues = new String[valuesCount];
-      Arrays.fill(myValues, defaultValue);
+      myValueInfos = new StatisticValueInfo[valuesCount];
+      Arrays.fill(myValueInfos, new StatisticValueInfo(defaultValue, null));
     }
 
     @NotNull
@@ -130,13 +132,29 @@ public class DynamicUsageStatisticsGroup implements UsageStatisticsGroupExtensio
       return myDisplayName;
     }
 
-    public void setValue(final int index, @NotNull final String value) {
-      myValues[index] = value;
+    public void setValue(final int index, @NotNull final String value, @Nullable final String tooltip) {
+      myValueInfos[index] = new StatisticValueInfo(value, tooltip);
     }
 
     @NotNull
-    public String[] getValues() {
-      return myValues;
+    public StatisticValueInfo[] getValueInfos() {
+      return myValueInfos;
+    }
+  }
+
+  public static class StatisticValueInfo extends Pair<String, String> {
+    StatisticValueInfo(@NotNull final String value, @Nullable final String tooltip) {
+      super(value, tooltip);
+    }
+
+    @NotNull
+    public String getValue() {
+      return getFirst();
+    }
+
+    @Nullable
+    public String getTooltip() {
+      return getSecond();
     }
   }
 

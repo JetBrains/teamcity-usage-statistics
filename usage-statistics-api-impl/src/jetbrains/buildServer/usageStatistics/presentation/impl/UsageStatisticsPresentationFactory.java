@@ -28,13 +28,16 @@ class UsageStatisticsPresentationFactory {
   @NotNull private final String myId;
   @Nullable private final String myDisplayName;
   @Nullable private final UsageStatisticsFormatter myFormatter;
+  @Nullable private final String myValueTooltip;
 
   public UsageStatisticsPresentationFactory(@NotNull final String id,
                                             @Nullable final String displayName,
-                                            @Nullable final UsageStatisticsFormatter formatter) {
+                                            @Nullable final UsageStatisticsFormatter formatter,
+                                            @Nullable final String valueTooltip) {
     myId = id;
     myDisplayName = displayName;
     myFormatter = formatter;
+    myValueTooltip = valueTooltip;
   }
 
   @NotNull
@@ -42,7 +45,8 @@ class UsageStatisticsPresentationFactory {
     return new UsageStatisticsPresentationImpl(
       myId,
       getNotNull(myDisplayName, myId),
-      getNotNull(myFormatter, ourDefaultFormatter).format(value)
+      getNotNull(myFormatter, ourDefaultFormatter).format(value),
+      myValueTooltip
     );
   }
 

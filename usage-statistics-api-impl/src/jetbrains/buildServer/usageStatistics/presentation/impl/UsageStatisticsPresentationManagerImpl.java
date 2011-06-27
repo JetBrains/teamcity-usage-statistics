@@ -42,7 +42,15 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
                                 @Nullable final String displayName,
                                 @Nullable final String groupName,
                                 @Nullable final UsageStatisticsFormatter formatter) {
-    doApplyPresentation(id, displayName, formatter);
+    applyPresentation(id, displayName, groupName, formatter, null);
+  }
+
+  public void applyPresentation(@NotNull final String id,
+                                @Nullable final String displayName,
+                                @Nullable final String groupName,
+                                @Nullable final UsageStatisticsFormatter formatter,
+                                @Nullable final String valueTooltip) {
+    doApplyPresentation(id, displayName, formatter, valueTooltip);
     if (groupName != null) {
       myStatisticGroups.put(id, groupName);
     }
@@ -95,12 +103,15 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
   @NotNull
   private UsageStatisticsPresentationFactory getPresentationFactory(@NotNull final String id) {
     if (!myPresentationFactories.containsKey(id)) {
-      doApplyPresentation(id, null, null);
+      doApplyPresentation(id, null, null, null);
     }
     return myPresentationFactories.get(id);
   }
 
-  private void doApplyPresentation(@NotNull final String id, @Nullable final String displayName, @Nullable final UsageStatisticsFormatter formatter) {
-    myPresentationFactories.put(id, new UsageStatisticsPresentationFactory(id, displayName, formatter));
+  private void doApplyPresentation(@NotNull final String id,
+                                   @Nullable final String displayName,
+                                   @Nullable final UsageStatisticsFormatter formatter,
+                                   @Nullable final String valueTooltip) {
+    myPresentationFactories.put(id, new UsageStatisticsPresentationFactory(id, displayName, formatter, valueTooltip));
   }
 }
