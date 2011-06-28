@@ -16,16 +16,6 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import javax.servlet.http.HttpServletRequest;
 import jetbrains.buildServer.plugins.bean.ServerPluginInfo;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
@@ -41,6 +31,17 @@ import jetbrains.buildServer.web.util.WebUtil;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
 public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements WebUsersProvider {
   @NotNull private static final Logger LOG = Logger.getLogger(WebPagesUsageStatisticsProvider.class);
 
@@ -50,13 +51,13 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   public WebPagesUsageStatisticsProvider(@NotNull final SBuildServer server,
                                          @NotNull final ServerPaths serverPaths,
                                          @NotNull final PagePlaces pagePlaces,
-                                         @NotNull final ServerPluginInfo pluginDescriptor,
+                                         @NotNull final PluginDescriptor pluginDescriptor,
                                          @NotNull final UsageStatisticsPresentationManager presentationManager) {
     super(server, serverPaths, presentationManager, new LinkedHashMap<Long, String>() {{
       put(Dates.ONE_WEEK, "Week");
       put(30 * Dates.ONE_DAY, "Month");
     }}, pluginDescriptor);
-    myPluginDescriptor = pluginDescriptor;
+    myPluginDescriptor = (ServerPluginInfo) pluginDescriptor;
     registerPageExtension(pagePlaces, pluginDescriptor);
   }
 

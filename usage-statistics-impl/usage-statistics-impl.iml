@@ -15,6 +15,13 @@
           <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/plugin-model-shared-spring.xml</file>
           <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/shared-spring-sub-container.xml</file>
           <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/shared-agent-server-spring.xml</file>
+          <file>file://$MODULE_DIR$/../../../cloud-server/src/META-INF/build-server-plugin-clouds-server.xml</file>
+          <file>file://$MODULE_DIR$/../../../cloud-server/src/META-INF/build-server-plugin-clouds-server-web.xml</file>
+          <file>file://$MODULE_DIR$/../../../web-startup/fake-predefined-implicit-spring-beans.xml</file>
+          <file>file://$MODULE_DIR$/../../../web/WEB-INF/buildServerConfigurator.xml</file>
+          <file>file://$MODULE_DIR$/../../../web/WEB-INF/buildServerPluginsSupportWeb.xml</file>
+          <file>file://$MODULE_DIR$/../../../web/WEB-INF/buildServerSpringWeb.xml</file>
+          <file>file://$MODULE_DIR$/../../../server-openapi/fake-predefined-implicit-spring-server-plugin-beans.xml</file>
         </fileset>
       </configuration>
     </facet>

@@ -24,6 +24,7 @@
   <bean id="usageStatisticsController" class="jetbrains.buildServer.controllers.UsageStatisticsController"/>
   <bean id="downloadUsageStatisticsController" class="jetbrains.buildServer.controllers.DownloadUsageStatisticsController"/>
 
+
   <!-- Core -->
 
   <bean id="usageStatisticsManager" class="jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCollectorImpl"/>
