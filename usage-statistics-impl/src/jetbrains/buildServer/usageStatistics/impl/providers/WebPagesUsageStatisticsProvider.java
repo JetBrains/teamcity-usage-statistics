@@ -19,7 +19,6 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import jetbrains.buildServer.plugins.bean.ServerPluginInfo;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.web.openapi.PagePlaces;
@@ -51,13 +50,12 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   public WebPagesUsageStatisticsProvider(@NotNull final SBuildServer server,
                                          @NotNull final ServerPaths serverPaths,
                                          @NotNull final PagePlaces pagePlaces,
-                                         @NotNull final PluginDescriptor pluginDescriptor,
-                                         @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(server, serverPaths, presentationManager, new LinkedHashMap<Long, String>() {{
+                                         @NotNull final ServerPluginInfo pluginDescriptor) {
+    super(server, serverPaths, new LinkedHashMap<Long, String>() {{
       put(Dates.ONE_WEEK, "Week");
       put(30 * Dates.ONE_DAY, "Month");
-    }}, pluginDescriptor);
-    myPluginDescriptor = (ServerPluginInfo) pluginDescriptor;
+    }});
+    myPluginDescriptor = pluginDescriptor;
     registerPageExtension(pagePlaces, pluginDescriptor);
   }
 
@@ -116,7 +114,7 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     return "User count (% of web users)";
   }
 
-  private void registerPageExtension(@NotNull final PagePlaces pagePlaces, final PluginDescriptor pluginDescriptor) {
+  private void registerPageExtension(@NotNull final PagePlaces pagePlaces, @NotNull final PluginDescriptor pluginDescriptor) {
     final String pagePath = pluginDescriptor.getPluginResourcesPath("empty.jsp");
     new SimplePageExtension(pagePlaces, PlaceId.ALL_PAGES_FOOTER, "webPagesUsageStatisticsProvider", pagePath) {
       {

@@ -25,7 +25,6 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresent
 import jetbrains.buildServer.usageStatistics.util.BasePersistentStateComponent;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.Dates;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -37,10 +36,8 @@ abstract class BaseFeatureUsageStatisticsProvider extends BaseDynamicUsageStatis
 
   protected BaseFeatureUsageStatisticsProvider(@NotNull final SBuildServer server,
                                                @NotNull final ServerPaths serverPaths,
-                                               @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                               @NotNull final LinkedHashMap<Long, String> periodDescriptions,
-                                               @NotNull final PluginDescriptor pluginDescriptor) {
-    super(presentationManager, pluginDescriptor, periodDescriptions);
+                                               @NotNull final LinkedHashMap<Long, String> periodDescriptions) {
+    super(periodDescriptions, null);
     registerPersistor(server, serverPaths);
   }
 
@@ -51,12 +48,15 @@ abstract class BaseFeatureUsageStatisticsProvider extends BaseDynamicUsageStatis
   protected abstract Feature[] getFeatures();
 
   @Override
-  protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long startDate) {
+  protected void accept(@NotNull final UsageStatisticsPublisher publisher,
+                        @NotNull final UsageStatisticsPresentationManager presentationManager,
+                        @NotNull final String periodDescription,
+                        final long startDate) {
     removeObsoleteUsages();
     for (final Pair<String, String> feature : getFeatures()) {
       final String featureName = feature.getFirst();
       final String statisticId = makeId(periodDescription, featureName);
-      myPresentationManager.applyPresentation(statisticId, feature.getSecond(), myGroupName, null);
+      presentationManager.applyPresentation(statisticId, feature.getSecond(), myGroupName, null, null);
       publisher.publishStatistic(statisticId, computeFeatureUsagesCount(featureName, startDate));
     }
   }

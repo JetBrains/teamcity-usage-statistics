@@ -84,8 +84,8 @@
               <div class="statisticGroup" id="group-${status.index}">
                 <l:settingsBlock title="${group.key}">
                   <div class="statisticGroupInner">
-                    <c:set var="statisticsGroup" value="${group.value}" scope="request"/>
-                    <jsp:include page="${group.value.jspPagePath}"/>
+                    <c:set var="statisticsGroup" value="${group.value.second}" scope="request"/>
+                    <jsp:include page="${group.value.first}"/>
                   </div>
                 </l:settingsBlock>
               </div>

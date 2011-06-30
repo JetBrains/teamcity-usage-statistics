@@ -28,25 +28,23 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
 
   @NotNull private final TeamCityDatabaseManager myDBManager;
   @NotNull private final LoginConfiguration myLoginConfiguration;
-  @NotNull private final UsageStatisticsPresentationManager myPresentationManager;
 
   public ServerConfigurationUsageStatisticsProvider(@NotNull final TeamCityDatabaseManager dbManager,
-                                                    @NotNull final LoginConfiguration loginConfiguration,
-                                                    @NotNull final UsageStatisticsPresentationManager presentationManager) {
+                                                    @NotNull final LoginConfiguration loginConfiguration) {
     myDBManager = dbManager;
     myLoginConfiguration = loginConfiguration;
-    myPresentationManager = presentationManager;
   }
 
-  public void accept(@NotNull final UsageStatisticsPublisher publisher) {
-    publishPlatform(publisher);
-    publishAuthScheme(publisher);
-    publishDatabaseInfo(publisher);
-    publishJavaInfo(publisher);
-    publishXmx(publisher);
+  @Override
+  protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    publishPlatform(publisher, presentationManager);
+    publishAuthScheme(publisher, presentationManager);
+    publishDatabaseInfo(publisher, presentationManager);
+    publishJavaInfo(publisher, presentationManager);
+    publishXmx(publisher, presentationManager);
   }
 
-  private void publishPlatform(@NotNull final UsageStatisticsPublisher publisher) {
+  private void publishPlatform(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String platformId = makeId("platform");
 
     final StringBuilder sb = new StringBuilder();
@@ -54,47 +52,47 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
     sb.append(System.getProperty("os.version")).append(" ");
     sb.append(System.getProperty("os.arch"));
 
-    myPresentationManager.applyPresentation(platformId, "Platform", myGroupName, null);
+    presentationManager.applyPresentation(platformId, "Platform", myGroupName, null, null);
     publisher.publishStatistic(platformId, sb.toString());
   }
 
-  private void publishAuthScheme(@NotNull final UsageStatisticsPublisher publisher) {
+  private void publishAuthScheme(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String authSchemeId = makeId("authScheme");
-    myPresentationManager.applyPresentation(authSchemeId, "Authentication scheme", myGroupName, null);
+    presentationManager.applyPresentation(authSchemeId, "Authentication scheme", myGroupName, null, null);
     publisher.publishStatistic(authSchemeId, myLoginConfiguration.getSelectedLoginModuleDescriptor().getDisplayName());
   }
 
-  private void publishJavaInfo(@NotNull final UsageStatisticsPublisher publisher) {
+  private void publishJavaInfo(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String javaId = makeId("java");
     final String javaRuntimeId = makeId("javaRuntime");
 
-    myPresentationManager.applyPresentation(javaId, "Java version", myGroupName, null);
+    presentationManager.applyPresentation(javaId, "Java version", myGroupName, null, null);
     publisher.publishStatistic(javaId, System.getProperty("java.version"));
 
-    myPresentationManager.applyPresentation(javaRuntimeId, "Java runtime version", myGroupName, null);
+    presentationManager.applyPresentation(javaRuntimeId, "Java runtime version", myGroupName, null, null);
     publisher.publishStatistic(javaRuntimeId, System.getProperty("java.runtime.version"));
   }
 
-  private void publishDatabaseInfo(@NotNull final UsageStatisticsPublisher publisher) {
+  private void publishDatabaseInfo(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String databaseId = makeId("database");
     final String jdbcId = makeId("jdbc");
 
-    myPresentationManager.applyPresentation(databaseId, "Database version", myGroupName, null);
+    presentationManager.applyPresentation(databaseId, "Database version", myGroupName, null, null);
     publisher.publishStatistic(databaseId, myDBManager.getDatabaseProductName() + ' ' + myDBManager.getDatabaseMajorVersion() + '.' + myDBManager.getDatabaseMinorVersion());
 
-    myPresentationManager.applyPresentation(jdbcId, "JDBC driver version", myGroupName, null);
+    presentationManager.applyPresentation(jdbcId, "JDBC driver version", myGroupName, null, null);
     publisher.publishStatistic(jdbcId, myDBManager.getDriverName() + ' ' + myDBManager.getDriverMajorVersion() + '.' + myDBManager.getDriverMinorVersion());
   }
 
-  private void publishXmx(@NotNull final UsageStatisticsPublisher publisher) {
+  private void publishXmx(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String maxMemoryId = makeId("maxMemory");
-    myPresentationManager.applyPresentation(maxMemoryId, "Maximum used memory", myGroupName,
+    presentationManager.applyPresentation(maxMemoryId, "Maximum used memory", myGroupName,
                                             new TypeBasedFormatter<Long>(Long.class) {
                                               @Override
                                               protected String doFormat(@NotNull final Long statisticValue) {
                                                 return String.format("%dMb", statisticValue);
                                               }
-                                            });
+                                            }, null);
     publisher.publishStatistic(maxMemoryId, Runtime.getRuntime().maxMemory() / MEGABYTE);
   }
 }

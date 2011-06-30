@@ -10,7 +10,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="annotations.jar" level="project" />
     <orderEntry type="module" module-name="usage-statistics-api" />
-    <orderEntry type="module" module-name="usage-statistics-api-impl" />
     <orderEntry type="module" module-name="server-openapi" />
   </component>
 </module>

@@ -16,47 +16,37 @@
 
 package jetbrains.buildServer.usageStatistics.presentation.renderers;
 
-import java.util.*;
-
 import com.intellij.openapi.util.Pair;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticPresentation;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupExtension;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class DynamicUsageStatisticsGroup implements UsageStatisticsGroupExtension {
-  @NotNull private final String myJspPagePath;
+import java.util.*;
+
+public class DynamicUsageStatisticsGroup implements UsageStatisticsGroup {
   @NotNull private final List<String> myPeriods;
-  @NotNull private final DefaultValueProvider myDefaultValueProvider;
+  @NotNull private final String myDefaultValue;
   private final boolean mySort;
 
   @NotNull private final Object myStatisticsLock = new Object();
   @NotNull private List<DynamicStatistic> myStatistics = new ArrayList<DynamicStatistic>();
 
-  public DynamicUsageStatisticsGroup(@NotNull final PluginDescriptor pluginDescriptor,
-                                     @NotNull final List<String> periods,
-                                     @NotNull final DefaultValueProvider defaultValueProvider,
+  public DynamicUsageStatisticsGroup(@NotNull final List<String> periods,
+                                     @NotNull final String defaultValue,
                                      final boolean sort) {
-    myJspPagePath = pluginDescriptor.getPluginResourcesPath("renderers/dynamic.jsp");
     myPeriods = periods;
-    myDefaultValueProvider = defaultValueProvider;
+    myDefaultValue = defaultValue;
     mySort = sort;
-  }
-
-  @NotNull
-  public String getJspPagePath() {
-    return myJspPagePath;
   }
 
   public void setStatistics(@NotNull final List<UsageStatisticPresentation> statistics) {
     final LinkedHashMap<String, DynamicStatistic> dynamicStatisticsMap = new LinkedHashMap<String, DynamicStatistic>();
-    final String defaultValue = myDefaultValueProvider.getDefaultValue();
 
     for (final UsageStatisticPresentation statistic : statistics) {
       final int index = extractIndex(statistic);
       if (index != -1) {
-        getOrCreate(dynamicStatisticsMap, statistic, defaultValue).setValue(index, statistic.getFormattedValue(), statistic.getValueTooltip());
+        getOrCreate(dynamicStatisticsMap, statistic).setValue(index, statistic.getFormattedValue(), statistic.getValueTooltip());
       }
     }
 
@@ -108,11 +98,10 @@ public class DynamicUsageStatisticsGroup implements UsageStatisticsGroupExtensio
 
   @NotNull
   private DynamicStatistic getOrCreate(@NotNull final Map<String, DynamicStatistic> dynamicStatistics,
-                                       @NotNull final UsageStatisticPresentation statistic,
-                                       @NotNull final String defaultValue) {
+                                       @NotNull final UsageStatisticPresentation statistic) {
     final String displayName = statistic.getDisplayName();
     if (!dynamicStatistics.containsKey(displayName)) {
-      dynamicStatistics.put(displayName, new DynamicStatistic(displayName, myPeriods.size(), defaultValue));
+      dynamicStatistics.put(displayName, new DynamicStatistic(displayName, myPeriods.size(), myDefaultValue));
     }
     return dynamicStatistics.get(displayName);
   }
@@ -156,10 +145,5 @@ public class DynamicUsageStatisticsGroup implements UsageStatisticsGroupExtensio
     public String getTooltip() {
       return getSecond();
     }
-  }
-
-  public static interface DefaultValueProvider {
-    @NotNull
-    String getDefaultValue();
   }
 }

@@ -17,15 +17,13 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.vcs.SVcsRoot;
 import org.jetbrains.annotations.NotNull;
 
 public class VCSUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
   @NotNull private final SBuildServer myServer;
 
-  public VCSUsageStatisticsProvider(@NotNull final SBuildServer server, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(presentationManager);
+  public VCSUsageStatisticsProvider(@NotNull final SBuildServer server) {
     myServer = server;
   }
 

@@ -26,19 +26,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 abstract class BaseExtensionUsageStatisticsProvider extends BaseUsageStatisticsProvider {
-  @NotNull private final UsageStatisticsPresentationManager myPresentationManager;
-
-  protected BaseExtensionUsageStatisticsProvider(@NotNull final UsageStatisticsPresentationManager presentationManager) {
-    myPresentationManager = presentationManager;
-  }
-
-  public void accept(@NotNull final UsageStatisticsPublisher publisher) {
+  @Override
+  protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final Map<ExtensionType, Integer> extensionUsages = doCollectUsages();
     final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalUsagesCount(extensionUsages));
     for (final Map.Entry<ExtensionType, Integer> entry : extensionUsages.entrySet()) {
       final ExtensionType type = entry.getKey();
       final String statisticId = makeId(type.getExtensionTypeId());
-      myPresentationManager.applyPresentation(statisticId, type.getExtensionTypeDisplayName(), myGroupName, formatter, getValueTooltip());
+      presentationManager.applyPresentation(statisticId, type.getExtensionTypeDisplayName(), myGroupName, formatter, getValueTooltip());
       publisher.publishStatistic(statisticId, entry.getValue());
     }
   }

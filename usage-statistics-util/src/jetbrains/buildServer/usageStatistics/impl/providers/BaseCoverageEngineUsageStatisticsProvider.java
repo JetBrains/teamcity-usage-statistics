@@ -19,7 +19,6 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import jetbrains.buildServer.serverSide.SBuildRunnerDescriptor;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,9 +31,7 @@ abstract class BaseCoverageEngineUsageStatisticsProvider extends BaseExtensionUs
   @NotNull private final SBuildServer myServer;
   @NotNull private final Map<String, String> myEngineName2DisplayName = new HashMap<String, String>();
 
-  protected BaseCoverageEngineUsageStatisticsProvider(@NotNull final SBuildServer server,
-                                                      @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(presentationManager);
+  protected BaseCoverageEngineUsageStatisticsProvider(@NotNull final SBuildServer server) {
     myServer = server;
   }
 

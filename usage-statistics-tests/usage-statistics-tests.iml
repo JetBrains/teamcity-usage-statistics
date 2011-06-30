@@ -9,9 +9,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="usage-statistics-api" />
-    <orderEntry type="module" module-name="usage-statistics-api-impl" />
-    <orderEntry type="module" module-name="usage-statistics-impl" />
     <orderEntry type="module" module-name="usage-statistics-util" />
+    <orderEntry type="module" module-name="usage-statistics-impl" />
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>

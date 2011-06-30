@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package jetbrains.buildServer.usageStatistics.presentation.renderers;
+package jetbrains.buildServer.usageStatistics.presentation.formatters;
 
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ListUsageStatisticsGroup extends BaseSimpleUsageStatisticsGroup {
-  public ListUsageStatisticsGroup(@NotNull final PluginDescriptor pluginDescriptor) {
-    super(pluginDescriptor, "renderers/list.jsp");
+public class DefaultFormatter implements UsageStatisticsFormatter {
+  @NotNull
+  public String format(@Nullable final Object statisticValue) {
+    return StringUtil.stringValueOf(statisticValue, StringUtil.NA);
   }
 }

@@ -18,14 +18,15 @@ package jetbrains.buildServer.controllers;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
+
+import com.intellij.openapi.util.Pair;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCollectorImpl;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupExtension;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroup;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
 import jetbrains.buildServer.util.StringUtil;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,19 +36,18 @@ public class UsageStatisticsBean {
   private final boolean myStatisticsCollected;
   private final String mySizeEstimate;
   private final Date myLastCollectingFinishDate;
-  private final LinkedHashMap<String, UsageStatisticsGroupExtension> myStatisticGroups;
+  private final LinkedHashMap<String, Pair<String, UsageStatisticsGroup>> myStatisticGroups;
 
   public UsageStatisticsBean(@NotNull final UsageStatisticsSettingsPersistor settingsPersistor,
                              @NotNull final UsageStatisticsCollector statisticsCollector,
-                             @NotNull final UsageStatisticsPresentationManagerEx presentationManager,
-                             @NotNull final PluginDescriptor pluginDescriptor) {
+                             @NotNull final UsageStatisticsPresentationManagerEx presentationManager) {
     myReportingEnabled = settingsPersistor.loadSettings().isReportingEnabled();
     myCollectingNow = statisticsCollector.isCollectingNow();
     myStatisticsCollected = statisticsCollector.isStatisticsCollected();
 
     if (myStatisticsCollected) {
       myLastCollectingFinishDate = statisticsCollector.getLastCollectingFinishDate();
-      myStatisticGroups = presentationManager.groupStatistics(statisticsCollector, pluginDescriptor);
+      myStatisticGroups = presentationManager.groupStatistics(statisticsCollector);
 
       final int[] sizeEstimate = new int[] { 0 };
       statisticsCollector.publishCollectedStatistics(new UsageStatisticsPublisher() {
@@ -86,7 +86,7 @@ public class UsageStatisticsBean {
   }
 
   @NotNull
-  public LinkedHashMap<String, UsageStatisticsGroupExtension> getStatisticGroups() {
+  public LinkedHashMap<String, Pair<String, UsageStatisticsGroup>> getStatisticGroups() {
     if (myStatisticGroups == null) {
       throw UsageStatisticsCollectorImpl.createIllegalStateException();
     }

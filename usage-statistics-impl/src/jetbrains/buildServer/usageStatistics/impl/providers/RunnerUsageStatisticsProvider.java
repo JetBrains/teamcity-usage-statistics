@@ -16,21 +16,20 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.SBuildRunnerDescriptor;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
   @NotNull private final SBuildServer myServer;
 
-  public RunnerUsageStatisticsProvider(@NotNull final SBuildServer server, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    super(presentationManager);
+  public RunnerUsageStatisticsProvider(@NotNull final SBuildServer server) {
     myServer = server;
   }
 

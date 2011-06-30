@@ -16,12 +16,22 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import com.intellij.openapi.util.UserDataHolder;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
+import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationProvider;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider {
+import java.util.ArrayList;
+import java.util.List;
+
+abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider, UsageStatisticsPresentationProvider {
   @NotNull private String myIdFormat;
   @NotNull protected String myGroupName;
+  @NotNull private final PresentationsCollector myPresentationsCollector = new PresentationsCollector();
 
   public void setIdFormat(@NotNull final String idFormat) {
     myIdFormat = idFormat;
@@ -34,5 +44,124 @@ abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider {
   @NotNull
   protected String makeId(@NotNull final String... params) {
     return String.format(myIdFormat, params);
+  }
+
+  protected abstract void accept(@NotNull UsageStatisticsPublisher publisher,
+                                 @NotNull UsageStatisticsPresentationManager presentationManager);
+
+  public void accept(@NotNull final UsageStatisticsPublisher publisher) {
+    myPresentationsCollector.clear();
+    accept(publisher, myPresentationsCollector);
+  }
+
+  public void accept(@NotNull final UsageStatisticsPresentationManager presentationManager) {
+    myPresentationsCollector.applyTo(presentationManager);
+  }
+
+  private static class PresentationsCollector implements UsageStatisticsPresentationManager {
+    @NotNull private final List<StatisticPresentation> myStatisticPresentations = new ArrayList<StatisticPresentation>();
+    @NotNull private final List<GroupPresentation> myGroupPresentations = new ArrayList<GroupPresentation>();
+
+    public void applyPresentation(@NotNull final String id,
+                                  @Nullable final String displayName,
+                                  @Nullable final String groupName,
+                                  @Nullable final UsageStatisticsFormatter formatter,
+                                  @Nullable final String valueTooltip) {
+      myStatisticPresentations.add(new StatisticPresentation(id, displayName, groupName, formatter, valueTooltip));
+    }
+
+    public void setGroupType(@NotNull final String groupName,
+                             @NotNull final String groupTypeId,
+                             @Nullable final UserDataHolder groupSettings) {
+      myGroupPresentations.add(new GroupPresentation(groupName, groupTypeId, groupSettings));
+    }
+
+    void clear() {
+      myStatisticPresentations.clear();
+      myGroupPresentations.clear();
+    }
+
+    void applyTo(@NotNull final UsageStatisticsPresentationManager presentationManager) {
+      for (final StatisticPresentation sp : myStatisticPresentations) {
+        presentationManager.applyPresentation(sp.getId(), sp.getDisplayName(), sp.getGroupName(), sp.getFormatter(), sp.getValueTooltip());
+      }
+      for (final GroupPresentation gp : myGroupPresentations) {
+        presentationManager.setGroupType(gp.getGroupName(), gp.getGroupTypeId(), gp.getGroupSettings());
+      }
+    }
+  }
+
+  private static class StatisticPresentation {
+    @NotNull private final String myId;
+    @Nullable private final String myDisplayName;
+    @Nullable private final String myGroupName;
+    @Nullable private final UsageStatisticsFormatter myFormatter;
+    @Nullable private final String myValueTooltip;
+
+    StatisticPresentation(@NotNull final String id,
+                          @Nullable final String displayName,
+                          @Nullable final String groupName,
+                          @Nullable final UsageStatisticsFormatter formatter,
+                          @Nullable final String valueTooltip) {
+      myId = id;
+      myDisplayName = displayName;
+      myGroupName = groupName;
+      myFormatter = formatter;
+      myValueTooltip = valueTooltip;
+    }
+
+    @NotNull
+    String getId() {
+      return myId;
+    }
+
+    @Nullable
+    String getDisplayName() {
+      return myDisplayName;
+    }
+
+    @Nullable
+    String getGroupName() {
+      return myGroupName;
+    }
+
+    @Nullable
+    UsageStatisticsFormatter getFormatter() {
+      return myFormatter;
+    }
+
+    @Nullable
+    String getValueTooltip() {
+      return myValueTooltip;
+    }
+  }
+
+  private static class GroupPresentation {
+    @NotNull private final String myGroupName;
+    @NotNull private final String myGroupTypeId;
+    @Nullable private final UserDataHolder myGroupSettings;
+
+    GroupPresentation(@NotNull final String groupName,
+                      @NotNull final String groupTypeId,
+                      @Nullable final UserDataHolder groupSettings) {
+      myGroupName = groupName;
+      myGroupTypeId = groupTypeId;
+      myGroupSettings = groupSettings;
+    }
+
+    @NotNull
+    String getGroupName() {
+      return myGroupName;
+    }
+
+    @NotNull
+    String getGroupTypeId() {
+      return myGroupTypeId;
+    }
+
+    @Nullable
+    UserDataHolder getGroupSettings() {
+      return myGroupSettings;
+    }
   }
 }

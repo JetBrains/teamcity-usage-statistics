@@ -25,6 +25,8 @@ import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationProvider;
 import jetbrains.buildServer.util.Dates;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +39,7 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
   private static final int DEFAULT_PROVIDER_SLEEP_TIME = 1000; // 1 second
 
   @NotNull private final ExtensionHolder myExtensionHolder;
+  @NotNull private final UsageStatisticsPresentationManager myPresentationManager;
 
   @NotNull private final Object myLock = new Object();
 
@@ -46,8 +49,10 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
   private boolean myCollectingWasForced = false;
   private boolean myServerIsActive = true;
 
-  public UsageStatisticsCollectorImpl(@NotNull final SBuildServer server, @NotNull final ExtensionHolder extensionHolder) {
-    myExtensionHolder = extensionHolder;
+  public UsageStatisticsCollectorImpl(@NotNull final SBuildServer server,
+                                      @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    myExtensionHolder = server;
+    myPresentationManager = presentationManager;
     server.addListener(this);
     new Thread(this, "Usage Statistics Collector").start();
   }
@@ -58,6 +63,7 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
     }
   }
 
+  @SuppressWarnings("NullableProblems")
   @NotNull
   private List<Pair<String, Object>> getCollectedStatistics() {
     synchronized (myLock) {
@@ -74,6 +80,7 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
     }
   }
 
+  @SuppressWarnings("NullableProblems")
   @NotNull
   public Date getLastCollectingFinishDate() {
     synchronized (myLock) {
@@ -152,6 +159,11 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
     for (final UsageStatisticsProvider provider : providers) {
       collectStatisticsWithProvider(provider, publisher);
     }
+
+    final Collection<UsageStatisticsPresentationProvider> presentationProviders = myExtensionHolder.getExtensions(UsageStatisticsPresentationProvider.class);
+    for (final UsageStatisticsPresentationProvider presentationProvider : presentationProviders) {
+      applyPresentationsWithProvider(presentationProvider);
+    }
   }
 
   private void collectStatisticsWithProvider(@NotNull final UsageStatisticsProvider provider, @NotNull final UsageStatisticsPublisher publisher) {
@@ -162,6 +174,17 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
     catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
       LOG.debug("Usage statistics provider failed", e);
+    }
+  }
+
+  private void applyPresentationsWithProvider(@NotNull final UsageStatisticsPresentationProvider presentationProvider) {
+    try {
+      presentationProvider.accept(myPresentationManager);
+      Thread.sleep(getProviderSleepTime());
+    }
+    catch (final InterruptedException ignore) {}
+    catch (final Throwable e) {
+      LOG.debug("Usage statistics presentation provider failed", e);
     }
   }
 

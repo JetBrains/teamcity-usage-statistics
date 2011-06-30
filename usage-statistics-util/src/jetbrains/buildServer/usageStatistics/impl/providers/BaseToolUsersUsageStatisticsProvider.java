@@ -16,7 +16,6 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import java.util.*;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -27,20 +26,19 @@ import jetbrains.buildServer.usageStatistics.util.BasePersistentStateComponent;
 import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.util.filters.Filter;
 import jetbrains.buildServer.util.filters.FilterUtil;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
   @NotNull private final Map<ICString, Set<ToolUsage>> myToolUsages = new TreeMap<ICString, Set<ToolUsage>>();
 
   protected BaseToolUsersUsageStatisticsProvider(@NotNull final SBuildServer server,
                                                  @NotNull final ServerPaths serverPaths,
-                                                 @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                                 @NotNull final LinkedHashMap<Long, String> periodDescriptions,
-                                                 @NotNull final PluginDescriptor pluginDescriptor) {
-    super(presentationManager, pluginDescriptor, periodDescriptions);
+                                                 @NotNull final LinkedHashMap<Long, String> periodDescriptions) {
+    super(periodDescriptions, new PercentageFormatter(1).format(0));
     registerPersistor(server, serverPaths);
   }
 
@@ -59,18 +57,20 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
   protected abstract String getValueTooltip();
 
   @Override
-  protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final String periodDescription, final long startDate) {
+  protected void accept(@NotNull final UsageStatisticsPublisher publisher,
+                        @NotNull final UsageStatisticsPresentationManager presentationManager,
+                        @NotNull final String periodDescription,
+                        final long startDate) {
     removeObsoleteUsages();
     final Map<ICString, Set<ToolUsage>> usages = filterUsages(startDate);
     final UsageStatisticsFormatter formatter = new PercentageFormatter(getUsers(usages).size());
-    setDefaultValue(myGroupName, formatter.format(0));
     final List<ICString> toolIds = new ArrayList<ICString>(usages.keySet());
     Collections.sort(toolIds);
     for (final ICString toolId : toolIds) {
       final String toolIdSource = toolId.getSource();
       if (!publishToolUsages(toolIdSource)) continue;
       final String statisticId = makeId(periodDescription, toolIdSource);
-      myPresentationManager.applyPresentation(statisticId, toolIdSource, myGroupName, formatter, getValueTooltip());
+      presentationManager.applyPresentation(statisticId, toolIdSource, myGroupName, formatter, getValueTooltip());
       publisher.publishStatistic(statisticId, usages.get(toolId).size());
     }
   }

@@ -16,26 +16,23 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import java.util.Set;
-import java.util.Vector;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.impl.XmlRpcBasedRemoteServer;
 import jetbrains.buildServer.serverSide.impl.XmlRpcDispatcher;
 import jetbrains.buildServer.serverSide.impl.XmlRpcListener;
 import jetbrains.buildServer.serverSide.impl.XmlRpcSession;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
+import java.util.Vector;
 
 public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener, IDEUsersProvider {
   public IDEUsageStatisticsProvider(@NotNull final SBuildServer server,
                                     @NotNull final ServerPaths serverPaths,
-                                    @NotNull final XmlRpcDispatcher xmlRpcDispatcher,
-                                    @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                    @NotNull final PluginDescriptor pluginDescriptor) {
-    super(server, serverPaths, presentationManager, createDWMPeriodDescriptions(), pluginDescriptor);
+                                    @NotNull final XmlRpcDispatcher xmlRpcDispatcher) {
+    super(server, serverPaths, createDWMPeriodDescriptions());
     xmlRpcDispatcher.addListener(this);
   }
 

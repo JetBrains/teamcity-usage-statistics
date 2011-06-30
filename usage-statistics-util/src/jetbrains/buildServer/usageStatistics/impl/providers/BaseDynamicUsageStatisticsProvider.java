@@ -17,39 +17,33 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.*;
+
+import com.intellij.openapi.util.UserDataHolder;
+import com.intellij.openapi.util.UserDataHolderBase;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupType;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
-import jetbrains.buildServer.usageStatistics.presentation.formatters.DefaultFormatter;
-import jetbrains.buildServer.usageStatistics.presentation.renderers.DynamicUsageStatisticsGroup;
+import jetbrains.buildServer.usageStatistics.presentation.renderers.DynamicUsageStatisticsGroupSettings;
 import jetbrains.buildServer.util.Dates;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsProvider {
-  @NotNull protected final UsageStatisticsPresentationManager myPresentationManager;
-  @NotNull private final PluginDescriptor myPluginDescriptor;
   @NotNull private final LinkedHashMap<Long, String> myPeriodDescriptions;
-  @NotNull private final Map<String, String> myDefaultValues; // group name -> default value
+  @Nullable private final String myDefaultValue;
 
-  protected BaseDynamicUsageStatisticsProvider(@NotNull final UsageStatisticsPresentationManager presentationManager,
-                                               @NotNull final PluginDescriptor pluginDescriptor,
-                                               @NotNull final LinkedHashMap<Long, String> periodDescriptions) {
-    myPresentationManager = presentationManager;
+  protected BaseDynamicUsageStatisticsProvider(@NotNull final LinkedHashMap<Long, String> periodDescriptions,
+                                               @Nullable final String defaultValue) {
     myPeriodDescriptions = periodDescriptions;
-    myPluginDescriptor = pluginDescriptor;
-    myDefaultValues = new HashMap<String, String>();
+    myDefaultValue = defaultValue;
   }
 
   @Override
-  public void setGroupName(@NotNull final String groupName) {
-    super.setGroupName(groupName);
-    registerGroupRenderer(myPresentationManager, myPluginDescriptor, myPeriodDescriptions, groupName);
-  }
-
-  public void accept(@NotNull final UsageStatisticsPublisher publisher) {
+  protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    setupGroup(presentationManager);
     final long now = Dates.now().getTime();
     for (final Long period : myPeriodDescriptions.keySet()) {
-      accept(publisher, myPeriodDescriptions.get(period).toLowerCase(), now - period);
+      accept(publisher, presentationManager, myPeriodDescriptions.get(period).toLowerCase(), now - period);
     }
   }
 
@@ -62,10 +56,6 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
     }};
   }
 
-  protected void setDefaultValue(@NotNull final String groupName, @NotNull final String defaultValue) {
-    myDefaultValues.put(groupName, defaultValue);
-  }
-
   protected long getThresholdDate() {
     long maxPeriod = 0;
     for (final Long period : myPeriodDescriptions.keySet()) {
@@ -76,33 +66,24 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
     return Dates.now().getTime() - maxPeriod;
   }
 
-  protected abstract void accept(@NotNull UsageStatisticsPublisher publisher, @NotNull String periodDescription, long startDate);
+  protected abstract void accept(@NotNull UsageStatisticsPublisher publisher,
+                                 @NotNull UsageStatisticsPresentationManager presentationManager,
+                                 @NotNull String periodDescription,
+                                 long startDate);
 
   protected abstract boolean mustSortStatistics();
 
-  private void registerGroupRenderer(@NotNull final UsageStatisticsPresentationManager presentationManager,
-                                     @NotNull final PluginDescriptor pluginDescriptor,
-                                     @NotNull final LinkedHashMap<Long, String> periodDescriptions,
-                                     @NotNull final String groupName) {
-    final List<String> periods = new ArrayList<String>(periodDescriptions.size());
-
-    for (final Map.Entry<Long, String> entry : periodDescriptions.entrySet()) {
+  private void setupGroup(@NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final List<String> periods = new ArrayList<String>(myPeriodDescriptions.size());
+    for (final Map.Entry<Long, String> entry : myPeriodDescriptions.entrySet()) {
       periods.add(entry.getValue());
     }
 
-    final DynamicUsageStatisticsGroup.DefaultValueProvider defaultValueProvider = createDefaultValueProvider(groupName, new DefaultFormatter().format(null));
-    final DynamicUsageStatisticsGroup group = new DynamicUsageStatisticsGroup(pluginDescriptor, periods, defaultValueProvider, mustSortStatistics());
+    final UserDataHolder groupSettings = new UserDataHolderBase();
+    groupSettings.putUserData(DynamicUsageStatisticsGroupSettings.PERIODS, periods);
+    groupSettings.putUserData(DynamicUsageStatisticsGroupSettings.DEFAULT_VALUE, myDefaultValue);
+    groupSettings.putUserData(DynamicUsageStatisticsGroupSettings.SORT, mustSortStatistics());
 
-    presentationManager.registerGroupRenderer(groupName, group);
-  }
-
-  private DynamicUsageStatisticsGroup.DefaultValueProvider createDefaultValueProvider(@NotNull final String groupName, @NotNull final String defaultDefaultValue) {
-    return new DynamicUsageStatisticsGroup.DefaultValueProvider() {
-      @NotNull
-      public String getDefaultValue() {
-        final String defaultValue = myDefaultValues.get(groupName);
-        return defaultValue == null ? defaultDefaultValue : defaultValue;
-      }
-    };
+    presentationManager.setGroupType(myGroupName, UsageStatisticsGroupType.DYNAMIC, groupSettings);
   }
 }
