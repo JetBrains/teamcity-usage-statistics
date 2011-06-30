@@ -18,7 +18,6 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import jetbrains.buildServer.serverSide.SBuildAgent;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
