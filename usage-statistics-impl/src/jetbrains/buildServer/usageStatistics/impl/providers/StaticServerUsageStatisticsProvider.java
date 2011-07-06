@@ -84,7 +84,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   private void publishNumberOfCloudImages(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String cloudImagesId = makeId("cloudImages");
     presentationManager.applyPresentation(cloudImagesId, "Cloud images", myGroupName, null, null);
-    publisher.publishStatistic(cloudImagesId, myCloudProvider.getNumberOfProfiles());
+    publisher.publishStatistic(cloudImagesId, myCloudProvider.getNumberOfImages());
   }
 
   private void publishNumberOfBuildTypes(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
