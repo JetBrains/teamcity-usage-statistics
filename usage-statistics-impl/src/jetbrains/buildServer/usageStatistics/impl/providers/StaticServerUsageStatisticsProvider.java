@@ -21,6 +21,7 @@ import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SBuildType;
+import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
@@ -29,13 +30,16 @@ import org.jetbrains.annotations.NotNull;
 public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProvider {
   @NotNull private final BuildServerEx myServer;
   @NotNull private final UserGroupManager myUserGroupManager;
+  @NotNull private final AgentPoolManager myAgentPoolManager;
   @NotNull private final CloudStatisticsProvider myCloudProvider;
 
   public StaticServerUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                              @NotNull final UserGroupManager userGroupManager,
+                                             @NotNull final AgentPoolManager agentPoolManager,
                                              @NotNull final CloudStatisticsProvider cloudProvider) {
     myServer = server;
     myUserGroupManager = userGroupManager;
+    myAgentPoolManager = agentPoolManager;
     myCloudProvider = cloudProvider;
   }
 
@@ -44,6 +48,7 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     publishNumberOfAgents(publisher, presentationManager);
     publishNumberOfVirtualAgents(publisher, presentationManager);
     publishNumberOfAgentLicenses(publisher, presentationManager);
+    publishNumberOfAgentPools(publisher, presentationManager);
 
     publishNumberOfBuildTypes(publisher, presentationManager);
     publishNumberOfDependencies(publisher, presentationManager);
@@ -80,6 +85,12 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     final String agentLicenseNumberId = makeId("agentLicenseNumber");
     presentationManager.applyPresentation(agentLicenseNumberId, "Agent licenses", myGroupName, null, null);
     publisher.publishStatistic(agentLicenseNumberId, myServer.getLicenseKeysManager().getLicenseList().getLicensedAgentCount());
+  }
+
+  private void publishNumberOfAgentPools(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final String agentPoolsId = makeId("agentPools");
+    presentationManager.applyPresentation(agentPoolsId, "Agent pools", myGroupName, null, null);
+    publisher.publishStatistic(agentPoolsId, myAgentPoolManager.getAllAgentPools().size());
   }
 
   private void publishNumberOfCloudProfiles(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
