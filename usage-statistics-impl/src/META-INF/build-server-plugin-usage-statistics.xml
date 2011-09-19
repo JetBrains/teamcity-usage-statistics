@@ -90,7 +90,7 @@
 
   <bean id="notificatorUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.NotificatorUsageStatisticsProvider">
     <property name="idFormat" value="jb.notificator[%s]"/>
-    <property name="groupName" value="Notificators"/>
+    <property name="groupName" value="Notifiers"/>
   </bean>
 
   <bean id="runnerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.RunnerUsageStatisticsProvider">
