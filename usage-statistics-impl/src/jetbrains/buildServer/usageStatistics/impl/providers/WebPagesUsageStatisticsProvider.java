@@ -69,7 +69,10 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   }
 
   public void processGetRequest(@NotNull final HttpServletRequest request) {
-    final SUser user = SessionUser.getUser(request);
+    SUser user = null;
+    try {
+      user = SessionUser.getUser(request);
+    } catch (final Exception ignore) {} // TW-18334
     if (user == null) return;
     String path = WebUtil.getPathFromUrl(WebUtil.getPathWithoutContext(request));
     if (!path.toLowerCase().endsWith(".html")) return;
