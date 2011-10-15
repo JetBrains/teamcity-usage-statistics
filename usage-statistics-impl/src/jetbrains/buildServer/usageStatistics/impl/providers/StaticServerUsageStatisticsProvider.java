@@ -18,7 +18,7 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
-import jetbrains.buildServer.serverSide.BuildAgentManager;
+import jetbrains.buildServer.serverSide.BuildAgentManagerEx;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
@@ -64,15 +64,24 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String allRegisteredAgentNumberId = makeId("allRegisteredAgentNumber");
     final String authorizedRegisteredAgentNumberId = makeId("authorizedRegisteredAgentNumber");
+    final String allUnregisteredAgentNumberId = makeId("allUnregisteredAgentNumber");
+    final String authorizedUnregisteredAgentNumberId = makeId("authorizedUnregisteredAgentNumber");
 
-    final BuildAgentManager buildAgentManager = myServer.getBuildAgentManager();
+    final BuildAgentManagerEx buildAgentManager = myServer.getBuildAgentManager();
     final int allRegisteredAgentsNumber = buildAgentManager.getRegisteredAgents(true).size();
+    final int allUnregisteredAgentsNumber = buildAgentManager.getUnregisteredAgents(true).size();
 
-    presentationManager.applyPresentation(allRegisteredAgentNumberId, "Registered agents (all)", myGroupName, null, null);
+    presentationManager.applyPresentation(allRegisteredAgentNumberId, "Connected agents (all)", myGroupName, null, null);
     publisher.publishStatistic(allRegisteredAgentNumberId, allRegisteredAgentsNumber);
 
-    presentationManager.applyPresentation(authorizedRegisteredAgentNumberId, "Registered agents (authorized only)", myGroupName, new PercentageFormatter(allRegisteredAgentsNumber), "Agent count (% of all agents)");
+    presentationManager.applyPresentation(authorizedRegisteredAgentNumberId, "Connected agents (authorized only)", myGroupName, new PercentageFormatter(allRegisteredAgentsNumber), "Agent count (% of all connected agents)");
     publisher.publishStatistic(authorizedRegisteredAgentNumberId, buildAgentManager.getRegisteredAgents(false).size());
+
+    presentationManager.applyPresentation(allUnregisteredAgentNumberId, "Disconnected agents (all)", myGroupName, null, null);
+    publisher.publishStatistic(allUnregisteredAgentNumberId, allUnregisteredAgentsNumber);
+
+    presentationManager.applyPresentation(authorizedUnregisteredAgentNumberId, "Disconnected agents (authorized only)", myGroupName, new PercentageFormatter(allUnregisteredAgentsNumber), "Agent count (% of all disconnected agents)");
+    publisher.publishStatistic(authorizedUnregisteredAgentNumberId, buildAgentManager.getUnregisteredAgents(false).size());
   }
 
   private void publishNumberOfVirtualAgents(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {

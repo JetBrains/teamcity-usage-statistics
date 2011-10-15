@@ -16,18 +16,19 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import jetbrains.buildServer.serverSide.BuildAgentEx;
+import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SBuildAgent;
-import jetbrains.buildServer.serverSide.SBuildServer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 
 public class AgentsJavaUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
-  @NotNull private final SBuildServer myServer;
+  @NotNull private final BuildServerEx myServer;
   @NotNull private String myParameterName = "";
 
-  public AgentsJavaUsageStatisticsProvider(@NotNull final SBuildServer server) {
+  public AgentsJavaUsageStatisticsProvider(@NotNull final BuildServerEx server) {
     myServer = server;
   }
 
@@ -58,7 +59,7 @@ public class AgentsJavaUsageStatisticsProvider extends BaseExtensionUsageStatist
   @NotNull
   @Override
   protected String getValueTooltip() {
-    return "Agent count (% of authorized agents)";
+    return "Agent count (% of all authorized agents)";
   }
 
   @Override
@@ -67,7 +68,7 @@ public class AgentsJavaUsageStatisticsProvider extends BaseExtensionUsageStatist
   }
 
   @NotNull
-  private List<SBuildAgent> getAuthorizedAgents() {
-    return myServer.getBuildAgentManager().getRegisteredAgents(false);
+  private List<BuildAgentEx> getAuthorizedAgents() {
+    return myServer.getBuildAgentManager().getAllAgents(false);
   }
 }
