@@ -11,18 +11,9 @@
     <orderEntry type="module" module-name="usage-statistics-api" />
     <orderEntry type="module" module-name="usage-statistics-util" />
     <orderEntry type="module" module-name="usage-statistics-impl" />
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$APPLICATION_HOME_DIR$/plugins/testng/lib/testng-jdk15.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module" module-name="test-core" />
     <orderEntry type="module" module-name="server" />
     <orderEntry type="module" module-name="remote-api-impl" />
+    <orderEntry type="module" module-name="server-test" />
   </component>
 </module>
 
