@@ -14,6 +14,7 @@
     <orderEntry type="module" module-name="server" />
     <orderEntry type="module" module-name="remote-api-impl" />
     <orderEntry type="module" module-name="server-test" />
+    <orderEntry type="module" module-name="cloud-server" />
   </component>
 </module>
 

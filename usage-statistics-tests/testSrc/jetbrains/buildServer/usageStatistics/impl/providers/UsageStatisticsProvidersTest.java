@@ -16,21 +16,70 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
+import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test
 public class UsageStatisticsProvidersTest extends BaseServerTestCase {
+  
+  private Collection<BaseUsageStatisticsProvider> myProviders;
+
+  @BeforeMethod
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    myProviders = new ArrayList<BaseUsageStatisticsProvider>();
+    myProviders.add(new IDEUsageStatisticsProvider(myServer, myFixture.getServerPaths(), myFixture.getXmlRpcDispatcher()));
+    myProviders.add(
+      new NotificatorUsageStatisticsProvider(myServer, myFixture.getNotificatorRegistry(), myFixture.getNotificationRulesManager()));
+    myProviders.add(new RunnerUsageStatisticsProvider(myServer));
+    myProviders.add(new ServerConfigurationUsageStatisticsProvider(new TeamCityDatabaseManager(), myFixture.getLoginConfiguration()));
+    myProviders.add(getStaticServerUsageProvider());
+    myProviders.add(new TriggerUsageStatisticsProvider(myServer));
+    myProviders.add(new VCSUsageStatisticsProvider(myServer));
+  }
+
+  private StaticServerUsageStatisticsProvider getStaticServerUsageProvider() {
+    final CloudStatisticsProvider mockCloudProvider = new CloudStatisticsProvider() {
+      public int getNumberOfProfiles() {
+        return 2;
+      }
+
+      public int getNumberOfImages() {
+        return 6;
+      }
+
+      public int getNumberOfRunningInstances() {
+        return 9;
+      }
+    };
+
+    myProviders.add(new AgentsJavaUsageStatisticsProvider(myServer));
+    myProviders.add(new ServerLoadUsageStatisticsProvider(myServer, new WebUsersProvider() {
+      @NotNull
+      public Set<String> getWebUsers(final long fromTimestamp) {
+        return Collections.emptySet();
+      }
+    }, new IDEUsersProvider() {
+      @NotNull
+      public Set<String> getIDEUsers(final long fromTimestamp) {
+        return Collections.emptySet();
+      }
+    }
+    ));
+    return new StaticServerUsageStatisticsProvider(myServer, myFixture.getUserGroupManager(), myFixture.getAgentPoolManager(), mockCloudProvider);
+  }
+
   public void provider_should_not_fail_on_publishing_statistics() {
     final UsageStatisticsPublisher publisher = new UsageStatisticsPublisher() {
       public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
@@ -38,7 +87,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
       }
     };
 
-    for (final BaseUsageStatisticsProvider provider : getAllProviders()) {
+    for (final BaseUsageStatisticsProvider provider : myProviders) {
       provider.setIdFormat("");
       provider.setGroupName("");
       provider.accept(publisher);
@@ -46,7 +95,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   }
 
   public void static_server_usage_statistics_provider_test() {
-    final StaticServerUsageStatisticsProvider provider = myServer.getSingletonService(StaticServerUsageStatisticsProvider.class);
+    final StaticServerUsageStatisticsProvider provider = getStaticServerUsageProvider();
     provider.setIdFormat("%s");
 
     final Map<String, Object> statistics = collectStatisticsByProvider(provider);
@@ -66,7 +115,9 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
     assertEquals(userGroupManager.getUserGroups().size(), statistics.get("userGroupNumber"));
   }
 
+/*
   private Collection<? extends BaseUsageStatisticsProvider> getAllProviders() {
+
     return Arrays.asList(
       myServer.getSingletonService(AgentsJavaUsageStatisticsProvider.class),
       myServer.getSingletonService(ServerLoadUsageStatisticsProvider.class),
@@ -80,6 +131,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
 //    myServer.getSingletonService(WebPagesUsageStatisticsProvider.class)
     );
   }
+*/
 
   private Map<String, Object> collectStatisticsByProvider(@NotNull final UsageStatisticsProvider provider) {
     final Map<String, Object> statistics = new HashMap<String, Object>();
