@@ -35,8 +35,8 @@ public class InvestigationUsageStatisticsProvider extends BaseFeatureUsageStatis
     super(server, serverPaths, createDWMPeriodDescriptions());
     server.addListener(new BuildServerAdapter() {
       @Override
-      public void responsibleChanged(@NotNull final SBuildType bt, @NotNull final ResponsibilityInfo oldValue, @NotNull final ResponsibilityInfo newValue, final boolean isUserAction) {
-        addUsageIfNeeded(newValue.getState(), BUILD_TYPES, isUserAction);
+      public void responsibleChanged(@NotNull final SBuildType bt, @NotNull final ResponsibilityEntry oldValue, @NotNull final ResponsibilityEntry newValue) {
+        addUsageIfNeeded(newValue.getState(), BUILD_TYPES, newValue.getReporterUser() != null);
       }
 
       @Override
