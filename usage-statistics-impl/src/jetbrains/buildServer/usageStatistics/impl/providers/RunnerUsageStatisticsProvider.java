@@ -37,7 +37,7 @@ public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsP
   protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
     for (final SBuildType buildType : myServer.getProjectManager().getActiveBuildTypes()) {
       final Set<String> collectedTypes = new HashSet<String>();
-      for (final SBuildRunnerDescriptor runnerDescriptor : buildType.getBuildRunners()) {
+      for (final SBuildRunnerDescriptor runnerDescriptor : buildType.getResolvedSettings().getBuildRunners()) {
         final RunType runType = runnerDescriptor.getRunType();
         final String type = runType.getType();
         if (!collectedTypes.contains(type)) {

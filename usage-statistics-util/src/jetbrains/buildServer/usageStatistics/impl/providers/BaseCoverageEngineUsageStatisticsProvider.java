@@ -46,7 +46,7 @@ abstract class BaseCoverageEngineUsageStatisticsProvider extends BaseExtensionUs
   protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
     for (final SBuildType buildType : myServer.getProjectManager().getActiveBuildTypes()) {
       final Set<String> collectedEngines = new HashSet<String>();
-      for (final SBuildRunnerDescriptor runner : buildType.getBuildRunners()) {
+      for (final SBuildRunnerDescriptor runner : buildType.getResolvedSettings().getBuildRunners()) {
         final String engineName = getSelectedEngineName(runner.getParameters());
         if (engineName != null && !collectedEngines.contains(engineName)) {
           callback.addUsage(engineName, myEngineName2DisplayName.get(engineName));
