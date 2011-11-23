@@ -17,6 +17,7 @@
 package jetbrains.buildServer.usageStatistics.presentation;
 
 import com.intellij.openapi.util.UserDataHolder;
+import jetbrains.buildServer.SystemProvided;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @since 6.5.2
  */
+@SystemProvided
 public interface UsageStatisticsPresentationManager {
   /**
    * Registers a UI representation for specified usage statistic.

@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics;
 
+import jetbrains.buildServer.SystemProvided;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @since 6.0
  */
+@SystemProvided
 public interface UsageStatisticsPublisher {
   /**
    * Call this method to publish your custom usage statistic.
