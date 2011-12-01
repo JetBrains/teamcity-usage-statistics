@@ -20,6 +20,8 @@ import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.SBuildRunnerDescriptor;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -31,6 +33,12 @@ public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsP
 
   public RunnerUsageStatisticsProvider(@NotNull final SBuildServer server) {
     myServer = server;
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.RUNNERS;
   }
 
   @Override

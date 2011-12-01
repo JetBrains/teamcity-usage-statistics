@@ -26,16 +26,13 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.*;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
 import jetbrains.buildServer.util.MultiMap;
+import jetbrains.buildServer.util.positioning.PositionAware;
+import jetbrains.buildServer.util.positioning.PositionAwareCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPresentationManagerEx {
   @NotNull private static final String MISCELLANEOUS = "Miscellaneous";
-  @NotNull private static final Comparator<String> STRINGS_COMPARATOR = new Comparator<String>() {
-    public int compare(@NotNull final String s1, @NotNull final String s2) {
-      return s1.compareToIgnoreCase(s2);
-    }
-  };
 
   @NotNull private final Map<String, String> myStatisticGroups = new HashMap<String, String>(); // statistic id -> group name
   @NotNull private final Map<String, GroupInfo> myGroupInfos = new HashMap<String, GroupInfo>(); // group name -> group info
@@ -58,8 +55,11 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
     }
   }
 
-  public void setGroupType(@NotNull final String groupName, @NotNull final String groupTypeId, @Nullable final UserDataHolder groupSettings) {
-    myGroupInfos.put(groupName, new GroupInfo(groupTypeId, groupSettings));
+  public void setGroupType(@NotNull final String groupName,
+                           @NotNull final String groupTypeId,
+                           @NotNull final PositionAware groupPosition,
+                           @Nullable final UserDataHolder groupSettings) {
+    myGroupInfos.put(groupName, new GroupInfo(groupTypeId, groupPosition, groupSettings));
   }
 
   @NotNull
@@ -71,14 +71,18 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
       }
     });
 
-    final List<String> groupNames = new ArrayList<String>(groupedStatistics.keySet());
-    Collections.sort(groupNames, STRINGS_COMPARATOR);
+    final PositionAwareCollection<Pair<String, GroupInfo>> groupInfos = new PositionAwareCollection<Pair<String, GroupInfo>>();
+    for (final String groupName : groupedStatistics.keySet()) {
+      final GroupInfo groupInfo = getGroupInfo(groupName);
+      groupInfos.add(Pair.create(groupName, groupInfo), groupInfo.getGroupPosition());
+    }
 
     final Map<String, UsageStatisticsGroupType> groupTypes = collectGroupTypes();
 
     final LinkedHashMap<String, Pair<String, UsageStatisticsGroup>> groups = new LinkedHashMap<String, Pair<String, UsageStatisticsGroup>>();
-    for (final String groupName : groupNames) {
-      final GroupInfo groupInfo = getGroupInfo(groupName);
+    for (final Pair<String, GroupInfo> pair : groupInfos.getAllSorted()) {
+      final String groupName = pair.getFirst();
+      final GroupInfo groupInfo = pair.getSecond();
       final UsageStatisticsGroupType groupType = groupTypes.get(groupInfo.getGroupTypeId());
       if (groupType == null) continue;
       final UsageStatisticsGroup group = groupType.createGroup(groupInfo.getGroupSettings());
@@ -117,7 +121,7 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
   @NotNull
   private GroupInfo getGroupInfo(@NotNull final String groupName) {
     if (!myGroupInfos.containsKey(groupName)) {
-      setGroupType(groupName, UsageStatisticsGroupType.DEFAULT, null);
+      setGroupType(groupName, UsageStatisticsGroupType.DEFAULT, UsageStatisticsGroupPosition.DEFAULT, null);
     }
     return myGroupInfos.get(groupName);
   }
@@ -129,19 +133,30 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
     myPresentationFactories.put(id, new UsageStatisticsPresentationFactory(id, displayName, formatter, valueTooltip));
   }
 
-  private static class GroupInfo extends Pair<String, UserDataHolder> {
-    GroupInfo(@NotNull final String groupTypeId, @Nullable final UserDataHolder groupSettings) {
-      super(groupTypeId, groupSettings);
+  private static class GroupInfo {
+    @NotNull private final String myGroupTypeId;
+    @NotNull private final PositionAware myGroupPosition;
+    @Nullable private final UserDataHolder myGroupSettings;
+
+    GroupInfo(@NotNull final String groupTypeId, @NotNull final PositionAware groupPosition, @Nullable final UserDataHolder groupSettings) {
+      myGroupTypeId = groupTypeId;
+      myGroupPosition = groupPosition;
+      myGroupSettings = groupSettings;
     }
 
     @NotNull
     String getGroupTypeId() {
-      return getFirst();
+      return myGroupTypeId;
+    }
+
+    @NotNull
+    PositionAware getGroupPosition() {
+      return myGroupPosition;
     }
 
     @Nullable
     UserDataHolder getGroupSettings() {
-      return getSecond();
+      return myGroupSettings;
     }
   }
 }

@@ -22,6 +22,8 @@ import jetbrains.buildServer.serverSide.impl.XmlRpcBasedRemoteServer;
 import jetbrains.buildServer.serverSide.impl.XmlRpcDispatcher;
 import jetbrains.buildServer.serverSide.impl.XmlRpcListener;
 import jetbrains.buildServer.serverSide.impl.XmlRpcSession;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +36,12 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
                                     @NotNull final XmlRpcDispatcher xmlRpcDispatcher) {
     super(server, serverPaths, createDWMPeriodDescriptions());
     xmlRpcDispatcher.addListener(this);
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.IDE_PLUGINS;
   }
 
   @NotNull

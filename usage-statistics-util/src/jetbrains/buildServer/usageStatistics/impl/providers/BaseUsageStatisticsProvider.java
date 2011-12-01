@@ -22,6 +22,7 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationProvider;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,12 +50,18 @@ abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider, U
   protected abstract void accept(@NotNull UsageStatisticsPublisher publisher,
                                  @NotNull UsageStatisticsPresentationManager presentationManager);
 
+  @NotNull
+  protected abstract PositionAware getGroupPosition();
+
+  protected abstract void setupGroup(@NotNull final UsageStatisticsPresentationManager presentationManager);
+
   public void accept(@NotNull final UsageStatisticsPublisher publisher) {
     myPresentationsCollector.clear();
     accept(publisher, myPresentationsCollector);
   }
 
   public void accept(@NotNull final UsageStatisticsPresentationManager presentationManager) {
+    setupGroup(presentationManager);
     myPresentationsCollector.applyTo(presentationManager);
   }
 
@@ -72,8 +79,9 @@ abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider, U
 
     public void setGroupType(@NotNull final String groupName,
                              @NotNull final String groupTypeId,
+                             @NotNull final PositionAware groupPosition,
                              @Nullable final UserDataHolder groupSettings) {
-      myGroupPresentations.add(new GroupPresentation(groupName, groupTypeId, groupSettings));
+      myGroupPresentations.add(new GroupPresentation(groupName, groupTypeId, groupPosition, groupSettings));
     }
 
     void clear() {
@@ -86,7 +94,7 @@ abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider, U
         presentationManager.applyPresentation(sp.getId(), sp.getDisplayName(), sp.getGroupName(), sp.getFormatter(), sp.getValueTooltip());
       }
       for (final GroupPresentation gp : myGroupPresentations) {
-        presentationManager.setGroupType(gp.getGroupName(), gp.getGroupTypeId(), gp.getGroupSettings());
+        presentationManager.setGroupType(gp.getGroupName(), gp.getGroupTypeId(), gp.getGroupPosition(), gp.getGroupSettings());
       }
     }
   }
@@ -139,13 +147,16 @@ abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider, U
   private static class GroupPresentation {
     @NotNull private final String myGroupName;
     @NotNull private final String myGroupTypeId;
+    @NotNull private final PositionAware myGroupPosition;
     @Nullable private final UserDataHolder myGroupSettings;
 
     GroupPresentation(@NotNull final String groupName,
                       @NotNull final String groupTypeId,
+                      @NotNull final PositionAware groupPosition,
                       @Nullable final UserDataHolder groupSettings) {
       myGroupName = groupName;
       myGroupTypeId = groupTypeId;
+      myGroupPosition = groupPosition;
       myGroupSettings = groupSettings;
     }
 
@@ -157,6 +168,11 @@ abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider, U
     @NotNull
     String getGroupTypeId() {
       return myGroupTypeId;
+    }
+
+    @NotNull
+    PositionAware getGroupPosition() {
+      return myGroupPosition;
     }
 
     @Nullable

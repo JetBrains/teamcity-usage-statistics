@@ -19,11 +19,13 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TypeBasedFormatter;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 
-public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatisticsProvider {
+public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsageStatisticsProvider {
   private static final long MEGABYTE = 1024 * 1024;
 
   @NotNull private final TeamCityDatabaseManager myDBManager;
@@ -33,6 +35,12 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseUsageStatist
                                                     @NotNull final LoginConfiguration loginConfiguration) {
     myDBManager = dbManager;
     myLoginConfiguration = loginConfiguration;
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.SERVER_CONFIGURATION;
   }
 
   @Override

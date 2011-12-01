@@ -21,10 +21,12 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TimeFormatter;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.vcs.SVcsModification;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -85,6 +87,12 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     myServer = server;
     myWebUsersProvider = webUsersProvider;
     myIDEUsersProvider = ideUsersProvider;
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.SERVER_LOAD;
   }
 
   @Override

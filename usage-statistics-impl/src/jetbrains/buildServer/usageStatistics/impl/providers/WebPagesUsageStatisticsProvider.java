@@ -19,8 +19,10 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import jetbrains.buildServer.plugins.bean.ServerPluginInfo;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.util.Dates;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PlaceId;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
@@ -57,6 +59,12 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     }});
     myPluginDescriptor = pluginDescriptor;
     registerPageExtension(pagePlaces, pluginDescriptor);
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.WEB_PAGES_USAGE;
   }
 
   public void setConfigFilePath(@NotNull final String configFilePath) {

@@ -17,6 +17,8 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.vcs.SVcsRoot;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,6 +27,12 @@ public class VCSUsageStatisticsProvider extends BaseExtensionUsageStatisticsProv
 
   public VCSUsageStatisticsProvider(@NotNull final SBuildServer server) {
     myServer = server;
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.VCS_ROOT_TYPES;
   }
 
   @Override

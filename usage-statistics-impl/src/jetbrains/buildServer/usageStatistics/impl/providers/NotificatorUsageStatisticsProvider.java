@@ -21,8 +21,10 @@ import jetbrains.buildServer.notification.NotificationRulesManager;
 import jetbrains.buildServer.notification.Notificator;
 import jetbrains.buildServer.notification.NotificatorRegistry;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.util.filters.Filter;
 import jetbrains.buildServer.util.filters.FilterUtil;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -39,6 +41,12 @@ public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatis
     myServer = server;
     myNotificatorRegistry = notificatorRegistry;
     myNotificationRulesManager = notificationRulesManager;
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.NOTIFIERS;
   }
 
   @Override

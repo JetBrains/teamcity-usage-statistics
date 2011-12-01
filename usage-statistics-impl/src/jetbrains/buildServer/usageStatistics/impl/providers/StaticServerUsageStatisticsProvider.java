@@ -23,11 +23,13 @@ import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 
-public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProvider {
+public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatisticsProvider {
   @NotNull private final BuildServerEx myServer;
   @NotNull private final UserGroupManager myUserGroupManager;
   @NotNull private final AgentPoolManager myAgentPoolManager;
@@ -41,6 +43,12 @@ public class StaticServerUsageStatisticsProvider extends BaseUsageStatisticsProv
     myUserGroupManager = userGroupManager;
     myAgentPoolManager = agentPoolManager;
     myCloudProvider = cloudProvider;
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.GENERAL;
   }
 
   @Override

@@ -20,6 +20,8 @@ import jetbrains.buildServer.serverSide.BuildServerAdapter;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.mute.MuteInfo;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +37,12 @@ public class MuteUsageStatisticsProvider extends BaseFeatureUsageStatisticsProvi
         addUsage(TESTS);
       }
     });
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.INVESTIGATION_MUTE;
   }
 
   @NotNull

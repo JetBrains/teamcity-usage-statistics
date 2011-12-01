@@ -20,6 +20,8 @@ import jetbrains.buildServer.responsibility.ResponsibilityEntry;
 import jetbrains.buildServer.responsibility.TestNameResponsibilityEntry;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.tests.TestName;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,6 +51,12 @@ public class InvestigationUsageStatisticsProvider extends BaseFeatureUsageStatis
         addUsageIfNeeded(entry.getState(), TESTS, isUserAction);
       }
     });
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.INVESTIGATION_MUTE;
   }
 
   @NotNull

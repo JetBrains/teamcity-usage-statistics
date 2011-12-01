@@ -40,7 +40,6 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
 
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    setupGroup(presentationManager);
     final long now = Dates.now().getTime();
     for (final Long period : myPeriodDescriptions.keySet()) {
       accept(publisher, presentationManager, myPeriodDescriptions.get(period).toLowerCase(), now - period);
@@ -73,7 +72,8 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
 
   protected abstract boolean mustSortStatistics();
 
-  private void setupGroup(@NotNull final UsageStatisticsPresentationManager presentationManager) {
+  @Override
+  protected void setupGroup(@NotNull final UsageStatisticsPresentationManager presentationManager) {
     final List<String> periods = new ArrayList<String>(myPeriodDescriptions.size());
     for (final Map.Entry<Long, String> entry : myPeriodDescriptions.entrySet()) {
       periods.add(entry.getValue());
@@ -84,6 +84,6 @@ abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsPro
     groupSettings.putUserData(DynamicUsageStatisticsGroupSettings.DEFAULT_VALUE, myDefaultValue);
     groupSettings.putUserData(DynamicUsageStatisticsGroupSettings.SORT, mustSortStatistics());
 
-    presentationManager.setGroupType(myGroupName, UsageStatisticsGroupType.DYNAMIC, groupSettings);
+    presentationManager.setGroupType(myGroupName, UsageStatisticsGroupType.DYNAMIC, getGroupPosition(), groupSettings);
   }
 }

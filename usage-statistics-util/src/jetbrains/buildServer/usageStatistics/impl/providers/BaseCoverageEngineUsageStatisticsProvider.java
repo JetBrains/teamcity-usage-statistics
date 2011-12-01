@@ -19,6 +19,8 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import jetbrains.buildServer.serverSide.SBuildRunnerDescriptor;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +35,12 @@ abstract class BaseCoverageEngineUsageStatisticsProvider extends BaseExtensionUs
 
   protected BaseCoverageEngineUsageStatisticsProvider(@NotNull final SBuildServer server) {
     myServer = server;
+  }
+
+  @NotNull
+  @Override
+  protected PositionAware getGroupPosition() {
+    return UsageStatisticsGroupPosition.COVERAGE_ENGINES;
   }
 
   protected void registerCoverageEngine(@NotNull final String engineName, @NotNull final String engineDisplayName) {

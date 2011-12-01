@@ -18,6 +18,7 @@ package jetbrains.buildServer.usageStatistics.presentation;
 
 import com.intellij.openapi.util.UserDataHolder;
 import jetbrains.buildServer.SystemProvided;
+import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,5 +54,8 @@ public interface UsageStatisticsPresentationManager {
    * @param groupTypeId Type id for the group.
    * @param groupSettings Group settings.
    */
-  public void setGroupType(@NotNull String groupName, @NotNull String groupTypeId, @Nullable UserDataHolder groupSettings);
+  public void setGroupType(@NotNull String groupName,
+                           @NotNull String groupTypeId,
+                           @NotNull PositionAware groupPosition,
+                           @Nullable UserDataHolder groupSettings);
 }
