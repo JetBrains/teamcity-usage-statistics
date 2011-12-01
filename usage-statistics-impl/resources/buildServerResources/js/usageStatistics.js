@@ -20,7 +20,7 @@ BS.UsageStatistics = {
   updateReportingStatus: function() {
     BS.Util.show('usageStatisticsReportingStatusUpdatingProgress');
 
-    BS.ajaxRequest(base_uri + "/admin/usageStatistics.html", {
+    BS.ajaxRequest(window['base_uri'] + "/admin/usageStatistics.html", {
       method: "post",
       parameters: "reportingEnabled=" + $('reportingEnabledCheckbox').checked,
       onComplete: function(transport) {
@@ -36,7 +36,7 @@ BS.UsageStatistics = {
   forceCollectingNow: function() {
     BS.Util.show('usageStatisticsCollectNowProgress');
 
-    BS.ajaxRequest(base_uri + "/admin/usageStatistics.html", {
+    BS.ajaxRequest(window['base_uri'] + "/admin/usageStatistics.html", {
       method: "post",
       parameters: "forceCollectingNow=true",
       onComplete: function() {
