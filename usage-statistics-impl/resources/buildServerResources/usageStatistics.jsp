@@ -18,16 +18,6 @@
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <jsp:useBean id="statisticsData" scope="request" type="jetbrains.buildServer.controllers.UsageStatisticsBean"/>
 
-<bs:linkScript>
-  ${teamcityPluginResourcesPath}js/usageStatistics.js
-</bs:linkScript>
-<bs:linkCSS>
-  ${teamcityPluginResourcesPath}css/usageStatistics.css
-  /css/main.css
-  /css/profilePage.css
-  /css/admin/serverConfig.css
-</bs:linkCSS>
-
 <div>
   <bs:refreshable containerId="usageStatisticsReportingStatusMessageContainer" pageUrl="${pageUrl}">
     <bs:messages key="usageStatisticsReportingStatusMessage"/>

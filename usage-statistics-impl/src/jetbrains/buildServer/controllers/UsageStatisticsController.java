@@ -19,11 +19,13 @@ package jetbrains.buildServer.controllers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.Used;
+import jetbrains.buildServer.controllers.admin.AdminPage;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.audit.ActionType;
 import jetbrains.buildServer.serverSide.audit.AuditLog;
 import jetbrains.buildServer.serverSide.audit.AuditLogFactory;
+import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettings;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
@@ -61,9 +63,22 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
     UsageStatisticsControllerUtil.register(this, authInterceptor, webControllerManager, "/admin/usageStatistics.html");
 
-    final SimpleCustomTab tab = new SimpleCustomTab(pagePlaces);
-    tab.setPlaceId(PlaceId.ADMIN_SERVER_CONFIGURATION_TAB);
-    tab.setPluginName("usage-statistics");
+    SimpleCustomTab tab = new AdminPage(pagePlaces) {
+      @Override
+      public boolean isAvailable(@NotNull HttpServletRequest request) {
+        return super.isAvailable(request) && 
+               checkHasGlobalPermissions(request, Permission.CHANGE_SERVER_SETTINGS, Permission.VIEW_USAGE_STATISTICS);
+      }
+
+      @NotNull
+      public String getGroup() {
+        return SERVER_RELATED_GROUP;
+      }
+    };
+    tab.addCssFile(pluginDescriptor.getPluginResourcesPath("css/usageStatistics.css"));
+    tab.addCssFile("/css/profilePage.css");
+    tab.addJsFile(pluginDescriptor.getPluginResourcesPath("js/usageStatistics.js"));
+    tab.setPluginName("usageStatistics");
     tab.setIncludeUrl(pluginDescriptor.getPluginResourcesPath("usageStatisticsTab.jsp"));
     tab.setTabTitle("Usage Statistics");
     tab.setPosition(PositionConstraint.last());
