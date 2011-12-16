@@ -81,7 +81,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
     tab.setPluginName("usageStatistics");
     tab.setIncludeUrl(pluginDescriptor.getPluginResourcesPath("usageStatisticsTab.jsp"));
     tab.setTabTitle("Usage Statistics");
-    tab.setPosition(PositionConstraint.last());
+    tab.setPosition(PositionConstraint.after("license"));
     tab.register();
   }
 
