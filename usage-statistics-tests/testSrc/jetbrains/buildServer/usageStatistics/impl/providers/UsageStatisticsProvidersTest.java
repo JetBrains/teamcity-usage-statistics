@@ -75,8 +75,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
       public Set<String> getIDEUsers(final long fromTimestamp) {
         return Collections.emptySet();
       }
-    }
-    ));
+    }, myServer.getVcsHistory()));
     return new StaticServerUsageStatisticsProvider(myServer, myFixture.getUserGroupManager(), myFixture.getAgentPoolManager(), mockCloudProvider);
   }
 
