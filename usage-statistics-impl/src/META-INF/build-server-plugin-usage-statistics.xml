@@ -46,6 +46,7 @@
   <!-- Providers -->
 
   <bean id="serverLoadUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.ServerLoadUsageStatisticsProvider">
+    <constructor-arg index="3" ref="hiddenDbVcsModificationHistory"/> <!-- to avoid unnecessary persmissions checking -->
     <property name="idFormat" value="jb.%s.%s"/>
     <property name="groupName" value="Server Load"/>
   </bean>

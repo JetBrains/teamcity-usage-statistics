@@ -28,6 +28,7 @@ import jetbrains.buildServer.usageStatistics.presentation.formatters.TimeFormatt
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.vcs.SVcsModification;
+import jetbrains.buildServer.vcs.VcsModificationHistory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,14 +80,17 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
   @NotNull private final SBuildServer myServer;
   @NotNull private final WebUsersProvider myWebUsersProvider;
   @NotNull private final IDEUsersProvider myIDEUsersProvider;
+  @NotNull private final VcsModificationHistory myVcsHistory;
 
   public ServerLoadUsageStatisticsProvider(@NotNull final SBuildServer server,
                                            @NotNull final WebUsersProvider webUsersProvider,
-                                           @NotNull final IDEUsersProvider ideUsersProvider) {
+                                           @NotNull final IDEUsersProvider ideUsersProvider,
+                                           @NotNull final VcsModificationHistory vcsHistory) {
     super(createDWMPeriodDescriptions(), null);
     myServer = server;
     myWebUsersProvider = webUsersProvider;
     myIDEUsersProvider = ideUsersProvider;
+    myVcsHistory = vcsHistory;
   }
 
   @NotNull
@@ -169,7 +173,7 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
                                  final long fromDate) {
     final String vcsChangesId = "vcsChanges";
     apply(presentationManager, periodDescription, vcsChangesId, "VCS changes", null, null);
-    final List<SVcsModification> allModifications = myServer.getVcsHistory().getAllModifications();
+    final List<SVcsModification> allModifications = myVcsHistory.getAllModifications();
     publish(publisher, periodDescription, vcsChangesId, CollectionsUtil.binarySearch(allModifications, new Condition<SVcsModification>() {
       public boolean value(final SVcsModification modification) {
         return modification.getVcsDate().getTime() <= fromDate;
