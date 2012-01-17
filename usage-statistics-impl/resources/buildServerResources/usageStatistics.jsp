@@ -46,7 +46,7 @@
         ><c:otherwise>not collected yet</c:otherwise
       ></c:choose><c:choose
         ><c:when test="${statisticsData.collectingNow}"> and is being collected now...</span></c:when
-        ><c:otherwise>.</span> <input type="button" value="Collect Now" class="collectNowButton" onclick="BS.UsageStatistics.forceCollectingNow();"><forms:saving id="usageStatisticsCollectNowProgress" style="float: left;"/></c:otherwise
+        ><c:otherwise>.</span> <input type="button" value="Collect Now" class="btn btn_mini collectNowButton" onclick="BS.UsageStatistics.forceCollectingNow();"><forms:saving id="usageStatisticsCollectNowProgress" style="float: left;"/></c:otherwise
       ></c:choose>
     <c:if test="${statisticsData.statisticsCollected}">
       <div class="downloadLink">
