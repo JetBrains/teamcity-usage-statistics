@@ -16,7 +16,6 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import com.intellij.openapi.util.Condition;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -27,14 +26,11 @@ import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageF
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TimeFormatter;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.positioning.PositionAware;
-import jetbrains.buildServer.vcs.SVcsModification;
-import jetbrains.buildServer.vcs.VcsModificationHistory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Set;
 
 public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
@@ -77,20 +73,23 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     ") t"
   );
 
+  @NotNull private static final GenericQuery<Void> ourVcsChangesCountQuery = new GenericQuery<Void>(
+    "select count(*) as vcs_changes_count " +
+    "from vcs_history h " +
+    "where change_date > ?"
+  );
+
   @NotNull private final SBuildServer myServer;
   @NotNull private final WebUsersProvider myWebUsersProvider;
   @NotNull private final IDEUsersProvider myIDEUsersProvider;
-  @NotNull private final VcsModificationHistory myVcsHistory;
 
   public ServerLoadUsageStatisticsProvider(@NotNull final SBuildServer server,
                                            @NotNull final WebUsersProvider webUsersProvider,
-                                           @NotNull final IDEUsersProvider ideUsersProvider,
-                                           @NotNull final VcsModificationHistory vcsHistory) {
+                                           @NotNull final IDEUsersProvider ideUsersProvider) {
     super(createDWMPeriodDescriptions(), null);
     myServer = server;
     myWebUsersProvider = webUsersProvider;
     myIDEUsersProvider = ideUsersProvider;
-    myVcsHistory = vcsHistory;
   }
 
   @NotNull
@@ -173,12 +172,14 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
                                  final long fromDate) {
     final String vcsChangesId = "vcsChanges";
     apply(presentationManager, periodDescription, vcsChangesId, "VCS changes", null, null);
-    final List<SVcsModification> allModifications = myVcsHistory.getAllModifications();
-    publish(publisher, periodDescription, vcsChangesId, CollectionsUtil.binarySearch(allModifications, new Condition<SVcsModification>() {
-      public boolean value(final SVcsModification modification) {
-        return modification.getVcsDate().getTime() <= fromDate;
+    ourVcsChangesCountQuery.execute(myServer.getSQLRunner(), new GenericQuery.ResultSetProcessor<Void>() {
+      public Void process(final ResultSet rs) throws SQLException {
+        if (rs.next()) {
+          publish(publisher, periodDescription, vcsChangesId, rs.getInt(1));
+        }
+        return null;
       }
-    }));
+    }, fromDate);
   }
 
   @Override
