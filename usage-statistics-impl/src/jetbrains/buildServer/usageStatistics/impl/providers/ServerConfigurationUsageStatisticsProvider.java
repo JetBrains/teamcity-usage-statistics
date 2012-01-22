@@ -16,6 +16,8 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import jetbrains.buildServer.serverSide.LicensingPolicy;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -23,6 +25,7 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPo
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TypeBasedFormatter;
 import jetbrains.buildServer.util.positioning.PositionAware;
+import jetbrains.buildServer.version.ServerVersionHolder;
 import org.jetbrains.annotations.NotNull;
 
 public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsageStatisticsProvider {
@@ -30,11 +33,14 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
 
   @NotNull private final TeamCityDatabaseManager myDBManager;
   @NotNull private final LoginConfiguration myLoginConfiguration;
+  @NotNull private final LicensingPolicy myLicensingPolicy;
 
   public ServerConfigurationUsageStatisticsProvider(@NotNull final TeamCityDatabaseManager dbManager,
-                                                    @NotNull final LoginConfiguration loginConfiguration) {
+                                                    @NotNull final LoginConfiguration loginConfiguration,
+                                                    @NotNull final SBuildServer buildServer) {
     myDBManager = dbManager;
     myLoginConfiguration = loginConfiguration;
+    myLicensingPolicy = buildServer.getLicensingPolicy();
   }
 
   @NotNull
@@ -50,6 +56,9 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     publishDatabaseInfo(publisher, presentationManager);
     publishJavaInfo(publisher, presentationManager);
     publishXmx(publisher, presentationManager);
+    publishLicenseType(publisher, presentationManager);
+    publishAgentLicenses(publisher, presentationManager);
+    publishTCVersion(publisher, presentationManager);
   }
 
   private void publishPlatform(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
@@ -102,5 +111,23 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
                                               }
                                             }, null);
     publisher.publishStatistic(maxMemoryId, Runtime.getRuntime().maxMemory() / MEGABYTE);
+  }
+
+  private void publishLicenseType(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final String licenseTypeId = makeId("licenseType");
+    presentationManager.applyPresentation(licenseTypeId, "License type", myGroupName, null, null);
+    publisher.publishStatistic(licenseTypeId, myLicensingPolicy.isEnterpriseMode() ? "Enterprise" : "Professional");
+  }
+
+  private void publishAgentLicenses(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final String agentLicensesId = makeId("agentLicenses");
+    presentationManager.applyPresentation(agentLicensesId, "Agent licenses", myGroupName, null, null);
+    publisher.publishStatistic(agentLicensesId, myLicensingPolicy.getMaxNumberOfAuthorizedAgents());
+  }
+
+  private void publishTCVersion(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final String versionId = makeId("version");
+    presentationManager.applyPresentation(versionId, "Server version", myGroupName, null, null);
+    publisher.publishStatistic(versionId, ServerVersionHolder.getVersion().getDisplayVersion());
   }
 }

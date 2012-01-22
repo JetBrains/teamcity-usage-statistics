@@ -55,7 +55,6 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     publishNumberOfAgents(publisher, presentationManager);
     publishNumberOfVirtualAgents(publisher, presentationManager);
-    publishNumberOfAgentLicenses(publisher, presentationManager);
     publishNumberOfAgentPools(publisher, presentationManager);
 
     publishNumberOfBuildTypes(publisher, presentationManager);
@@ -96,12 +95,6 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
     final String virtualAgentNumberId = makeId("virtualAgentNumber");
     presentationManager.applyPresentation(virtualAgentNumberId, "Virtual agents", myGroupName, null, null);
     publisher.publishStatistic(virtualAgentNumberId, myCloudProvider.getNumberOfRunningInstances());
-  }
-
-  private void publishNumberOfAgentLicenses(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    final String agentLicenseNumberId = makeId("agentLicenseNumber");
-    presentationManager.applyPresentation(agentLicenseNumberId, "Agent licenses", myGroupName, null, null);
-    publisher.publishStatistic(agentLicenseNumberId, myServer.getLicenseKeysManager().getLicenseList().getLicensedAgentCount());
   }
 
   private void publishNumberOfAgentPools(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
