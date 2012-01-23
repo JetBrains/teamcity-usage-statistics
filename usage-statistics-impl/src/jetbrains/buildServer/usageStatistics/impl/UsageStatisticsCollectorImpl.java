@@ -212,6 +212,6 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
 
   @NotNull
   public static IllegalStateException createIllegalStateException() {
-    return new IllegalStateException("Usage statistics were not collected yet");
+    return new IllegalStateException("Usage statistics data was not collected yet");
   }
 }
