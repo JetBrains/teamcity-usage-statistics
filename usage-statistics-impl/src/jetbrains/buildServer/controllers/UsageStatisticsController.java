@@ -27,6 +27,7 @@ import jetbrains.buildServer.serverSide.audit.AuditLog;
 import jetbrains.buildServer.serverSide.audit.AuditLogFactory;
 import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
+import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCommonDataPersistor;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettings;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
@@ -36,9 +37,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
 
 public class UsageStatisticsController extends BaseFormXmlController {
+  @NotNull public static final String USAGE_STATISTICS_ITEM_VALUE = "usageStatistics";
   @NotNull private static final String USAGE_STATISTICS_REPORTING_STATUS_MESSAGE_KEY = "usageStatisticsReportingStatusMessage";
 
   @NotNull private final UsageStatisticsSettingsPersistor mySettingsPersistor;
+  @NotNull private final UsageStatisticsCommonDataPersistor myDataPersistor;
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
   @NotNull private final UsageStatisticsPresentationManagerEx myPresentationManager;
   @NotNull private final AuditLog myAuditLog;
@@ -52,10 +55,12 @@ public class UsageStatisticsController extends BaseFormXmlController {
                                    @NotNull final PagePlaces pagePlaces,
                                    @NotNull final AuditLogFactory auditLogFactory,
                                    @NotNull final UsageStatisticsSettingsPersistor settingsPersistor,
+                                   @NotNull final UsageStatisticsCommonDataPersistor dataPersistor,
                                    @NotNull final UsageStatisticsCollector statisticsCollector,
                                    @NotNull final UsageStatisticsPresentationManagerEx presentationManager) {
     super(server);
     mySettingsPersistor = settingsPersistor;
+    myDataPersistor = dataPersistor;
     myStatisticsCollector = statisticsCollector;
     myPresentationManager = presentationManager;
     myAuditLog = auditLogFactory.createForServer();
@@ -78,7 +83,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
     tab.addCssFile(pluginDescriptor.getPluginResourcesPath("css/usageStatistics.css"));
     tab.addCssFile("/css/profilePage.css");
     tab.addJsFile(pluginDescriptor.getPluginResourcesPath("js/usageStatistics.js"));
-    tab.setPluginName("usageStatistics");
+    tab.setPluginName(USAGE_STATISTICS_ITEM_VALUE);
     tab.setIncludeUrl(pluginDescriptor.getPluginResourcesPath("usageStatisticsTab.jsp"));
     tab.setTabTitle("Usage Statistics");
     tab.setPosition(PositionConstraint.after("license"));
@@ -103,6 +108,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
     final String reportingEnabledStr = request.getParameter("reportingEnabled");
     if (reportingEnabledStr != null) {
+      myDataPersistor.markReportingSuggestionAsConsidered();
       final boolean reportingEnabled = "true".equalsIgnoreCase(reportingEnabledStr);
       try {
         setReportingEnabled(reportingEnabled);

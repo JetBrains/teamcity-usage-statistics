@@ -26,7 +26,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class UsageStatisticsCommonDataPersistor extends BasePersistentStateComponent {
   @NotNull private static final String LAST_REPORTING_DATE = "last-reporting-date";
+  @NotNull private static final String REPORTING_SUGGESTION_WAS_CONSIDERED = "reporting-suggestion-was-considered";
   @Nullable private Date myLastReportingDate;
+  private boolean myReportingSuggestionWasConsidered;
 
   public UsageStatisticsCommonDataPersistor(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
     super(server, serverPaths);
@@ -42,6 +44,14 @@ public class UsageStatisticsCommonDataPersistor extends BasePersistentStateCompo
     myLastReportingDate = date;
   }
 
+  public boolean wasReportingSuggestionConsidered() {
+    return myReportingSuggestionWasConsidered;
+  }
+
+  public void markReportingSuggestionAsConsidered() {
+    myReportingSuggestionWasConsidered = true;
+  }
+
   @NotNull
   @Override
   protected String getId() {
@@ -53,6 +63,7 @@ public class UsageStatisticsCommonDataPersistor extends BasePersistentStateCompo
     if (myLastReportingDate != null) {
       element.setAttribute(LAST_REPORTING_DATE, String.valueOf(myLastReportingDate.getTime()));
     }
+    element.setAttribute(REPORTING_SUGGESTION_WAS_CONSIDERED, String.valueOf(myReportingSuggestionWasConsidered));
   }
 
   @Override
@@ -63,5 +74,6 @@ public class UsageStatisticsCommonDataPersistor extends BasePersistentStateCompo
         myLastReportingDate = new Date(Long.parseLong(lastReportingDate));
       } catch (final NumberFormatException ignore) {}
     }
+    myReportingSuggestionWasConsidered = Boolean.parseBoolean(element.getAttributeValue(REPORTING_SUGGESTION_WAS_CONSIDERED));
   }
 }

@@ -15,17 +15,21 @@ import org.jetbrains.annotations.NotNull;
  */
 public class UsageStatisticsLicenseAgreementListener implements LicenseAgreementListener {
   @NotNull private final UsageStatisticsSettingsPersistor mySettingsPersistor;
+  @NotNull private final UsageStatisticsCommonDataPersistor myDataPersistor;
 
   public UsageStatisticsLicenseAgreementListener(@NotNull final UsageStatisticsSettingsPersistor settingsPersistor,
                                                  @NotNull final PagePlaces pagePlaces,
                                                  @NotNull final PluginDescriptor pluginDescriptor,
-                                                 @NotNull final LicenseAgreementDispatcher dispatcher) {
+                                                 @NotNull final LicenseAgreementDispatcher dispatcher,
+                                                 @NotNull final UsageStatisticsCommonDataPersistor dataPersistor) {
     mySettingsPersistor = settingsPersistor;
+    myDataPersistor = dataPersistor;
     registerPageExtension(pagePlaces, pluginDescriptor);
     dispatcher.addListener(this);
   }
 
   public void onLicenseAccepted(@NotNull final HttpServletRequest request) {
+    myDataPersistor.markReportingSuggestionAsConsidered();
     if (Boolean.parseBoolean(request.getParameter("sendUsageStatistics"))) {
       final UsageStatisticsSettings settings = mySettingsPersistor.loadSettings();
       settings.setReportingEnabled(true);
