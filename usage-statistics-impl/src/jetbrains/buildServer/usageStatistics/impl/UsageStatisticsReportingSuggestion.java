@@ -8,7 +8,6 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.SimplePageExtension;
 import org.jetbrains.annotations.NotNull;
 
-import static jetbrains.buildServer.controllers.UsageStatisticsController.USAGE_STATISTICS_ITEM_VALUE;
 import static jetbrains.buildServer.controllers.admin.AdminOverviewController.ITEM_PARAM_NAME;
 
 /**
@@ -35,7 +34,7 @@ public class UsageStatisticsReportingSuggestion extends SimplePageExtension {
 
   @Override
   public boolean isAvailable(@NotNull final HttpServletRequest request) {
-    return !USAGE_STATISTICS_ITEM_VALUE.equals(request.getParameter(ITEM_PARAM_NAME));
+    return request.getParameter(ITEM_PARAM_NAME) == null;
   }
 
   @Override

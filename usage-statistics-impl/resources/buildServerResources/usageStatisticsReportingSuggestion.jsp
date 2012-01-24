@@ -34,8 +34,8 @@
   <c:if test="${showSuggestion}">
     <div class="attentionComment" style="margin-bottom: 1em;">
       Would you like to send anonymous <a href="<c:url value="/admin/admin.html?item=usageStatistics"/>">usage statistics</a> to TeamCity development team (can be turned off at any time)?
-      <input type="button" value="Yes, I would!" onclick="BS.UsageStatisticsReportingSuggestion.makeDecision(true);">
-      <input type="button" value="No, I would not." onclick="BS.UsageStatisticsReportingSuggestion.makeDecision(false);">
+      <input type="button" class="btn btn_mini btn_primary" value="Yes, I would!" onclick="BS.UsageStatisticsReportingSuggestion.makeDecision(true);">
+      <input type="button" class="btn btn_mini" value="No, I would not." onclick="BS.UsageStatisticsReportingSuggestion.makeDecision(false);">
       <forms:progressRing id="usageStatisticsReportingSuggestionProgress" style="display: none;"/>
     </div>
   </c:if>
