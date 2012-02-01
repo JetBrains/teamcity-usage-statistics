@@ -88,6 +88,11 @@
     <property name="groupName" value="VCS Root Types"/>
   </bean>
 
+  <bean id="issueTrackerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.IssueTrackerUsageStatisticsProvider">
+    <property name="idFormat" value="jb.issueTracker[%s]"/>
+    <property name="groupName" value="Issue Trackers"/>
+  </bean>
+
   <bean id="notificatorUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.NotificatorUsageStatisticsProvider">
     <property name="idFormat" value="jb.notificator[%s]"/>
     <property name="groupName" value="Notifiers"/>
