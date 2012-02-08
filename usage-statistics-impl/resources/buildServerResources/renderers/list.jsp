@@ -18,7 +18,7 @@
 %><jsp:useBean id="statisticsGroup" scope="request" type="jetbrains.buildServer.usageStatistics.presentation.renderers.SimpleUsageStatisticsGroup"
 /><table style="width: 99%;" cellspacing="0">
   <c:forEach var="statistic" items="${statisticsGroup.statistics}">
-    <tr class="highlightRow statisticRow">
+    <tr class="statisticRow">
       <td><c:out value="${statistic.displayName}"/></td>
     </tr>
   </c:forEach>

@@ -25,7 +25,7 @@
     </c:forEach>
   </tr>
   <c:forEach var="statistic" items="${statisticsGroup.statistics}">
-    <tr class="highlightRow statisticRow">
+    <tr class="statisticRow">
       <td><c:out value="${statistic.displayName}"/></td>
       <c:forEach var="valueInfo" items="${statistic.valueInfos}">
         <c:set var="tooltip" value="${valueInfo.tooltip}"/>
