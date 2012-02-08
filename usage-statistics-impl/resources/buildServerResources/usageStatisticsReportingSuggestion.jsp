@@ -18,12 +18,11 @@
 <script type="text/javascript">
   BS.UsageStatisticsReportingSuggestion = {
     makeDecision: function(decision) {
-      BS.Util.show('usageStatisticsReportingSuggestionProgress');
       BS.ajaxRequest(window['base_uri'] + "/admin/usageStatistics.html", {
         method: "post",
         parameters: "reportingEnabled=" + decision,
         onComplete: function(transport) {
-          $('usageStatisticsReportingSuggestionContainer').refresh('usageStatisticsReportingSuggestionProgress');
+          $('usageStatisticsReportingSuggestionContainer').refresh();
         }
       });
     }
@@ -32,11 +31,12 @@
 <bs:refreshable containerId="usageStatisticsReportingSuggestionContainer" pageUrl="${pageUrl}">
   <bs:messages key="usageStatisticsReportingStatusMessage" style="margin-bottom: 1em;"/>
   <c:if test="${showSuggestion}">
-    <div class="attentionComment" style="margin-bottom: 1em;">
-      Would you like to send anonymous <a href="<c:url value="/admin/admin.html?item=usageStatistics"/>">usage statistics</a> to TeamCity development team (can be turned off at any time)?
-      <input type="button" class="btn btn_mini btn_primary" value="Yes, I would like to help make TeamCity even better!" onclick="BS.UsageStatisticsReportingSuggestion.makeDecision(true);">
-      <input type="button" class="btn btn_mini" value="No, thank you" onclick="BS.UsageStatisticsReportingSuggestion.makeDecision(false);">
-      <forms:progressRing id="usageStatisticsReportingSuggestionProgress" style="display: none;"/>
+    <div class="messagePrompt" style="margin-bottom: 1em;">
+      Would you like to send anonymous <a href="<c:url value="/admin/admin.html?item=usageStatistics"/>">usage statistics</a> to the TeamCity development team (can be turned off at any time)?
+      <p class="messagePromptButtons">
+        <input type="button" class="btn" value="Yes, I would like to help make TeamCity even better!" onclick="BS.UsageStatisticsReportingSuggestion.makeDecision(true);">
+        <input type="button" class="btn" value="No, thank you" onclick="BS.UsageStatisticsReportingSuggestion.makeDecision(false);">
+      </p>
     </div>
   </c:if>
 </bs:refreshable>

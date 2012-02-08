@@ -25,7 +25,7 @@
 </div>
 <c:if test="${empty param['updateMessages']}">
   <div>
-    <div style="margin-bottom: 1.5em">Please let us learn a bit more about your TeamCity usage. We are not watching you and not collecting any user- or project-sensitive data, just numbers. Help us improve the tool!</div>
+    <div style="margin-bottom: 1em">Please let us learn a bit more about your TeamCity usage. We are not watching you and not collecting any user- or project-sensitive data, just numbers. Help us improve the tool!</div>
     <div>
       <input type="checkbox"
              id="reportingEnabledCheckbox"
