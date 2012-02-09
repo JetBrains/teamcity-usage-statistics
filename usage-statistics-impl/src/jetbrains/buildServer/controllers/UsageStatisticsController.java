@@ -26,12 +26,15 @@ import jetbrains.buildServer.serverSide.audit.ActionType;
 import jetbrains.buildServer.serverSide.audit.AuditLog;
 import jetbrains.buildServer.serverSide.audit.AuditLogFactory;
 import jetbrains.buildServer.serverSide.auth.Permission;
+import jetbrains.buildServer.serverSide.impl.auth.ServerAuthUtil;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCommonDataPersistor;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettings;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
+import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.openapi.*;
+import jetbrains.buildServer.web.util.SessionUser;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
@@ -68,11 +71,10 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
     UsageStatisticsControllerUtil.register(this, authInterceptor, webControllerManager, "/admin/usageStatistics.html");
 
-    SimpleCustomTab tab = new AdminPage(pagePlaces) {
+    final SimpleCustomTab tab = new AdminPage(pagePlaces) {
       @Override
-      public boolean isAvailable(@NotNull HttpServletRequest request) {
-        return super.isAvailable(request) && 
-               checkHasGlobalPermissions(request, Permission.CHANGE_SERVER_SETTINGS, Permission.VIEW_USAGE_STATISTICS);
+      public boolean isAvailable(@NotNull final HttpServletRequest request) {
+        return super.isAvailable(request) && checkHasGlobalPermissions(request, Permission.VIEW_USAGE_STATISTICS);
       }
 
       @NotNull
@@ -108,6 +110,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
     final String reportingEnabledStr = request.getParameter("reportingEnabled");
     if (reportingEnabledStr != null) {
+      checkCanChangeServerSettings(request);
       myDataPersistor.markReportingSuggestionAsConsidered();
       final boolean reportingEnabled = "true".equalsIgnoreCase(reportingEnabledStr);
       try {
@@ -123,6 +126,14 @@ public class UsageStatisticsController extends BaseFormXmlController {
         xmlResponse.addContent("error");
       }
     }
+  }
+
+  private void checkCanChangeServerSettings(@NotNull final HttpServletRequest request) {
+    final SUser user = SessionUser.getUser(request);
+    if (user == null) {
+      throw new IllegalStateException("Session is expired or user is not specified");
+    }
+    ServerAuthUtil.checkHasGlobalPermission(user, Permission.CHANGE_SERVER_SETTINGS);
   }
 
   private void setReportingEnabled(final boolean reportingEnabled) {

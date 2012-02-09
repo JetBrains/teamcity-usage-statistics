@@ -24,20 +24,22 @@
   </bs:refreshable>
 </div>
 <c:if test="${empty param['updateMessages']}">
-  <div>
-    <div style="margin-bottom: 1em">Please let us learn a bit more about your TeamCity usage. We are not watching you and not collecting any user- or project-sensitive data, just numbers. Help us improve the tool!</div>
-    <bs:refreshable containerId="usageStatisticsReportingCheckboxContainer" pageUrl="${pageUrl}">
-      <input type="checkbox"
-             id="reportingEnabledCheckbox"
-             onclick="BS.UsageStatistics.updateReportingStatus();"
-             <c:if test="${statisticsData.reportingEnabled}">checked</c:if>
-      >
-      <label for="reportingEnabledCheckbox" class="checkBoxLabel">Periodically send this statistics to JetBrains</label>
-      <forms:saving id="usageStatisticsReportingStatusUpdatingProgress" style="float:left;"/>
-      &nbsp;
-    </bs:refreshable>
-    <div style="height: 10px;"></div>
-  </div>
+  <authz:authorize allPermissions="CHANGE_SERVER_SETTINGS">
+    <div>
+      <div style="margin-bottom: 1em">Please let us learn a bit more about your TeamCity usage. We are not watching you and not collecting any user- or project-sensitive data, just numbers. Help us improve the tool!</div>
+      <bs:refreshable containerId="usageStatisticsReportingCheckboxContainer" pageUrl="${pageUrl}">
+        <input type="checkbox"
+               id="reportingEnabledCheckbox"
+               onclick="BS.UsageStatistics.updateReportingStatus();"
+               <c:if test="${statisticsData.reportingEnabled}">checked</c:if>
+        >
+        <label for="reportingEnabledCheckbox" class="checkBoxLabel">Periodically send this statistics to JetBrains</label>
+        <forms:saving id="usageStatisticsReportingStatusUpdatingProgress" style="float:left;"/>
+        &nbsp;
+      </bs:refreshable>
+      <div style="height: 10px;"></div>
+    </div>
+  </authz:authorize>
   <bs:refreshable containerId="usageStatisticsStatus" pageUrl="${pageUrl}">
     <span style="float: left; padding-top: 1px; padding-bottom: 1px;"
       ><c:if test="${statisticsData.collectingNow}"><img src="<c:url value='/img/buildStates/running_green_transparent.gif'/>" class="icon"/> </c:if
