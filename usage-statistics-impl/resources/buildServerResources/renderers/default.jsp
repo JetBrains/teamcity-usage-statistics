@@ -16,9 +16,9 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><jsp:useBean id="statisticsGroup" scope="request" type="jetbrains.buildServer.usageStatistics.presentation.renderers.SimpleUsageStatisticsGroup"
-/><table style="width: 99%;" cellspacing="0">
-  <c:forEach var="statistic" items="${statisticsGroup.statistics}">
-    <tr class="statisticRow">
+/><table class="borderBottom" style="width: 99%;" cellspacing="0">
+  <c:forEach var="statistic" items="${statisticsGroup.statistics}" varStatus="statisticIndex">
+    <tr class="statisticRow<c:if test="${statisticIndex.last}"> noBorder</c:if>">
       <td><c:out value="${statistic.displayName}"/></td>
       <c:set var="tooltip" value="${statistic.valueTooltip}"/>
       <td style="width: 13%; white-space: nowrap;" <c:if test="${not empty tooltip}">title="${tooltip}"</c:if>><c:out value="${statistic.formattedValue}"/></td>

@@ -44,8 +44,8 @@
   overflow-y: auto;
 }
 
-.statisticRow:hover {
-  cursor: default;
+.statisticRow.noBorder td {
+  border-bottom: none;
 }
 
 .left {
