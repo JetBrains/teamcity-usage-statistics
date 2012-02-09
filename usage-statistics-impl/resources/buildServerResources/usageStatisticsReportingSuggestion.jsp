@@ -15,22 +15,25 @@
   --%>
 <%@ include file="/include.jsp"%>
 <jsp:useBean id="showSuggestion" scope="request" type="java.lang.Boolean"/>
-<script type="text/javascript">
-  BS.UsageStatisticsReportingSuggestion = {
-    makeDecision: function(decision) {
-      BS.ajaxRequest(window['base_uri'] + "/admin/usageStatistics.html", {
-        method: "post",
-        parameters: "reportingEnabled=" + decision,
-        onComplete: function(transport) {
-          $('usageStatisticsReportingSuggestionContainer').refresh();
-        }
-      });
-    }
-  };
-</script>
 <bs:refreshable containerId="usageStatisticsReportingSuggestionContainer" pageUrl="${pageUrl}">
   <bs:messages key="usageStatisticsReportingStatusMessage" style="margin-bottom: 1em;"/>
   <c:if test="${showSuggestion}">
+    <script type="text/javascript">
+      BS.UsageStatisticsReportingSuggestion = {
+        makeDecision: function(decision) {
+          BS.ajaxRequest(window['base_uri'] + "/admin/usageStatistics.html", {
+            method: "post",
+            parameters: "reportingEnabled=" + decision,
+            onComplete: function(transport) {
+              $('usageStatisticsReportingSuggestionContainer').refresh();
+              if ($('usageStatisticsReportingCheckboxContainer')) { // we are on the usage statistics page
+                $('usageStatisticsReportingCheckboxContainer').refresh();
+              }
+            }
+          });
+        }
+      };
+    </script>
     <div class="messagePrompt" style="margin-bottom: 1em;">
       Would you like to send anonymous <a href="<c:url value="/admin/admin.html?item=usageStatistics"/>">usage statistics</a> to the TeamCity development team (can be turned off at any time)?
       <p class="messagePromptButtons">

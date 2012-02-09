@@ -26,7 +26,7 @@
 <c:if test="${empty param['updateMessages']}">
   <div>
     <div style="margin-bottom: 1em">Please let us learn a bit more about your TeamCity usage. We are not watching you and not collecting any user- or project-sensitive data, just numbers. Help us improve the tool!</div>
-    <div>
+    <bs:refreshable containerId="usageStatisticsReportingCheckboxContainer" pageUrl="${pageUrl}">
       <input type="checkbox"
              id="reportingEnabledCheckbox"
              onclick="BS.UsageStatistics.updateReportingStatus();"
@@ -35,7 +35,7 @@
       <label for="reportingEnabledCheckbox" class="checkBoxLabel">Periodically send this statistics to JetBrains</label>
       <forms:saving id="usageStatisticsReportingStatusUpdatingProgress" style="float:left;"/>
       &nbsp;
-    </div>
+    </bs:refreshable>
     <div style="height: 10px;"></div>
   </div>
   <bs:refreshable containerId="usageStatisticsStatus" pageUrl="${pageUrl}">

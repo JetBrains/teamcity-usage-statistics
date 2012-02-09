@@ -25,7 +25,12 @@ BS.UsageStatistics = {
       parameters: "reportingEnabled=" + $('reportingEnabledCheckbox').checked,
       onComplete: function(transport) {
         $('usageStatisticsReportingStatusMessageContainer').refresh('usageStatisticsReportingStatusUpdatingProgress', 'updateMessages=true', function() {
-          if (transport.responseText.indexOf("error") != -1) {
+          if (transport.responseText.indexOf("error") == -1) {
+            if ($("usageStatisticsReportingSuggestionContainer")) { // usage statistics reporting suggestion is shown
+              BS.Util.fadeOutAndDelete("#usageStatisticsReportingSuggestionContainer");
+            }
+          }
+          else {
             $('reportingEnabledCheckbox').checked = !$('reportingEnabledCheckbox').checked;
           }
         });
