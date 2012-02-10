@@ -83,6 +83,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
       }
     };
     tab.addCssFile(pluginDescriptor.getPluginResourcesPath("css/usageStatistics.css"));
+    tab.addCssFile("/css/settingsBlock.css");
     tab.addJsFile(pluginDescriptor.getPluginResourcesPath("js/usageStatistics.js"));
     tab.setPluginName(USAGE_STATISTICS_ITEM_VALUE);
     tab.setIncludeUrl(pluginDescriptor.getPluginResourcesPath("usageStatisticsTab.jsp"));
