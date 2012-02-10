@@ -44,7 +44,7 @@
   overflow-y: auto;
 }
 
-.statisticRow.noBorder td {
+table.borderBottom .statisticRow.noBorder td {
   border-bottom: none;
 }
 
