@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2011 JetBrains s.r.o.
+ * Copyright 2000-2012 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 
 package jetbrains.buildServer.usageStatistics.presentation.renderers;
 
+import java.util.List;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticPresentation;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroup;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class SimpleUsageStatisticsGroup implements UsageStatisticsGroup {
   @NotNull private List<UsageStatisticPresentation> myStatistics;

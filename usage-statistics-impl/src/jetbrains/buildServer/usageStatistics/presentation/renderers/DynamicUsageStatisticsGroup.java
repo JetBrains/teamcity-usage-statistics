@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2011 JetBrains s.r.o.
+ * Copyright 2000-2012 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@
 package jetbrains.buildServer.usageStatistics.presentation.renderers;
 
 import com.intellij.openapi.util.Pair;
+import java.util.*;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticPresentation;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
 
 public class DynamicUsageStatisticsGroup implements UsageStatisticsGroup {
   @NotNull private final List<String> myPeriods;

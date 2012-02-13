@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2011 JetBrains s.r.o.
+ * Copyright 2000-2012 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.util.List;
+import java.util.Map;
 import jetbrains.buildServer.notification.NotificationRule;
 import jetbrains.buildServer.notification.NotificationRulesManager;
 import jetbrains.buildServer.notification.Notificator;
@@ -26,9 +28,6 @@ import jetbrains.buildServer.util.filters.Filter;
 import jetbrains.buildServer.util.filters.FilterUtil;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.Map;
 
 public class NotificatorUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
   @NotNull private final SBuildServer myServer;

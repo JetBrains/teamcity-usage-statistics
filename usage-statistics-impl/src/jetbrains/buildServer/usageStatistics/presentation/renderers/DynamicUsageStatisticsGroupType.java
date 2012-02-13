@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2011 JetBrains s.r.o.
+ * Copyright 2000-2012 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
 package jetbrains.buildServer.usageStatistics.presentation.renderers;
 
 import com.intellij.openapi.util.UserDataHolder;
+import java.util.Collections;
+import java.util.List;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroup;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupType;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.DefaultFormatter;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.List;
 
 public class DynamicUsageStatisticsGroupType implements UsageStatisticsGroupType {
   @NotNull private final String myJspPagePath;

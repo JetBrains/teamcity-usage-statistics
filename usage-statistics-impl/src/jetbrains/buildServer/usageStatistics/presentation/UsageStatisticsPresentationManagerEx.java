@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2011 JetBrains s.r.o.
+ * Copyright 2000-2012 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 
 package jetbrains.buildServer.usageStatistics.presentation;
 
-import java.util.LinkedHashMap;
-
 import com.intellij.openapi.util.Pair;
+import java.util.LinkedHashMap;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import org.jetbrains.annotations.NotNull;
 

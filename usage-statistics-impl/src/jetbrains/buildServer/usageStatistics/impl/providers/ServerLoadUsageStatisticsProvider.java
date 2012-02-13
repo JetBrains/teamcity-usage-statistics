@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2011 JetBrains s.r.o.
+ * Copyright 2000-2012 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Set;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -28,10 +31,6 @@ import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Set;
 
 public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
   @NotNull private static final UsageStatisticsFormatter ourTimeFormatter = new TimeFormatter();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2011 JetBrains s.r.o.
+ * Copyright 2000-2012 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@
 package jetbrains.buildServer.usageStatistics.presentation.renderers;
 
 import com.intellij.openapi.util.Key;
+import java.util.List;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public interface DynamicUsageStatisticsGroupSettings {
   @NotNull @NonNls public static final Key<List<String>> PERIODS = Key.create("dynamic.periods");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2011 JetBrains s.r.o.
+ * Copyright 2000-2012 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import com.intellij.openapi.util.UserDataHolder;
+import java.util.ArrayList;
+import java.util.List;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
@@ -25,9 +27,6 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresent
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider, UsageStatisticsPresentationProvider {
   @NotNull private String myIdFormat;
