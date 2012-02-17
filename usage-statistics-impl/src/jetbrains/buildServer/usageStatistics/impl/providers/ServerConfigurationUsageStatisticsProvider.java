@@ -121,7 +121,12 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
 
   private void publishAgentLicenses(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String agentLicensesId = makeId("agentLicenses");
-    presentationManager.applyPresentation(agentLicensesId, "Agent licenses", myGroupName, null, null);
+    presentationManager.applyPresentation(agentLicensesId, "Agent licenses", myGroupName, new TypeBasedFormatter<Integer>(Integer.class) {
+      @Override
+      protected String doFormat(@NotNull final Integer count) {
+        return count < 0 ? "unlimited" : String.valueOf(count);
+      }
+    }, null);
     publisher.publishStatistic(agentLicensesId, myLicensingPolicy.getMaxNumberOfAuthorizedAgents());
   }
 
@@ -129,5 +134,9 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     final String versionId = makeId("version");
     presentationManager.applyPresentation(versionId, "Server version", myGroupName, null, null);
     publisher.publishStatistic(versionId, ServerVersionHolder.getVersion().getDisplayVersion());
+
+    final String buildId = makeId("build");
+    presentationManager.applyPresentation(buildId, "Server build", myGroupName, null, null);
+    publisher.publishStatistic(buildId, ServerVersionHolder.getVersion().getBuildNumber());
   }
 }
