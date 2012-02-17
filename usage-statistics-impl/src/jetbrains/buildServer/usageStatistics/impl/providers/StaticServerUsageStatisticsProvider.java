@@ -71,24 +71,15 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String allRegisteredAgentNumberId = makeId("allRegisteredAgentNumber");
     final String authorizedRegisteredAgentNumberId = makeId("authorizedRegisteredAgentNumber");
-    final String allUnregisteredAgentNumberId = makeId("allUnregisteredAgentNumber");
-    final String authorizedUnregisteredAgentNumberId = makeId("authorizedUnregisteredAgentNumber");
 
     final BuildAgentManagerEx buildAgentManager = myServer.getBuildAgentManager();
     final int allRegisteredAgentsNumber = buildAgentManager.getRegisteredAgents(true).size();
-    final int allUnregisteredAgentsNumber = buildAgentManager.getUnregisteredAgents(true).size();
 
     presentationManager.applyPresentation(allRegisteredAgentNumberId, "Connected agents (all)", myGroupName, null, null);
     publisher.publishStatistic(allRegisteredAgentNumberId, allRegisteredAgentsNumber);
 
     presentationManager.applyPresentation(authorizedRegisteredAgentNumberId, "Connected agents (authorized only)", myGroupName, new PercentageFormatter(allRegisteredAgentsNumber), "Agent count (% of all connected agents)");
     publisher.publishStatistic(authorizedRegisteredAgentNumberId, buildAgentManager.getRegisteredAgents(false).size());
-
-    presentationManager.applyPresentation(allUnregisteredAgentNumberId, "Disconnected agents (all)", myGroupName, null, null);
-    publisher.publishStatistic(allUnregisteredAgentNumberId, allUnregisteredAgentsNumber);
-
-    presentationManager.applyPresentation(authorizedUnregisteredAgentNumberId, "Disconnected agents (authorized only)", myGroupName, new PercentageFormatter(allUnregisteredAgentsNumber), "Agent count (% of all disconnected agents)");
-    publisher.publishStatistic(authorizedUnregisteredAgentNumberId, buildAgentManager.getUnregisteredAgents(false).size());
   }
 
   private void publishNumberOfVirtualAgents(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
