@@ -51,7 +51,9 @@ BS.UsageStatistics = {
   },
 
   scheduleStatusUpdating: function() {
-    setTimeout("BS.UsageStatistics.updateStatus();", 10000);
+    setTimeout(function () {
+      BS.UsageStatistics.updateStatus();
+    }, 10000);
   },
 
   updateStatus: function() {
