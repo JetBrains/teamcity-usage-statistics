@@ -93,7 +93,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
   }
 
   @Override
-  protected ModelAndView doGet(final HttpServletRequest request, final HttpServletResponse response) {
+  protected ModelAndView doGet(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response) {
     final ModelAndView modelAndView = new ModelAndView(myJspPagePath);
     //noinspection unchecked
     modelAndView.getModel().put("statisticsData", new UsageStatisticsBean(mySettingsPersistor, myStatisticsCollector, myPresentationManager));
@@ -101,7 +101,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
   }
 
   @Override
-  protected void doPost(final HttpServletRequest request, final HttpServletResponse response, final Element xmlResponse) {
+  protected void doPost(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response, @NotNull final Element xmlResponse) {
     if (request.getParameter("forceCollectingNow") != null) {
       myStatisticsCollector.forceAsynchronousCollectingNow();
       myAuditLog.logUserAction(ActionType.USAGE_STATISTICS_COLLECTING_STARTED, null, null);
