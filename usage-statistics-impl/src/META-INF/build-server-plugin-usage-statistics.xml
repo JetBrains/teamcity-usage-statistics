@@ -67,6 +67,11 @@
     <property name="groupName" value="Web Pages Usage"/>
   </bean>
 
+  <bean id="browserUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.BrowserUsageStatisticsProvider">
+    <property name="idFormat" value="jb.browser.%s[%s]"/>
+    <property name="groupName" value="Web Browsers"/>
+  </bean>
+
   <bean id="muteUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.MuteUsageStatisticsProvider">
     <property name="idFormat" value="jb.mute.%s.%s"/>
     <property name="groupName" value="Investigation / Mute"/>

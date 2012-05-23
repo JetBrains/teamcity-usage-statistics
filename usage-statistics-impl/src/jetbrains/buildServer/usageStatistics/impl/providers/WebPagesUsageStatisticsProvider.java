@@ -20,15 +20,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.servlet.http.HttpServletRequest;
+import jetbrains.buildServer.Used;
 import jetbrains.buildServer.plugins.bean.ServerPluginInfo;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
@@ -41,21 +39,24 @@ import jetbrains.buildServer.web.util.WebUtil;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements WebUsersProvider, GetRequestDetector.Listener {
+public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements GetRequestDetector.Listener {
   @NotNull private static final Logger LOG = Logger.getLogger(WebPagesUsageStatisticsProvider.class);
 
   @NotNull private final List<Pattern> myPathPatterns = new ArrayList<Pattern>();
   @NotNull private final ServerPluginInfo myPluginDescriptor;
+  @NotNull private final WebUsersProvider myWebUsersProvider;
 
   public WebPagesUsageStatisticsProvider(@NotNull final SBuildServer server,
                                          @NotNull final ServerPaths serverPaths,
                                          @NotNull final GetRequestDetector getRequestDetector,
-                                         @NotNull final ServerPluginInfo pluginDescriptor) {
+                                         @NotNull final ServerPluginInfo pluginDescriptor,
+                                         @NotNull final WebUsersProvider webUsersProvider) {
     super(server, serverPaths, new LinkedHashMap<Long, String>() {{
       put(Dates.ONE_WEEK, "Week");
       put(30 * Dates.ONE_DAY, "Month");
     }});
     myPluginDescriptor = pluginDescriptor;
+    myWebUsersProvider = webUsersProvider;
     getRequestDetector.addListener(this);
   }
 
@@ -65,13 +66,9 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     return UsageStatisticsGroupPosition.WEB_PAGES_USAGE;
   }
 
+  @Used("spring")
   public void setConfigFilePath(@NotNull final String configFilePath) {
     readWebPagePatterns(configFilePath);
-  }
-
-  @NotNull
-  public Set<String> getWebUsers(final long fromTimestamp) {
-    return getUsers(fromTimestamp);
   }
 
   public void onGetRequest(@NotNull final HttpServletRequest request, @NotNull final SUser user) {
@@ -100,6 +97,11 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   @Override
   protected String getToolIdName() {
     return "path";
+  }
+
+  @Override
+  protected int getTotalUsersCount(@NotNull final Map<ICString, Set<ToolUsage>> usages, final long startDate) {
+    return myWebUsersProvider.getWebUsers(startDate).size();
   }
 
   @Override

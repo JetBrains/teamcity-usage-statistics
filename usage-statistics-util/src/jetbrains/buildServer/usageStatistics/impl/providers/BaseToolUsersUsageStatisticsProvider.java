@@ -62,7 +62,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
                         final long startDate) {
     removeObsoleteUsages();
     final Map<ICString, Set<ToolUsage>> usages = filterUsages(startDate);
-    final UsageStatisticsFormatter formatter = new PercentageFormatter(getUsers(usages).size());
+    final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalUsersCount(usages, startDate));
     final List<ICString> toolIds = new ArrayList<ICString>(usages.keySet());
     Collections.sort(toolIds);
     for (final ICString toolId : toolIds) {
@@ -72,6 +72,10 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
       presentationManager.applyPresentation(statisticId, toolIdSource, myGroupName, formatter, getValueTooltip());
       publisher.publishStatistic(statisticId, usages.get(toolId).size());
     }
+  }
+
+  protected int getTotalUsersCount(@NotNull final Map<ICString, Set<ToolUsage>> usages, final long startDate) {
+    return getUsers(usages).size();
   }
 
   @Override
@@ -227,7 +231,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     };
   }
 
-  private static class ToolUsage {
+  protected static class ToolUsage {
     @NotNull private final String myUserId;
     private final long myTimestamp;
 
@@ -258,7 +262,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
     }
   }
 
-  private static class ICString implements Comparable<ICString> {
+  protected static class ICString implements Comparable<ICString> {
     @NotNull private String mySource;
 
     public ICString(@NotNull final String source) {
