@@ -114,5 +114,9 @@
     <property name="groupName" value="Agent Java Versions"/>
   </bean>
 
+  <!-- Helpers -->
+
+  <bean id="getRequestDetector" class="jetbrains.buildServer.usageStatistics.impl.GetRequestDetector"/>
+
 </beans>
 

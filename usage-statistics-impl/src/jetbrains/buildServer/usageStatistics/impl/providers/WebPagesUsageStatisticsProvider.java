@@ -20,7 +20,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
@@ -29,20 +32,16 @@ import javax.servlet.http.HttpServletRequest;
 import jetbrains.buildServer.plugins.bean.ServerPluginInfo;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.usageStatistics.impl.GetRequestDetector;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.util.positioning.PositionAware;
-import jetbrains.buildServer.web.openapi.PagePlaces;
-import jetbrains.buildServer.web.openapi.PlaceId;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
-import jetbrains.buildServer.web.openapi.SimplePageExtension;
-import jetbrains.buildServer.web.util.SessionUser;
 import jetbrains.buildServer.web.util.WebUtil;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements WebUsersProvider {
+public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements WebUsersProvider, GetRequestDetector.Listener {
   @NotNull private static final Logger LOG = Logger.getLogger(WebPagesUsageStatisticsProvider.class);
 
   @NotNull private final List<Pattern> myPathPatterns = new ArrayList<Pattern>();
@@ -50,14 +49,14 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
 
   public WebPagesUsageStatisticsProvider(@NotNull final SBuildServer server,
                                          @NotNull final ServerPaths serverPaths,
-                                         @NotNull final PagePlaces pagePlaces,
+                                         @NotNull final GetRequestDetector getRequestDetector,
                                          @NotNull final ServerPluginInfo pluginDescriptor) {
     super(server, serverPaths, new LinkedHashMap<Long, String>() {{
       put(Dates.ONE_WEEK, "Week");
       put(30 * Dates.ONE_DAY, "Month");
     }});
     myPluginDescriptor = pluginDescriptor;
-    registerPageExtension(pagePlaces, pluginDescriptor);
+    getRequestDetector.addListener(this);
   }
 
   @NotNull
@@ -75,12 +74,7 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
     return getUsers(fromTimestamp);
   }
 
-  public void processGetRequest(@NotNull final HttpServletRequest request) {
-    SUser user = null;
-    try {
-      user = SessionUser.getUser(request);
-    } catch (final Exception ignore) {} // TW-18334
-    if (user == null) return;
+  public void onGetRequest(@NotNull final HttpServletRequest request, @NotNull final SUser user) {
     String path = WebUtil.getPathFromUrl(WebUtil.getPathWithoutContext(request));
     if (!path.toLowerCase().endsWith(".html")) return;
     final String tab = request.getParameter("tab");
@@ -122,23 +116,6 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   @Override
   protected String getValueTooltip() {
     return "User count (% of web users)";
-  }
-
-  private void registerPageExtension(@NotNull final PagePlaces pagePlaces, @NotNull final PluginDescriptor pluginDescriptor) {
-    final String pagePath = pluginDescriptor.getPluginResourcesPath("empty.jsp");
-    new SimplePageExtension(pagePlaces, PlaceId.ALL_PAGES_FOOTER, "webPagesUsageStatisticsProvider", pagePath) {
-      {
-        register();
-      }
-
-      @Override
-      public void fillModel(@NotNull final Map<String, Object> model, @NotNull final HttpServletRequest request) {
-        super.fillModel(model, request);
-        if (isGet(request)) {
-          processGetRequest(request);
-        }
-      }
-    };
   }
 
   private void readWebPagePatterns(@NotNull final String configFilePath) {
