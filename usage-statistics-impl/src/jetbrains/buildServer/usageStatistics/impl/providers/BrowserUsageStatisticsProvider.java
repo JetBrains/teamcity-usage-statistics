@@ -25,9 +25,7 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPo
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.web.util.WebUtil;
-import nl.bitwalker.useragentutils.Browser;
-import nl.bitwalker.useragentutils.BrowserType;
-import nl.bitwalker.useragentutils.UserAgent;
+import nl.bitwalker.useragentutils.*;
 import org.jetbrains.annotations.NotNull;
 
 public class BrowserUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements WebUsersProvider, GetRequestDetector.Listener {
@@ -50,14 +48,21 @@ public class BrowserUsageStatisticsProvider extends BaseToolUsersUsageStatistics
   }
 
   public void onGetRequest(@NotNull final HttpServletRequest request, @NotNull final SUser user) {
-    final String userAgent = WebUtil.getUserAgent(request);
-    if (userAgent == null) return;
+    final String userAgentString = WebUtil.getUserAgent(request);
+    if (userAgentString == null) return;
 
-    final Browser browser = UserAgent.parseUserAgentString(userAgent).getBrowser();
+    final UserAgent userAgent = UserAgent.parseUserAgentString(userAgentString);
+
+    final Browser browser = userAgent.getBrowser();
     final BrowserType browserType = browser.getBrowserType();
     if (!isBrowser(browserType)) return;
 
-    final String name = getBrowserGroupIfNeeded(browser, browserType).getName(); // do not report version for non-IE web browsers
+    String name = getBrowserGroupIfNeeded(browser, browserType).getName(); // do not report version for non-IE web browsers
+
+    final OperatingSystem operatingSystem = userAgent.getOperatingSystem();
+    if (operatingSystem.getDeviceType() != DeviceType.COMPUTER) { // do not specify OS for desktop browsers
+      name += " (" + operatingSystem.getGroup().getName() + ")";
+    }
 
     addUsage(name, user.getId());
   }
