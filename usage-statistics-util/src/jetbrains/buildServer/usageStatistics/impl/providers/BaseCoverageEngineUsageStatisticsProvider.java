@@ -16,10 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import jetbrains.buildServer.serverSide.SBuildRunnerDescriptor;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
@@ -28,12 +25,11 @@ import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-abstract class BaseCoverageEngineUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
-  @NotNull private final SBuildServer myServer;
+abstract class BaseCoverageEngineUsageStatisticsProvider extends BaseBuildTypeBasedExtensionUsageStatisticsProvider<SBuildRunnerDescriptor> {
   @NotNull private final Map<String, String> myEngineName2DisplayName = new HashMap<String, String>();
 
   protected BaseCoverageEngineUsageStatisticsProvider(@NotNull final SBuildServer server) {
-    myServer = server;
+    super(server);
   }
 
   @NotNull
@@ -49,28 +45,21 @@ abstract class BaseCoverageEngineUsageStatisticsProvider extends BaseExtensionUs
   @Nullable
   protected abstract String getSelectedEngineName(@NotNull Map<String, String> parameters);
 
+  @NotNull
   @Override
-  protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
-    for (final SBuildType buildType : myServer.getProjectManager().getActiveBuildTypes()) {
-      final Set<String> collectedEngines = new HashSet<String>();
-      for (final SBuildRunnerDescriptor runner : buildType.getResolvedSettings().getBuildRunners()) {
-        final String engineName = getSelectedEngineName(runner.getParameters());
-        if (engineName != null && !collectedEngines.contains(engineName)) {
-          callback.addUsage(engineName, myEngineName2DisplayName.get(engineName));
-          collectedEngines.add(engineName);
-        }
-      }
-    }
+  protected Collection<SBuildRunnerDescriptor> collectExtensions(@NotNull final SBuildType buildType) {
+    return buildType.getResolvedSettings().getBuildRunners();
+  }
+
+  @Nullable
+  @Override
+  protected String getExtensionType(@NotNull final SBuildRunnerDescriptor runnerDescriptor) {
+    return getSelectedEngineName(runnerDescriptor.getParameters());
   }
 
   @NotNull
   @Override
-  protected String getValueTooltip() {
-    return "Build configuration count (% of active build configurations)";
-  }
-
-  @Override
-  protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
-    return myServer.getProjectManager().getActiveBuildTypes().size();
+  protected String getExtensionDisplayName(@NotNull final SBuildRunnerDescriptor runnerDescriptor, @NotNull final String extensionType) {
+    return myEngineName2DisplayName.get(extensionType);
   }
 }

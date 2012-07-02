@@ -108,6 +108,16 @@
     <property name="groupName" value="Runners"/>
   </bean>
 
+  <bean id="buildFeatureUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.BuildFeatureUsageStatisticsProvider">
+    <property name="idFormat" value="jb.buildFeature[%s]"/>
+    <property name="groupName" value="Build Features"/>
+  </bean>
+
+  <bean id="buildFailureConditionUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.BuildFailureConditionUsageStatisticsProvider">
+    <property name="idFormat" value="jb.buildFailureCondition[%s]"/>
+    <property name="groupName" value="Build Failure Conditions"/>
+  </bean>
+
   <bean id="triggerUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.TriggerUsageStatisticsProvider">
     <property name="idFormat" value="jb.trigger[%s]"/>
     <property name="groupName" value="Triggers"/>

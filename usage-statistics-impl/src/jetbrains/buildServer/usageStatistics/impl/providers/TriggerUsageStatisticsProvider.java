@@ -16,22 +16,17 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.Collection;
 import jetbrains.buildServer.buildTriggers.BuildTriggerDescriptor;
-import jetbrains.buildServer.buildTriggers.BuildTriggerService;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 
-public class TriggerUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
-  @NotNull private final SBuildServer myServer;
-
+public class TriggerUsageStatisticsProvider extends BaseBuildTypeBasedExtensionUsageStatisticsProvider<BuildTriggerDescriptor> {
   public TriggerUsageStatisticsProvider(@NotNull final SBuildServer server) {
-    myServer = server;
+    super(server);
   }
 
   @NotNull
@@ -40,29 +35,21 @@ public class TriggerUsageStatisticsProvider extends BaseExtensionUsageStatistics
     return UsageStatisticsGroupPosition.TRIGGERS;
   }
 
+  @NotNull
   @Override
-  protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
-    for (final SBuildType buildType : myServer.getProjectManager().getActiveBuildTypes()) {
-      final Set<String> collectedNames = new HashSet<String>();
-      for (final BuildTriggerDescriptor triggerDescriptor : buildType.getBuildTriggersCollection()) {
-        final BuildTriggerService triggerService = triggerDescriptor.getBuildTriggerService();
-        final String name = triggerService.getName();
-        if (!collectedNames.contains(name)) {
-          callback.addUsage(name, triggerService.getDisplayName());
-          collectedNames.add(name);
-        }
-      }
-    }
+  protected Collection<BuildTriggerDescriptor> collectExtensions(@NotNull final SBuildType buildType) {
+    return buildType.getBuildTriggersCollection();
   }
 
   @NotNull
   @Override
-  protected String getValueTooltip() {
-    return "Build configuration count (% of active build configurations)";
+  protected String getExtensionType(@NotNull final BuildTriggerDescriptor triggerDescriptor) {
+    return triggerDescriptor.getBuildTriggerService().getName();
   }
 
+  @NotNull
   @Override
-  protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
-    return myServer.getProjectManager().getActiveBuildTypes().size();
+  protected String getExtensionDisplayName(@NotNull final BuildTriggerDescriptor triggerDescriptor, @NotNull final String extensionType) {
+    return triggerDescriptor.getBuildTriggerService().getDisplayName();
   }
 }

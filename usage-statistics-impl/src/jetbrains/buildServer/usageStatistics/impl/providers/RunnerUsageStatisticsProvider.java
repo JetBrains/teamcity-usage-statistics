@@ -16,10 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import jetbrains.buildServer.serverSide.RunType;
+import java.util.Collection;
 import jetbrains.buildServer.serverSide.SBuildRunnerDescriptor;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
@@ -27,11 +24,9 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPo
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 
-public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
-  @NotNull private final SBuildServer myServer;
-
+public class RunnerUsageStatisticsProvider extends BaseBuildTypeBasedExtensionUsageStatisticsProvider<SBuildRunnerDescriptor> {
   public RunnerUsageStatisticsProvider(@NotNull final SBuildServer server) {
-    myServer = server;
+    super(server);
   }
 
   @NotNull
@@ -40,29 +35,21 @@ public class RunnerUsageStatisticsProvider extends BaseExtensionUsageStatisticsP
     return UsageStatisticsGroupPosition.RUNNERS;
   }
 
+  @NotNull
   @Override
-  protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
-    for (final SBuildType buildType : myServer.getProjectManager().getActiveBuildTypes()) {
-      final Set<String> collectedTypes = new HashSet<String>();
-      for (final SBuildRunnerDescriptor runnerDescriptor : buildType.getResolvedSettings().getBuildRunners()) {
-        final RunType runType = runnerDescriptor.getRunType();
-        final String type = runType.getType();
-        if (!collectedTypes.contains(type)) {
-          callback.addUsage(type, runType.getDisplayName());
-          collectedTypes.add(type);
-        }
-      }
-    }
+  protected Collection<SBuildRunnerDescriptor> collectExtensions(@NotNull final SBuildType buildType) {
+    return buildType.getResolvedSettings().getBuildRunners();
   }
 
   @NotNull
   @Override
-  protected String getValueTooltip() {
-    return "Build configuration count (% of active build configurations)";
+  protected String getExtensionType(@NotNull final SBuildRunnerDescriptor runnerDescriptor) {
+    return runnerDescriptor.getRunType().getType();
   }
 
+  @NotNull
   @Override
-  protected int getTotalUsagesCount(@NotNull final Map<ExtensionType, Integer> extensionUsages) {
-    return myServer.getProjectManager().getActiveBuildTypes().size();
+  protected String getExtensionDisplayName(@NotNull final SBuildRunnerDescriptor runnerDescriptor, @NotNull final String extensionType) {
+    return runnerDescriptor.getRunType().getDisplayName();
   }
 }
