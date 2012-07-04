@@ -35,7 +35,7 @@
       };
     </script>
     <div class="messagePrompt">
-      Would you like to help improve TeamCity by sending anonymous <a href="<c:url value="/admin/admin.html?item=usageStatistics"/>">usage statistics</a> to the TeamCity development team? (This can be turned off at any time under "Usage Statistics".)
+      Would you like to help improve TeamCity by sending anonymous <a href="<c:url value="/admin/admin.html?item=usageStatistics"/>">usage statistics</a> to the TeamCity development team?<br/>This can be turned off at any time under "Usage Statistics".
       <p class="messagePromptButtons">
         <input type="button" class="btn" value="Yes, please" onclick="BS.UsageStatisticsReportingSuggestion.makeDecision(true);">
         <input type="button" class="btn" value="No, thank you" onclick="BS.UsageStatisticsReportingSuggestion.makeDecision(false);">
