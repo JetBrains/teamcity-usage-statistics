@@ -22,10 +22,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import jetbrains.buildServer.util.ExceptionUtil;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -46,15 +46,15 @@ public class XmlUtil {
         outputter.output(new Document(element), fos);
       }
       catch (final IOException e) {
-        LOG.warn(e.getLocalizedMessage(), e);
+        ExceptionUtil.log(LOG, "Failed to save file \"" + file.getAbsolutePath() + "\"", e);
       }
       finally {
         if (fos != null) {
           try {
-              fos.close();
+            fos.close();
           }
           catch (final IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
+            ExceptionUtil.log(LOG, "Failed to close file output stream for file \"" + file.getAbsolutePath() + "\"", e);
           }
         }
       }
@@ -68,11 +68,8 @@ public class XmlUtil {
       try {
         return new SAXBuilder().build(file).getRootElement();
       }
-      catch (final JDOMException e) {
-        LOG.warn(e.getLocalizedMessage(), e);
-      }
-      catch (final IOException e) {
-        LOG.warn(e.getLocalizedMessage(), e);
+      catch (final Exception e) {
+        ExceptionUtil.log(LOG, "Failed to load file \"" + file.getAbsolutePath() + "\"", e);
       }
     }
     return null;
