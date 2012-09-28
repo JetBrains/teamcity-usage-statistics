@@ -12,7 +12,7 @@
           <file>file://$MODULE_DIR$/../../../server/src/META-INF/buildServerPluginsSupport.xml</file>
           <file>file://$MODULE_DIR$/../../../server/src/META-INF/buildServerSpring.xml</file>
           <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/per-plugin-shared-spring.xml</file>
-          <file>file://$MODULE_DIR$/../../../plugin-model-common/src/META-INF/plugin-model-shared-spring.xml</file>
+          <file>file://$MODULE_DIR$/../../../plugin-model-common/src/META-INF/plugin-model-shared-spring-common.xml</file>
           <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/plugin-model-shared-spring.xml</file>
           <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/shared-spring-sub-container.xml</file>
           <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/shared-agent-server-spring.xml</file>
