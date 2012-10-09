@@ -31,6 +31,7 @@ import jetbrains.buildServer.serverSide.WebLinks;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCollectorImpl;
+import jetbrains.buildServer.util.SortedProperties;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildServer.web.util.WebUtil;
 import org.jetbrains.annotations.NotNull;
@@ -104,7 +105,7 @@ public class DownloadUsageStatisticsController extends BaseController {
 
     writer.flush();
 
-    final Properties properties = new Properties();
+    final Properties properties = new SortedProperties();
 
     myStatisticsCollector.publishCollectedStatistics(new UsageStatisticsPublisher() {
       public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
