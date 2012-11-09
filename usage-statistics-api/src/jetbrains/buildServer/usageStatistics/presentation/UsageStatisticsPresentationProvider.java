@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 public interface UsageStatisticsPresentationProvider extends TeamCityExtension {
   /**
    * This method is called every time when TeamCity collects usage statistics values for some reason.
-   * Every call of this method is allways performed after avery call of {@link jetbrains.buildServer.usageStatistics.UsageStatisticsProvider#accept(jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher)}.
+   * Every call of this method is always performed after avery call of {@link jetbrains.buildServer.usageStatistics.UsageStatisticsProvider#accept(jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher)}.
    *
    * @param presentationManager presentation manager
    */
