@@ -27,12 +27,15 @@ import jetbrains.buildServer.serverSide.auth.AuthMethodDescriptor;
 import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
+import jetbrains.buildServer.usageStatistics.presentation.formatters.TrimFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TypeBasedFormatter;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.version.ServerVersionHolder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsageStatisticsProvider {
   private static final long MEGABYTE = 1024 * 1024;
@@ -82,11 +85,16 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     final String loginModules = makeId("auth.loginModules");
     final String httpAuthSchemes = makeId("auth.httpAuthSchemes");
 
-    presentationManager.applyPresentation(loginModules, "Login modules", myGroupName, null, null);
-    presentationManager.applyPresentation(httpAuthSchemes, "HTTP authentication schemes", myGroupName, null, null);
-    
-    publisher.publishStatistic(loginModules, join(myLoginConfiguration.getConfiguredLoginModules()));
-    publisher.publishStatistic(httpAuthSchemes, join(myLoginConfiguration.getConfiguredAuthMethods(HttpAuthenticationScheme.class)));
+    final String loginModulesValue = join(myLoginConfiguration.getConfiguredLoginModules());
+    final String httpAuthSchemesValue = join(myLoginConfiguration.getConfiguredAuthMethods(HttpAuthenticationScheme.class));
+
+    final TrimFormatter formatter = new TrimFormatter(50);
+
+    presentationManager.applyPresentation(loginModules, "Login modules", myGroupName, formatter, getTooltip(formatter, loginModulesValue));
+    presentationManager.applyPresentation(httpAuthSchemes, "HTTP authentication schemes", myGroupName, formatter, getTooltip(formatter, httpAuthSchemesValue));
+
+    publisher.publishStatistic(loginModules, loginModulesValue);
+    publisher.publishStatistic(httpAuthSchemes, httpAuthSchemesValue);
   }
 
   @NotNull
@@ -97,6 +105,11 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
         return authMethod.getDescriptor().getDisplayName();
       }
     }, ", ");
+  }
+
+  @Nullable
+  private static String getTooltip(@NotNull final UsageStatisticsFormatter formatter, @NotNull final String value) {
+    return value.equals(formatter.format(value)) ? null : value;
   }
 
   private void publishJavaInfo(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
