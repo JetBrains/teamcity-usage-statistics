@@ -16,8 +16,14 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.Function;
+import java.util.List;
+import jetbrains.buildServer.controllers.interceptors.auth.HttpAuthenticationScheme;
 import jetbrains.buildServer.serverSide.LicensingPolicy;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.auth.AuthMethod;
+import jetbrains.buildServer.serverSide.auth.AuthMethodDescriptor;
 import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -52,7 +58,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     publishPlatform(publisher, presentationManager);
-    publishAuthScheme(publisher, presentationManager);
+    publishAuthMethods(publisher, presentationManager);
     publishDatabaseInfo(publisher, presentationManager);
     publishJavaInfo(publisher, presentationManager);
     publishXmx(publisher, presentationManager);
@@ -72,10 +78,25 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     publisher.publishStatistic(platformId, sb.toString());
   }
 
-  private void publishAuthScheme(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    final String authSchemeId = makeId("authScheme");
-    presentationManager.applyPresentation(authSchemeId, "Authentication scheme", myGroupName, null, null);
-    publisher.publishStatistic(authSchemeId, myLoginConfiguration.getSelectedLoginModuleDescriptor().getDisplayName());
+  private void publishAuthMethods(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final String loginModules = makeId("auth.loginModules");
+    final String httpAuthSchemes = makeId("auth.httpAuthSchemes");
+
+    presentationManager.applyPresentation(loginModules, "Login modules", myGroupName, null, null);
+    presentationManager.applyPresentation(httpAuthSchemes, "HTTP authentication schemes", myGroupName, null, null);
+    
+    publisher.publishStatistic(loginModules, join(myLoginConfiguration.getConfiguredLoginModules()));
+    publisher.publishStatistic(httpAuthSchemes, join(myLoginConfiguration.getConfiguredAuthMethods(HttpAuthenticationScheme.class)));
+  }
+
+  @NotNull
+  private static <T extends AuthMethodDescriptor> String join(@NotNull final List<AuthMethod<T>> authMethods) {
+    return StringUtil.join(authMethods, new Function<AuthMethod<T>, String>() {
+      @NotNull
+      public String fun(@NotNull final AuthMethod<T> authMethod) {
+        return authMethod.getDescriptor().getDisplayName();
+      }
+    }, ", ");
   }
 
   private void publishJavaInfo(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
