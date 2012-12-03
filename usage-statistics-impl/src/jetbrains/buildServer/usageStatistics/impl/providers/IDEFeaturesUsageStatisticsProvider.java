@@ -40,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener {
   @NotNull private static final ICString TEST_STATUS = new ICString("Test Status");
+  @NotNull private static final ICString[] ourFeatures = new ICString[] { TEST_STATUS };
 
   @NotNull private static final GenericQuery<Void> ourRemoteDebugSessionsCountQuery = new GenericQuery<Void>(
     "select count(*) as debug_sessions_count " +
@@ -131,8 +132,10 @@ public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatis
 
   @Override
   protected void patchUsagesIfNeeded(@NotNull final Map<ICString, Set<ToolUsage>> usages) {
-    if (!usages.containsKey(TEST_STATUS)) {
-      usages.put(TEST_STATUS, Collections.<ToolUsage>emptySet());
+    for (final ICString feature : ourFeatures) {
+      if (!usages.containsKey(feature)) {
+        usages.put(feature, Collections.<ToolUsage>emptySet());
+      }
     }
   }
 
