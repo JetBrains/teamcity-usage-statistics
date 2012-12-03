@@ -78,18 +78,6 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     "where change_date > ?"
   );
 
-  @NotNull private static final GenericQuery<Void> ourRemoteDebugSessionsCountQuery = new GenericQuery<Void>(
-    "select count(*) as debug_sessions_count " +
-    "from personal_vcs_history h " +
-    "where scheduled_for_deletion = 0 and commit_changes = -1 and user_id is not null and change_date > ?"
-  );
-
-  @NotNull private static final GenericQuery<Void> ourRemoteDebugSessionUsersCountQuery = new GenericQuery<Void>(
-    "select count(distinct user_id) as debug_session_users_count " +
-    "from personal_vcs_history h " +
-    "where scheduled_for_deletion = 0 and commit_changes = -1 and user_id is not null and change_date > ?"
-  );
-
   @NotNull private final SBuildServer myServer;
   @NotNull private final WebUsersProvider myWebUsersProvider;
   @NotNull private final IDEUsersProvider myIDEUsersProvider;
@@ -117,8 +105,6 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     publishBuildData(publisher, presentationManager, periodDescription, startDate);
     publishOnlineUsers(publisher, presentationManager, periodDescription, startDate);
     publishVcsChanges(publisher, presentationManager, periodDescription, startDate);
-    publishDebugSessions(publisher, presentationManager, periodDescription, startDate);
-    publishDebugSessionUsers(publisher, presentationManager, periodDescription, startDate);
   }
 
   private void publishBuildData(@NotNull final UsageStatisticsPublisher publisher,
@@ -189,39 +175,6 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
           publish(publisher, periodDescription, vcsChangesId, rs.getInt(1));
-        }
-        return null;
-      }
-    }, fromDate);
-  }
-
-  private void publishDebugSessions(@NotNull final UsageStatisticsPublisher publisher,
-                                    @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                    @NotNull final String periodDescription,
-                                    final long fromDate) {
-    final String debugSessionsId = "remoteDebugSessions";
-    apply(presentationManager, periodDescription, debugSessionsId, "Remote debug sessions", null, null);
-    ourRemoteDebugSessionsCountQuery.execute(myServer.getSQLRunner(), new GenericQuery.ResultSetProcessor<Void>() {
-      public Void process(final ResultSet rs) throws SQLException {
-        if (rs.next()) {
-          publish(publisher, periodDescription, debugSessionsId, rs.getInt(1));
-        }
-        return null;
-      }
-    }, fromDate);
-  }
-
-  private void publishDebugSessionUsers(@NotNull final UsageStatisticsPublisher publisher,
-                                        @NotNull final UsageStatisticsPresentationManager presentationManager,
-                                        @NotNull final String periodDescription,
-                                        final long fromDate) {
-    final String debugSessionUsersId = "remoteDebugSessionUsers";
-    final PercentageFormatter formatter = new PercentageFormatter(myIDEUsersProvider.getIDEUsers(fromDate).size());
-    apply(presentationManager, periodDescription, debugSessionUsersId, "Remote debug session users", formatter, "User count (% of IDE users)");
-    ourRemoteDebugSessionUsersCountQuery.execute(myServer.getSQLRunner(), new GenericQuery.ResultSetProcessor<Void>() {
-      public Void process(final ResultSet rs) throws SQLException {
-        if (rs.next()) {
-          publish(publisher, periodDescription, debugSessionUsersId, rs.getInt(1));
         }
         return null;
       }

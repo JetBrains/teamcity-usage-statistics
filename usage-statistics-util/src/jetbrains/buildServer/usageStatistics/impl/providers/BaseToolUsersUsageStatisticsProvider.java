@@ -62,6 +62,7 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
                         final long startDate) {
     removeObsoleteUsages();
     final Map<ICString, Set<ToolUsage>> usages = filterUsages(startDate);
+    patchUsagesIfNeeded(usages);
     final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalUsersCount(usages, startDate));
     final List<ICString> toolIds = new ArrayList<ICString>(usages.keySet());
     Collections.sort(toolIds);
@@ -73,6 +74,8 @@ abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStat
       publisher.publishStatistic(statisticId, usages.get(toolId).size());
     }
   }
+
+  protected void patchUsagesIfNeeded(@NotNull final Map<ICString, Set<ToolUsage>> usages) {}
 
   protected int getTotalUsersCount(@NotNull final Map<ICString, Set<ToolUsage>> usages, final long startDate) {
     return getUsers(usages).size();
