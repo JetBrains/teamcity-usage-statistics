@@ -25,15 +25,20 @@ import jetbrains.buildServer.serverSide.impl.XmlRpcDispatcher;
 import jetbrains.buildServer.serverSide.impl.XmlRpcListener;
 import jetbrains.buildServer.serverSide.impl.XmlRpcSession;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
+import jetbrains.buildServer.users.UserModelEx;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener, IDEUsersProvider {
+  @NotNull private final UserModelEx myUserModel;
+
   public IDEUsageStatisticsProvider(@NotNull final SBuildServer server,
                                     @NotNull final ServerPaths serverPaths,
+                                    @NotNull final UserModelEx userModel,
                                     @NotNull final XmlRpcDispatcher xmlRpcDispatcher) {
     super(server, serverPaths, createDWMPeriodDescriptions());
+    myUserModel = userModel;
     xmlRpcDispatcher.addListener(this);
   }
 
@@ -54,7 +59,7 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
                                  @Nullable final XmlRpcSession session) {
     if (targetClass == XmlRpcBasedRemoteServer.class && session != null) {
       final Long userId = session.getUserId();
-      if (userId != null) {
+      if (userId != null && !myUserModel.isSpecialUserId(userId)) {
         addUsage(prepareUserAgent(session.getUserAgent()), userId);
       }
     }

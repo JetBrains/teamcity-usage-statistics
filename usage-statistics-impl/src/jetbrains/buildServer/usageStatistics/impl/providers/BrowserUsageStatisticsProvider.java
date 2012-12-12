@@ -23,16 +23,21 @@ import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.usageStatistics.impl.GetRequestDetector;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.SUser;
+import jetbrains.buildServer.users.UserModelEx;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.web.util.WebUtil;
 import nl.bitwalker.useragentutils.*;
 import org.jetbrains.annotations.NotNull;
 
 public class BrowserUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements WebUsersProvider, GetRequestDetector.Listener {
+  @NotNull private final UserModelEx myUserModel;
+
   public BrowserUsageStatisticsProvider(@NotNull final SBuildServer server,
                                         @NotNull final ServerPaths serverPaths,
+                                        @NotNull final UserModelEx userModel,
                                         @NotNull final GetRequestDetector getRequestDetector) {
     super(server, serverPaths, createDWMPeriodDescriptions());
+    myUserModel = userModel;
     getRequestDetector.addListener(this);
   }
 
@@ -48,6 +53,8 @@ public class BrowserUsageStatisticsProvider extends BaseToolUsersUsageStatistics
   }
 
   public void onGetRequest(@NotNull final HttpServletRequest request, @NotNull final SUser user) {
+    if (myUserModel.isSpecialUser(user)) return;
+
     final String userAgentString = WebUtil.getUserAgent(request);
     if (userAgentString == null) return;
 
