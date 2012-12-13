@@ -40,7 +40,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
     super.setUp();
     final TeamCityDatabaseManager dbManager = new TeamCityDatabaseManager();
     myProviders = new ArrayList<BaseUsageStatisticsProvider>();
-    myProviders.add(new IDEUsageStatisticsProvider(myServer, myFixture.getServerPaths(), myFixture.getXmlRpcDispatcher()));
+    myProviders.add(new IDEUsageStatisticsProvider(myServer, myFixture.getServerPaths(), getUserModelEx(), myFixture.getXmlRpcDispatcher()));
     myProviders.add(new NotificatorUsageStatisticsProvider(myServer, myFixture.getNotificatorRegistry(), myFixture.getNotificationRulesManager()));
     myProviders.add(new RunnerUsageStatisticsProvider(myServer));
     myProviders.add(new ServerConfigurationUsageStatisticsProvider(dbManager, myFixture.getLoginConfiguration(), myFixture.getServer()));
