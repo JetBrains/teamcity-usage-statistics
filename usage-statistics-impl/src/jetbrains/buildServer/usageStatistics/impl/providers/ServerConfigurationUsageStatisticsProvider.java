@@ -23,7 +23,7 @@ import jetbrains.buildServer.controllers.interceptors.auth.HttpAuthenticationSch
 import jetbrains.buildServer.serverSide.LicensingPolicy;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.auth.AuthMethod;
-import jetbrains.buildServer.serverSide.auth.AuthMethodDescriptor;
+import jetbrains.buildServer.serverSide.auth.AuthMethodType;
 import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -98,11 +98,11 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   }
 
   @NotNull
-  private static <T extends AuthMethodDescriptor> String join(@NotNull final List<AuthMethod<T>> authMethods) {
+  private static <T extends AuthMethodType> String join(@NotNull final List<AuthMethod<T>> authMethods) {
     return StringUtil.join(authMethods, new Function<AuthMethod<T>, String>() {
       @NotNull
       public String fun(@NotNull final AuthMethod<T> authMethod) {
-        return authMethod.getDescriptor().getDisplayName();
+        return authMethod.getType().getDisplayName();
       }
     }, ", ");
   }
