@@ -39,8 +39,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener {
-  @NotNull private static final ICString TEST_STATUS = new ICString("Test Status");
-  @NotNull private static final ICString[] ourFeatures = new ICString[] { TEST_STATUS };
+  @NotNull private static final ICString TEST_STATUS_WITH_SUCCESSFUL = new ICString("Test Status (with successful)");
+  @NotNull private static final ICString TEST_STATUS_WITHOUT_SUCCESSFUL = new ICString("Test Status (without successful)");
+  @NotNull private static final ICString[] ourFeatures = new ICString[] { TEST_STATUS_WITH_SUCCESSFUL, TEST_STATUS_WITHOUT_SUCCESSFUL };
 
   @NotNull private static final GenericQuery<Void> ourRemoteDebugSessionsCountQuery = new GenericQuery<Void>(
     "select count(*) as debug_sessions_count " +
@@ -87,10 +88,15 @@ public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatis
                                  @NotNull final String methodName,
                                  @NotNull final Vector params,
                                  @Nullable final XmlRpcSession session) {
-    if (targetClass == XmlRpcBasedRemoteServer.class && methodName.endsWith(".findTests") && session != null) {
+    if (targetClass == XmlRpcBasedRemoteServer.class && session != null) {
       final Long userId = session.getUserId();
       if (userId != null) {
-        addUsage(TEST_STATUS.getSource(), userId);
+        if (methodName.endsWith(".findTests")) {
+          addUsage(TEST_STATUS_WITH_SUCCESSFUL.getSource(), userId);
+        }
+        else if (methodName.endsWith(".findFailedTests")) {
+          addUsage(TEST_STATUS_WITHOUT_SUCCESSFUL.getSource(), userId);
+        }
       }
     }
   }
