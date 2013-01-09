@@ -20,8 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
-import jetbrains.buildServer.serverSide.auth.AuthMethod;
-import jetbrains.buildServer.serverSide.auth.AuthMethodType;
+import jetbrains.buildServer.serverSide.auth.AuthenticatedUserInfo;
 import jetbrains.buildServer.serverSide.auth.UserAuthListener;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.SUser;
@@ -48,9 +47,10 @@ public class AuthMethodUsageStatisticsProvider extends BaseToolUsersUsageStatist
     return UsageStatisticsGroupPosition.AUTH_METHODS;
   }
 
-  public void userLoggedIn(@NotNull final SUser user, @NotNull final AuthMethod<? extends AuthMethodType> authMethod) {
+  public void userLoggedIn(@NotNull final AuthenticatedUserInfo authenticatedUserInfo) {
+    final SUser user = authenticatedUserInfo.getUser();
     if (!myUserModel.isSpecialUser(user)) {
-      addUsage(authMethod.getType().getDisplayName(), user.getId());
+      addUsage(authenticatedUserInfo.getAuthMethod().getType().getDisplayName(), user.getId());
     }
   }
 
