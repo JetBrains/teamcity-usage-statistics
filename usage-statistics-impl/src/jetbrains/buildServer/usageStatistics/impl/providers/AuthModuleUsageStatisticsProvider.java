@@ -29,10 +29,10 @@ import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 
-public class AuthMethodUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements UserAuthListener {
+public class AuthModuleUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements UserAuthListener {
   @NotNull private final UserModelEx myUserModel;
 
-  public AuthMethodUsageStatisticsProvider(@NotNull final SBuildServer server,
+  public AuthModuleUsageStatisticsProvider(@NotNull final SBuildServer server,
                                            @NotNull final ServerPaths serverPaths,
                                            @NotNull final UserModelEx userModel,
                                            @NotNull final EventDispatcher<UserAuthListener> userAuthDispatcher) {
@@ -44,26 +44,26 @@ public class AuthMethodUsageStatisticsProvider extends BaseToolUsersUsageStatist
   @NotNull
   @Override
   protected PositionAware getGroupPosition() {
-    return UsageStatisticsGroupPosition.AUTH_METHODS;
+    return UsageStatisticsGroupPosition.AUTH_MODULES;
   }
 
   public void userLoggedIn(@NotNull final AuthenticatedUserInfo authenticatedUserInfo) {
     final SUser user = authenticatedUserInfo.getUser();
     if (!myUserModel.isSpecialUser(user)) {
-      addUsage(authenticatedUserInfo.getAuthMethod().getType().getDisplayName(), user.getId());
+      addUsage(authenticatedUserInfo.getAuthModule().getType().getDisplayName(), user.getId());
     }
   }
 
   @NotNull
   @Override
   protected String getExternalId() {
-    return "authMethodsUsage";
+    return "authModulesUsage";
   }
 
   @NotNull
   @Override
   protected String getToolName() {
-    return "authMethod";
+    return "authModule";
   }
 
   @NotNull

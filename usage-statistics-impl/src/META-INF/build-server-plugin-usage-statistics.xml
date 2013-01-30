@@ -78,9 +78,9 @@
     <property name="groupName" value="Web Browsers"/>
   </bean>
 
-  <bean id="authMethodUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.AuthMethodUsageStatisticsProvider">
-    <property name="idFormat" value="jb.authMethod.%s[%s]"/>
-    <property name="groupName" value="Authentication Methods"/>
+  <bean id="authModuleUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.AuthModuleUsageStatisticsProvider">
+    <property name="idFormat" value="jb.authModule.%s[%s]"/>
+    <property name="groupName" value="Authentication Modules"/>
   </bean>
 
   <bean id="muteUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.MuteUsageStatisticsProvider">

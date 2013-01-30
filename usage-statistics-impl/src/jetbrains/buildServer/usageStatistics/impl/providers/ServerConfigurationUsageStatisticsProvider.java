@@ -22,8 +22,8 @@ import java.util.List;
 import jetbrains.buildServer.controllers.interceptors.auth.HttpAuthenticationScheme;
 import jetbrains.buildServer.serverSide.LicensingPolicy;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.auth.AuthMethod;
-import jetbrains.buildServer.serverSide.auth.AuthMethodType;
+import jetbrains.buildServer.serverSide.auth.AuthModule;
+import jetbrains.buildServer.serverSide.auth.AuthModuleType;
 import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -61,7 +61,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     publishPlatform(publisher, presentationManager);
-    publishAuthMethods(publisher, presentationManager);
+    publishAuthModules(publisher, presentationManager);
     publishDatabaseInfo(publisher, presentationManager);
     publishJavaInfo(publisher, presentationManager);
     publishXmx(publisher, presentationManager);
@@ -81,12 +81,12 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     publisher.publishStatistic(platformId, sb.toString());
   }
 
-  private void publishAuthMethods(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+  private void publishAuthModules(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String loginModules = makeId("auth.loginModules");
     final String httpAuthSchemes = makeId("auth.httpAuthSchemes");
 
     final String loginModulesValue = join(myLoginConfiguration.getConfiguredLoginModules());
-    final String httpAuthSchemesValue = join(myLoginConfiguration.getConfiguredAuthMethods(HttpAuthenticationScheme.class));
+    final String httpAuthSchemesValue = join(myLoginConfiguration.getConfiguredAuthModules(HttpAuthenticationScheme.class));
 
     final TrimFormatter formatter = new TrimFormatter(50);
 
@@ -98,11 +98,11 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   }
 
   @NotNull
-  private static <T extends AuthMethodType> String join(@NotNull final List<AuthMethod<T>> authMethods) {
-    return StringUtil.join(authMethods, new Function<AuthMethod<T>, String>() {
+  private static <T extends AuthModuleType> String join(@NotNull final List<AuthModule<T>> authModules) {
+    return StringUtil.join(authModules, new Function<AuthModule<T>, String>() {
       @NotNull
-      public String fun(@NotNull final AuthMethod<T> authMethod) {
-        return authMethod.getType().getDisplayName();
+      public String fun(@NotNull final AuthModule<T> authModule) {
+        return authModule.getType().getDisplayName();
       }
     }, ", ");
   }
