@@ -22,6 +22,7 @@ import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
+import jetbrains.buildServer.serverSide.impl.ServerSettings;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +77,8 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
         return Collections.emptySet();
       }
     }));
-    return new StaticServerUsageStatisticsProvider(myServer, myFixture.getUserGroupManager(), myFixture.getAgentPoolManager(), mockCloudProvider);
+    return new StaticServerUsageStatisticsProvider(myServer, myFixture.getUserGroupManager(), myFixture.getAgentPoolManager(),
+                                                   mockCloudProvider, myServer.getSingletonService(ServerSettings.class));
   }
 
   public void provider_should_not_fail_on_publishing_statistics() {
@@ -98,6 +100,8 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
     provider.setIdFormat("%s");
 
     final Map<String, Object> statistics = collectStatisticsByProvider(provider);
+
+    assertEquals(myServer.getSingletonService(ServerSettings.class).getServerId(), statistics.get("serverId"));
 
     assertEquals(myServer.getProjectManager().getNumberOfProjects(), statistics.get("projectNumber"));
     assertEquals(myServer.getProjectManager().getArchivedProjects().size(), statistics.get("archivedProjectNumber"));

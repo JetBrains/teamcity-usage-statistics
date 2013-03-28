@@ -22,6 +22,7 @@ import jetbrains.buildServer.serverSide.BuildAgentManagerEx;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
+import jetbrains.buildServer.serverSide.impl.ServerSettings;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
@@ -34,15 +35,18 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
   @NotNull private final UserGroupManager myUserGroupManager;
   @NotNull private final AgentPoolManager myAgentPoolManager;
   @NotNull private final CloudStatisticsProvider myCloudProvider;
+  @NotNull private final ServerSettings myServerSettings;
 
   public StaticServerUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                              @NotNull final UserGroupManager userGroupManager,
                                              @NotNull final AgentPoolManager agentPoolManager,
-                                             @NotNull final CloudStatisticsProvider cloudProvider) {
+                                             @NotNull final CloudStatisticsProvider cloudProvider,
+                                             @NotNull final ServerSettings serverSettings) {
     myServer = server;
     myUserGroupManager = userGroupManager;
     myAgentPoolManager = agentPoolManager;
     myCloudProvider = cloudProvider;
+    myServerSettings = serverSettings;
   }
 
   @NotNull
@@ -53,6 +57,8 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
 
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    publishServerInfo(publisher);
+
     publishNumberOfAgents(publisher, presentationManager);
     publishNumberOfVirtualAgents(publisher, presentationManager);
     publishNumberOfAgentPools(publisher, presentationManager);
@@ -66,6 +72,10 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
 
     publishNumberOfCloudImages(publisher, presentationManager);
     publishNumberOfCloudProfiles(publisher, presentationManager);
+  }
+
+  private void publishServerInfo(final UsageStatisticsPublisher publisher) {
+    publisher.publishStatistic("serverId", myServerSettings.getServerId());
   }
 
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
