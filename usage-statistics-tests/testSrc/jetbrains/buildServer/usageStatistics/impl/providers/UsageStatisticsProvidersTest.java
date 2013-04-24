@@ -39,17 +39,23 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    final TeamCityDatabaseManager dbManager = new TeamCityDatabaseManager();
     myProviders = new ArrayList<BaseUsageStatisticsProvider>();
     myProviders.add(new IDEUsageStatisticsProvider(myServer, myFixture.getServerPaths(), getUserModelEx(), myFixture.getXmlRpcDispatcher()));
     myProviders.add(new NotificatorUsageStatisticsProvider(myServer, myFixture.getNotificatorRegistry(), myFixture.getNotificationRulesManager()));
     myProviders.add(new RunnerUsageStatisticsProvider(myServer));
-    myProviders.add(new ServerConfigurationUsageStatisticsProvider(dbManager, myFixture.getLoginConfiguration(), myFixture.getServer()));
+    myProviders.add(getServerConfigurationUsageStatisticsProvider());
     myProviders.add(getStaticServerUsageProvider());
     myProviders.add(new TriggerUsageStatisticsProvider(myServer));
     myProviders.add(new VCSUsageStatisticsProvider(myServer));
   }
 
+  @NotNull
+  private ServerConfigurationUsageStatisticsProvider getServerConfigurationUsageStatisticsProvider() {
+    return new ServerConfigurationUsageStatisticsProvider(new TeamCityDatabaseManager(), myFixture.getLoginConfiguration(),
+                                                          myFixture.getServer(), myFixture.getServerSettings());
+  }
+
+  @NotNull
   private StaticServerUsageStatisticsProvider getStaticServerUsageProvider() {
     final CloudStatisticsProvider mockCloudProvider = new CloudStatisticsProvider() {
       public int getNumberOfProfiles() {
@@ -77,8 +83,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
         return Collections.emptySet();
       }
     }));
-    return new StaticServerUsageStatisticsProvider(myServer, myFixture.getUserGroupManager(), myFixture.getAgentPoolManager(),
-                                                   mockCloudProvider, myServer.getSingletonService(ServerSettings.class));
+    return new StaticServerUsageStatisticsProvider(myServer, myFixture.getUserGroupManager(), myFixture.getAgentPoolManager(), mockCloudProvider);
   }
 
   public void provider_should_not_fail_on_publishing_statistics() {
@@ -101,8 +106,6 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
 
     final Map<String, Object> statistics = collectStatisticsByProvider(provider);
 
-    assertEquals(myServer.getSingletonService(ServerSettings.class).getServerId(), statistics.get("serverId"));
-
     assertEquals(myServer.getProjectManager().getNumberOfProjects(), statistics.get("projectNumber"));
     assertEquals(myServer.getProjectManager().getArchivedProjects().size(), statistics.get("archivedProjectNumber"));
     assertEquals(myServer.getProjectManager().getNumberOfBuildTypes(), statistics.get("buildTypeNumber"));
@@ -116,6 +119,15 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
 
     final UserGroupManager userGroupManager = myServer.getSingletonService(UserGroupManager.class);
     assertEquals(userGroupManager.getUserGroups().size(), statistics.get("userGroupNumber"));
+  }
+
+  public void server_id_test() {
+    final ServerConfigurationUsageStatisticsProvider provider = getServerConfigurationUsageStatisticsProvider();
+    provider.setIdFormat("%s");
+
+    final Map<String, Object> statistics = collectStatisticsByProvider(provider);
+
+    assertEquals(myServer.getSingletonService(ServerSettings.class).getServerId(), statistics.get("id"));
   }
 
 /*

@@ -26,6 +26,7 @@ import jetbrains.buildServer.serverSide.auth.AuthModule;
 import jetbrains.buildServer.serverSide.auth.AuthModuleType;
 import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
+import jetbrains.buildServer.serverSide.impl.ServerSettings;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
@@ -43,13 +44,16 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   @NotNull private final TeamCityDatabaseManager myDBManager;
   @NotNull private final LoginConfiguration myLoginConfiguration;
   @NotNull private final LicensingPolicy myLicensingPolicy;
+  @NotNull private final ServerSettings myServerSettings;
 
   public ServerConfigurationUsageStatisticsProvider(@NotNull final TeamCityDatabaseManager dbManager,
                                                     @NotNull final LoginConfiguration loginConfiguration,
-                                                    @NotNull final SBuildServer buildServer) {
+                                                    @NotNull final SBuildServer buildServer,
+                                                    @NotNull final ServerSettings serverSettings) {
     myDBManager = dbManager;
     myLoginConfiguration = loginConfiguration;
     myLicensingPolicy = buildServer.getLicensingPolicy();
+    myServerSettings = serverSettings;
   }
 
   @NotNull
@@ -60,6 +64,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
 
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    publishServerId(publisher, presentationManager);
     publishPlatform(publisher, presentationManager);
     publishAuthModules(publisher, presentationManager);
     publishDatabaseInfo(publisher, presentationManager);
@@ -67,6 +72,12 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     publishXmx(publisher, presentationManager);
     publishLicenseType(publisher, presentationManager);
     publishTCVersion(publisher, presentationManager);
+  }
+
+  private void publishServerId(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final String serverIdId = makeId("id");
+    presentationManager.applyPresentation(serverIdId, "Server ID", myGroupName, null, null);
+    publisher.publishStatistic(serverIdId, myServerSettings.getServerId());
   }
 
   private void publishPlatform(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
