@@ -127,7 +127,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
 
     final Map<String, Object> statistics = collectStatisticsByProvider(provider);
 
-    assertEquals(myServer.getSingletonService(ServerSettings.class).getServerId(), statistics.get("id"));
+    assertEquals(myServer.getSingletonService(ServerSettings.class).getServerUUID(), statistics.get("id"));
   }
 
 /*

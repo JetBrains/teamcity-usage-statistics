@@ -77,7 +77,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   private void publishServerId(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String serverIdId = makeId("id");
     presentationManager.applyPresentation(serverIdId, "Server ID", myGroupName, null, null);
-    publisher.publishStatistic(serverIdId, myServerSettings.getServerId());
+    publisher.publishStatistic(serverIdId, myServerSettings.getServerUUID());
   }
 
   private void publishPlatform(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
