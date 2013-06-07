@@ -42,7 +42,7 @@
   </authz:authorize>
   <bs:refreshable containerId="usageStatisticsStatus" pageUrl="${pageUrl}">
     <span style="float: left; padding-top: 1px; padding-bottom: 1px;"
-      ><c:if test="${statisticsData.collectingNow}"><img src="<c:url value='/img/buildStates/running_green_transparent.gif'/>" class="icon"/> </c:if
+      ><c:if test="${statisticsData.collectingNow}"><i class="icon-refresh icon-spin"></i> </c:if
       >Usage statistics data was <c:choose
         ><c:when test="${statisticsData.statisticsCollected}">collected <bs:date smart="true" no_smart_title="true" value="${statisticsData.lastCollectingFinishDate}"/></c:when
         ><c:otherwise>not collected yet</c:otherwise
