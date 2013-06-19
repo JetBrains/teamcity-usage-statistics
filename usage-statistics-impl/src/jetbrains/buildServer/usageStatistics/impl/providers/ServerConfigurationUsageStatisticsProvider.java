@@ -20,6 +20,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Function;
 import java.util.List;
 import jetbrains.buildServer.controllers.interceptors.auth.HttpAuthenticationScheme;
+import jetbrains.buildServer.serverSide.LicenseMode;
 import jetbrains.buildServer.serverSide.LicensingPolicy;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.auth.AuthModule;
@@ -31,6 +32,7 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
+import jetbrains.buildServer.usageStatistics.presentation.formatters.SingleValueFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TrimFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TypeBasedFormatter;
 import jetbrains.buildServer.util.positioning.PositionAware;
@@ -70,7 +72,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     publishDatabaseInfo(publisher, presentationManager);
     publishJavaInfo(publisher, presentationManager);
     publishXmx(publisher, presentationManager);
-    publishLicenseType(publisher, presentationManager);
+    publishLicenseTypeAndMode(publisher, presentationManager);
     publishTCVersion(publisher, presentationManager);
   }
 
@@ -157,10 +159,16 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     publisher.publishStatistic(maxMemoryId, Runtime.getRuntime().maxMemory() / MEGABYTE);
   }
 
-  private void publishLicenseType(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+  private void publishLicenseTypeAndMode(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String licenseTypeId = makeId("licenseType");
     presentationManager.applyPresentation(licenseTypeId, "License type", myGroupName, null, null);
     publisher.publishStatistic(licenseTypeId, myLicensingPolicy.isEnterpriseMode() ? "Enterprise" : "Professional");
+
+    final LicenseMode licenseMode = new LicenseMode(myLicensingPolicy);
+
+    final String licenseModeId = makeId("licenseMode");
+    presentationManager.applyPresentation(licenseModeId, "License mode", myGroupName, new SingleValueFormatter(licenseMode.getFullDisplayName()), null);
+    publisher.publishStatistic(licenseModeId, licenseMode.getKey());
   }
 
   private void publishTCVersion(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
