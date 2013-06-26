@@ -73,6 +73,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     publishJavaInfo(publisher, presentationManager);
     publishXmx(publisher, presentationManager);
     publishLicenseTypeAndMode(publisher, presentationManager);
+    publishAgentLicenses(publisher, presentationManager);
     publishTCVersion(publisher, presentationManager);
   }
 
@@ -169,6 +170,17 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     final String licenseModeId = makeId("licenseMode");
     presentationManager.applyPresentation(licenseModeId, "License mode", myGroupName, new SingleValueFormatter(licenseMode.getFullDisplayName()), null);
     publisher.publishStatistic(licenseModeId, licenseMode.getKey());
+  }
+
+  private void publishAgentLicenses(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final String agentLicensesId = makeId("agentLicenses");
+    presentationManager.applyPresentation(agentLicensesId, "Agent licenses", myGroupName, new TypeBasedFormatter<Integer>(Integer.class) {
+      @Override
+      protected String doFormat(@NotNull final Integer count) {
+        return count < 0 ? "unlimited" : String.valueOf(count);
+      }
+    }, null);
+    publisher.publishStatistic(agentLicensesId, myLicensingPolicy.getMaxNumberOfAuthorizedAgents());
   }
 
   private void publishTCVersion(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
