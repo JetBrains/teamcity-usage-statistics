@@ -33,34 +33,33 @@
           id="reportingEnabledCheckbox"
           onclick="BS.UsageStatistics.updateReportingStatus();"
           checked="${statisticsData.reportingEnabled}"/>
-        <label for="reportingEnabledCheckbox" class="checkBoxLabel">Periodically send this statistics to JetBrains</label>
-        <forms:saving id="usageStatisticsReportingStatusUpdatingProgress" style="float:left;"/>
-        &nbsp;
+        <label for="reportingEnabledCheckbox">Periodically send this statistics to JetBrains</label>
+        <forms:saving id="usageStatisticsReportingStatusUpdatingProgress" className="progressRingInline"/>
       </bs:refreshable>
-      <div style="height: 10px;"></div>
     </div>
   </authz:authorize>
   <bs:refreshable containerId="usageStatisticsStatus" pageUrl="${pageUrl}">
-    <span style="float: left; padding-top: 1px; padding-bottom: 1px;"
-      ><c:if test="${statisticsData.collectingNow}"><i class="icon-refresh icon-spin"></i> </c:if
-      >Usage statistics data was <c:choose
-        ><c:when test="${statisticsData.statisticsCollected}">collected <bs:date smart="true" no_smart_title="true" value="${statisticsData.lastCollectingFinishDate}"/></c:when
-        ><c:otherwise>not collected yet</c:otherwise
-      ></c:choose><c:choose
-        ><c:when test="${statisticsData.collectingNow}"> and is being collected now...</span></c:when
-        ><c:otherwise>.</span> <input type="button" value="Collect Now" class="btn btn_mini collectNowButton" onclick="BS.UsageStatistics.forceCollectingNow();"><forms:saving id="usageStatisticsCollectNowProgress" style="float: left;"/></c:otherwise
-      ></c:choose>
-    <c:if test="${statisticsData.statisticsCollected}">
-      <div class="downloadLink">
-        <a class="downloadLink" href="<c:url value="/admin/downloadUsageStatistics.html"/>">Download (~${statisticsData.sizeEstimate})</a>
-      </div>
-    </c:if>
-    <script type="text/javascript">
-      <c:choose>
-        <c:when test="${statisticsData.statisticsCollected}">BS.UsageStatistics.onStatusUpdated(${statisticsData.lastCollectingFinishDate.time});</c:when>
-        <c:otherwise>BS.UsageStatistics.onStatusUpdated(-1);</c:otherwise>
-      </c:choose>
-    </script>
+    <div style="margin-top: 1em">
+      <c:if test="${statisticsData.collectingNow}"><forms:saving className="progressRingInline"/> </c:if
+        >Usage statistics data was <c:choose
+          ><c:when test="${statisticsData.statisticsCollected}">collected <bs:date smart="true" no_smart_title="true" value="${statisticsData.lastCollectingFinishDate}"/></c:when
+          ><c:otherwise>not collected yet</c:otherwise
+        ></c:choose><c:choose
+          ><c:when test="${statisticsData.collectingNow}"> and is being collected now...</c:when
+          ><c:otherwise>. <input type="button" value="Collect Now" class="btn btn_mini" onclick="BS.UsageStatistics.forceCollectingNow();"><forms:saving id="usageStatisticsCollectNowProgress" className="progressRingInline"/></c:otherwise
+        ></c:choose>
+      <c:if test="${statisticsData.statisticsCollected}">
+        <div class="downloadLink">
+          <a class="downloadLink" href="<c:url value="/admin/downloadUsageStatistics.html"/>">Download (~${statisticsData.sizeEstimate})</a>
+        </div>
+      </c:if>
+      <script type="text/javascript">
+        <c:choose>
+          <c:when test="${statisticsData.statisticsCollected}">BS.UsageStatistics.onStatusUpdated(${statisticsData.lastCollectingFinishDate.time});</c:when>
+          <c:otherwise>BS.UsageStatistics.onStatusUpdated(-1);</c:otherwise>
+        </c:choose>
+      </script>
+    </div>
   </bs:refreshable>
   <bs:refreshable containerId="usageStatisticsContent" pageUrl="${pageUrl}">
     <c:if test="${statisticsData.statisticsCollected}">
