@@ -81,8 +81,8 @@ public class DownloadUsageStatisticsController extends BaseController {
       writeStatistics(out, collectingFinishDate);
     }
     catch (final Exception e) {
-      response.sendError(500, "Failed to download usage statistics");
       LOG.error("Failed to download usage statistics", e);
+      response.sendError(500, "Failed to download usage statistics");
     }
     finally {
       if (out != null) {
