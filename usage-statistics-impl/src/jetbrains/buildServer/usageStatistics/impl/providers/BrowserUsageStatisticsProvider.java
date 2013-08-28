@@ -25,7 +25,7 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPo
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.users.UserModelEx;
 import jetbrains.buildServer.util.positioning.PositionAware;
-import jetbrains.buildServer.web.util.WebUtil;
+import jetbrains.buildServer.web.util.UserAgentUtil;
 import nl.bitwalker.useragentutils.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,14 +55,12 @@ public class BrowserUsageStatisticsProvider extends BaseToolUsersUsageStatistics
   public void onGetRequest(@NotNull final HttpServletRequest request, @NotNull final SUser user) {
     if (myUserModel.isSpecialUser(user)) return;
 
-    final String userAgentString = WebUtil.getUserAgent(request);
-    if (userAgentString == null) return;
-
-    final UserAgent userAgent = UserAgent.parseUserAgentString(userAgentString);
+    final UserAgent userAgent = UserAgentUtil.getUserAgent(request);
+    if (userAgent == null) return;
 
     final Browser browser = userAgent.getBrowser();
     final BrowserType browserType = browser.getBrowserType();
-    if (!isBrowser(browserType)) return;
+    if (!UserAgentUtil.isBrowser(browserType)) return;
 
     String name = getBrowserGroupIfNeeded(browser, browserType).getName(); // do not report version for non-IE web browsers
 
@@ -72,10 +70,6 @@ public class BrowserUsageStatisticsProvider extends BaseToolUsersUsageStatistics
     }
 
     addUsage(name, user.getId());
-  }
-
-  private static boolean isBrowser(@NotNull final BrowserType browserType) {
-    return browserType == BrowserType.WEB_BROWSER || browserType == BrowserType.MOBILE_BROWSER || browserType == BrowserType.TEXT_BROWSER;
   }
 
   @NotNull
