@@ -22,9 +22,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.SQLRunner;
+import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.db.SQLRunnerEx;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
 import jetbrains.buildServer.serverSide.impl.XmlRpcBasedRemoteServer;
 import jetbrains.buildServer.serverSide.impl.XmlRpcDispatcher;
@@ -55,10 +55,10 @@ public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatis
     "where scheduled_for_deletion = 0 and commit_changes = -1 and user_id is not null and change_date > ?"
   );
 
-  @NotNull private final SQLRunner mySQLRunner;
+  @NotNull private final SQLRunnerEx mySQLRunner;
   @NotNull private final IDEUsersProvider myIdeUsersProvider;
 
-  public IDEFeaturesUsageStatisticsProvider(@NotNull final SBuildServer server,
+  public IDEFeaturesUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                             @NotNull final ServerPaths serverPaths,
                                             @NotNull final XmlRpcDispatcher xmlRpcDispatcher,
                                             @NotNull final IDEUsersProvider ideUsersProvider) {

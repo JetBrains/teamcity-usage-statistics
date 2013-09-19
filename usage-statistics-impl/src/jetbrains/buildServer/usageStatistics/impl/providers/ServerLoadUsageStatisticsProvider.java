@@ -19,7 +19,7 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
-import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
@@ -78,11 +78,11 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     "where change_date > ?"
   );
 
-  @NotNull private final SBuildServer myServer;
+  @NotNull private final BuildServerEx myServer;
   @NotNull private final WebUsersProvider myWebUsersProvider;
   @NotNull private final IDEUsersProvider myIDEUsersProvider;
 
-  public ServerLoadUsageStatisticsProvider(@NotNull final SBuildServer server,
+  public ServerLoadUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                            @NotNull final WebUsersProvider webUsersProvider,
                                            @NotNull final IDEUsersProvider ideUsersProvider) {
     super(createDWMPeriodDescriptions(), null);
