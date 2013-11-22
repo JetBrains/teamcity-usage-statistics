@@ -20,7 +20,7 @@ import java.util.*;
 import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
-import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
+import jetbrains.buildServer.serverSide.db.TestDB;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
 import jetbrains.buildServer.serverSide.impl.ServerSettings;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
@@ -51,7 +51,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
 
   @NotNull
   private ServerConfigurationUsageStatisticsProvider getServerConfigurationUsageStatisticsProvider() {
-    return new ServerConfigurationUsageStatisticsProvider(new TeamCityDatabaseManager(), myFixture.getLoginConfiguration(),
+    return new ServerConfigurationUsageStatisticsProvider(TestDB.getDbManager(), myFixture.getLoginConfiguration(),
                                                           myFixture.getServer(), myFixture.getServerSettings());
   }
 
