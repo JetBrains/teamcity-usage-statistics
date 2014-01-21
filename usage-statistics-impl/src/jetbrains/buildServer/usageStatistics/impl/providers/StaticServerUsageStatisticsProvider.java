@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.util.List;
 import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManagerEx;
@@ -109,14 +110,28 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
   private void publishNumberOfBuildTypes(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String buildTypeNumberId = makeId("buildTypeNumber");
     final String activeBuildTypeNumberId = makeId("activeBuildTypeNumber");
+    final String multiVcsRootBuildTypeNumberId = makeId("multiVcsRootBuildTypeNumber");
 
     final int buildTypeNumber = myServer.getProjectManager().getNumberOfBuildTypes();
 
     presentationManager.applyPresentation(buildTypeNumberId, "Build configurations", myGroupName, null, null);
     publisher.publishStatistic(buildTypeNumberId, buildTypeNumber);
 
+    final List<SBuildType> activeBuildTypes = myServer.getProjectManager().getActiveBuildTypes();
+    final int activeBuildTypeNumber = activeBuildTypes.size();
+
     presentationManager.applyPresentation(activeBuildTypeNumberId, "Active build configurations", myGroupName, new PercentageFormatter(buildTypeNumber), "Build configuration count (% of all build configurations)");
-    publisher.publishStatistic(activeBuildTypeNumberId, myServer.getProjectManager().getActiveBuildTypes().size());
+    publisher.publishStatistic(activeBuildTypeNumberId, activeBuildTypeNumber);
+
+    int multiVcsRootBuildTypeNumber = 0;
+    for (SBuildType buildType : activeBuildTypes) {
+      if (buildType.getVcsRoots().size() > 1) {
+        multiVcsRootBuildTypeNumber++;
+      }
+    }
+
+    presentationManager.applyPresentation(multiVcsRootBuildTypeNumberId, "Active build configurations with several VCS roots", myGroupName, new PercentageFormatter(activeBuildTypeNumber), "Build configuration count (% of all active build configurations)");
+    publisher.publishStatistic(multiVcsRootBuildTypeNumberId, multiVcsRootBuildTypeNumber);
   }
 
   private void publishNumberOfDependencies(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
