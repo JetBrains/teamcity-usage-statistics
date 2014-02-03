@@ -27,7 +27,7 @@ import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-abstract class BaseCoverageEngineUsageStatisticsProvider extends BaseBuildTypeBasedExtensionUsageStatisticsProvider<SBuildRunnerDescriptor> {
+public abstract class BaseCoverageEngineUsageStatisticsProvider extends BaseBuildTypeBasedExtensionUsageStatisticsProvider<SBuildRunnerDescriptor> {
   @NotNull private final Map<String, String> myEngineName2DisplayName = new HashMap<String, String>();
 
   protected BaseCoverageEngineUsageStatisticsProvider(@NotNull final SBuildServer server) {

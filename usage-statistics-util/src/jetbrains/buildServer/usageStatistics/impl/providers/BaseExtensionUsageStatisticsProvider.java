@@ -25,7 +25,7 @@ import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageF
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-abstract class BaseExtensionUsageStatisticsProvider extends BaseDefaultUsageStatisticsProvider {
+public abstract class BaseExtensionUsageStatisticsProvider extends BaseDefaultUsageStatisticsProvider {
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final Map<ExtensionType, Integer> extensionUsages = doCollectUsages();

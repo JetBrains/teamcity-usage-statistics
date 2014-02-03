@@ -20,7 +20,7 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupTy
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import org.jetbrains.annotations.NotNull;
 
-abstract class BaseDefaultUsageStatisticsProvider extends BaseUsageStatisticsProvider {
+public abstract class BaseDefaultUsageStatisticsProvider extends BaseUsageStatisticsProvider {
   @Override
   protected void setupGroup(@NotNull final UsageStatisticsPresentationManager presentationManager) {
     presentationManager.setGroupType(myGroupName, UsageStatisticsGroupType.DEFAULT, getGroupPosition(), null);

@@ -28,7 +28,7 @@ import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider, UsageStatisticsPresentationProvider {
+public abstract class BaseUsageStatisticsProvider implements UsageStatisticsProvider, UsageStatisticsPresentationProvider {
   @NotNull private String myIdFormat;
   @NotNull protected String myGroupName;
   @NotNull private final PresentationsCollector myPresentationsCollector = new PresentationsCollector();

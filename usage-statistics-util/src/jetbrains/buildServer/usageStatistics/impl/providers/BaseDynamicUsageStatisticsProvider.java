@@ -30,7 +30,7 @@ import jetbrains.buildServer.util.Dates;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsProvider {
+public abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsProvider {
   @NotNull private final LinkedHashMap<Long, String> myPeriodDescriptions;
   @Nullable private final String myDefaultValue;
 

@@ -30,7 +30,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-abstract class BaseFeatureUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
+public abstract class BaseFeatureUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
   @NotNull private final Map<String, List<Long>> myFeatureUsages = new HashMap<String, List<Long>>(); // feature name -> timestamps
 
   protected BaseFeatureUsageStatisticsProvider(@NotNull final SBuildServer server,

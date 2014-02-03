@@ -31,7 +31,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
+public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
   @NotNull private final Map<ICString, Set<ToolUsage>> myToolUsages = new TreeMap<ICString, Set<ToolUsage>>();
 
   protected BaseToolUsersUsageStatisticsProvider(@NotNull final SBuildServer server,
