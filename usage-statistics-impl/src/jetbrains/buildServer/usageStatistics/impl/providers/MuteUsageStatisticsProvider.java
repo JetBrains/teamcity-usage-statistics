@@ -34,9 +34,14 @@ public class MuteUsageStatisticsProvider extends BaseFeatureUsageStatisticsProvi
     server.addListener(new BuildServerAdapter() {
       @Override
       public void testsMuted(@NotNull final MuteInfo muteInfo) {
-        addUsage(TESTS);
+        doAddUsage();
       }
     });
+  }
+
+  // do not inline this method, see TW-34736
+  private void doAddUsage() {
+    addUsage(TESTS);
   }
 
   @NotNull
