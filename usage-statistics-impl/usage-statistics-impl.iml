@@ -54,6 +54,7 @@
     <orderEntry type="module" module-name="web" />
     <orderEntry type="module" module-name="cloud-server" />
     <orderEntry type="library" name="user-agent-utils" level="project" />
+    <orderEntry type="module" module-name="web-startup" />
   </component>
 </module>
 
