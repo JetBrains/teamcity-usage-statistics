@@ -53,7 +53,7 @@
     <orderEntry type="module" module-name="remote-api-impl" />
     <orderEntry type="module" module-name="web" />
     <orderEntry type="module" module-name="cloud-server" />
-    <orderEntry type="library" name="UserAgentUtils-1.6" level="project" />
+    <orderEntry type="library" name="user-agent-utils" level="project" />
   </component>
 </module>
 

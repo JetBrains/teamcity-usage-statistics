@@ -26,7 +26,7 @@ import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.users.UserModelEx;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.web.util.UserAgentUtil;
-import nl.bitwalker.useragentutils.*;
+import eu.bitwalker.useragentutils.*;
 import org.jetbrains.annotations.NotNull;
 
 public class BrowserUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements WebUsersProvider, GetRequestDetector.Listener {
