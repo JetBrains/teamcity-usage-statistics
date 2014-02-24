@@ -31,6 +31,7 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationProvider;
 import jetbrains.buildServer.util.Dates;
+import jetbrains.buildServer.util.NamedDaemonThreadFactory;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,7 +58,8 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
     myExtensionHolder = server;
     myPresentationManager = presentationManager;
     server.addListener(this);
-    new Thread(this, "Usage Statistics Collector").start();
+
+    new NamedDaemonThreadFactory("Usage statistics collector").newThread(this).start();
   }
 
   public void publishCollectedStatistics(@NotNull final UsageStatisticsPublisher publisher) {
