@@ -142,10 +142,10 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     final String jdbcId = makeId("jdbc");
 
     presentationManager.applyPresentation(databaseId, "Database version", myGroupName, null, null);
-    publisher.publishStatistic(databaseId, myDBManager.getDatabaseProductName() + ' ' + myDBManager.getDatabaseMajorVersion() + '.' + myDBManager.getDatabaseMinorVersion());
+    publisher.publishStatistic(databaseId, myDBManager.getDatabaseProductName() + ' ' + myDBManager.getDatabaseProductVersion().toString(2,2));
 
     presentationManager.applyPresentation(jdbcId, "JDBC driver version", myGroupName, null, null);
-    publisher.publishStatistic(jdbcId, myDBManager.getDriverName() + ' ' + myDBManager.getDriverMajorVersion() + '.' + myDBManager.getDriverMinorVersion());
+    publisher.publishStatistic(jdbcId, myDBManager.getDriverName() + ' ' + myDBManager.getDriverVersion().toString(2,2));
   }
 
   private void publishXmx(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
