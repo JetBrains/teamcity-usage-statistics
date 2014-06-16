@@ -42,11 +42,11 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     "  avg(h.remove_from_queue_time - h.queued_time) as avg_build_queue_time," +
     "  avg(h.build_finish_time_server - h.build_start_time_server) as avg_build_duration " +
     "from (" +
-    "  select *" +
-    "    from history " +
+    "  select history.build_id, history.is_personal,build_finish_time_server,build_start_time_server, bs.remove_from_queue_time as remove_from_queue_time, bs.queued_time as queued_time " +
+    "    from history join build_state bs on history.build_state_id = bs.id " +
     "    where build_finish_time_server > ?" +
     "  union all" +
-    "  select *" +
+    "  select build_id, is_personal,build_finish_time_server,build_start_time_server, remove_from_queue_time, queued_time" +
     "    from light_history" +
     "    where build_finish_time_server > ?" +
     ") h"
