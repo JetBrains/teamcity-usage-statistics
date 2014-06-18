@@ -72,8 +72,7 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   }
 
   public void onGetRequest(@NotNull final HttpServletRequest request, @NotNull final SUser user) {
-    String path = WebUtil.getPathFromUrl(WebUtil.getPathWithoutContext(request));
-    if (!path.toLowerCase().endsWith(".html")) return;
+    String path = WebUtil.getPathWithoutContext(request);
     final String tab = request.getParameter("tab");
     if (tab != null) {
       path += "?tab=" + tab;
