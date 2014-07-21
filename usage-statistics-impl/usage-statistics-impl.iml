@@ -5,26 +5,26 @@
       <configuration>
         <fileset id="fileset1" name="usage-statistics-impl" removed="false">
           <file>file://$MODULE_DIR$/src/META-INF/build-server-plugin-usage-statistics.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/server/src/META-INF/build-server-declarative-extensibility.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/server/src/META-INF/build-server-plugin-agents-statistics.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/server/src/META-INF/buildServerCompatMode.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/server/src/META-INF/buildServerPermissions.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/server/src/META-INF/buildServerPluginsSupport.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/server/src/META-INF/buildServerSpring.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/common-impl/src/META-INF/per-plugin-shared-spring.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/plugin-model-common/src/META-INF/plugin-model-shared-spring-common.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/common-impl/src/META-INF/plugin-model-shared-spring.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/common-impl/src/META-INF/shared-spring-sub-container.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/common-impl/src/META-INF/shared-agent-server-spring.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/cloud-server/src/META-INF/build-server-plugin-clouds-server.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/cloud-server/src/META-INF/build-server-plugin-clouds-server-web.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/web-startup/fake-predefined-implicit-spring-beans.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/web/WEB-INF/buildServerConfigurator.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/web/WEB-INF/buildServerPluginsSupportWeb.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/web/WEB-INF/buildServerSpringWeb.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/server-openapi/fake-predefined-implicit-spring-server-plugin-beans.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/remote-api-impl/src/META-INF/buildServerSpring-RemoteApiImpl.xml</file>
-          <file>file://$BUILDSERVER_PROJECT_HOME$/svnrepo/usage-statistics/usage-statistics-api-impl/src/META-INF/buildServerSpring-usage-statistics.xml</file>
+          <file>file://$MODULE_DIR$/../../../server/src/META-INF/build-server-declarative-extensibility.xml</file>
+          <file>file://$MODULE_DIR$/../../../server/src/META-INF/build-server-plugin-agents-statistics.xml</file>
+          <file>file://$MODULE_DIR$/../../../server/src/META-INF/buildServerCompatMode.xml</file>
+          <file>file://$MODULE_DIR$/../../../server/src/META-INF/buildServerPermissions.xml</file>
+          <file>file://$MODULE_DIR$/../../../server/src/META-INF/buildServerPluginsSupport.xml</file>
+          <file>file://$MODULE_DIR$/../../../server/src/META-INF/buildServerSpring.xml</file>
+          <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/per-plugin-shared-spring.xml</file>
+          <file>file://$MODULE_DIR$/../../../plugin-model-common/src/META-INF/plugin-model-shared-spring-common.xml</file>
+          <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/plugin-model-shared-spring.xml</file>
+          <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/shared-spring-sub-container.xml</file>
+          <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/shared-agent-server-spring.xml</file>
+          <file>file://$MODULE_DIR$/../../../cloud-server/src/META-INF/build-server-plugin-clouds-server.xml</file>
+          <file>file://$MODULE_DIR$/../../../cloud-server/src/META-INF/build-server-plugin-clouds-server-web.xml</file>
+          <file>file://$MODULE_DIR$/../../../web-startup/fake-predefined-implicit-spring-beans.xml</file>
+          <file>file://$MODULE_DIR$/../../../web/WEB-INF/buildServerConfigurator.xml</file>
+          <file>file://$MODULE_DIR$/../../../web/WEB-INF/buildServerPluginsSupportWeb.xml</file>
+          <file>file://$MODULE_DIR$/../../../web/WEB-INF/buildServerSpringWeb.xml</file>
+          <file>file://$MODULE_DIR$/../../../server-openapi/fake-predefined-implicit-spring-server-plugin-beans.xml</file>
+          <file>file://$MODULE_DIR$/../../../remote-api-impl/src/META-INF/buildServerSpring-RemoteApiImpl.xml</file>
+          <file>file://$MODULE_DIR$/../usage-statistics-api-impl/src/META-INF/buildServerSpring-usage-statistics.xml</file>
         </fileset>
       </configuration>
     </facet>
