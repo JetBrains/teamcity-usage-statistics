@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import jetbrains.buildServer.util.ExceptionUtil;
-import org.apache.log4j.Logger;
+import jetbrains.buildServer.log.Loggers;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class XmlUtil {
-  @NotNull private static final Logger LOG = Logger.getLogger(XmlUtil.class);
   @NotNull private static final Map<String, Object> ourFileLocks = new HashMap<String, Object>();
 
   public static void saveXml(@NotNull final Element element, @NotNull final File file) {
@@ -46,7 +44,7 @@ public class XmlUtil {
         outputter.output(new Document(element), fos);
       }
       catch (final IOException e) {
-        ExceptionUtil.log(LOG, "Failed to save file \"" + file.getAbsolutePath() + "\"", e);
+        Loggers.SERVER.warnAndDebugDetails("Failed to save file \"" + file.getAbsolutePath() + "\"", e);
       }
       finally {
         if (fos != null) {
@@ -54,7 +52,7 @@ public class XmlUtil {
             fos.close();
           }
           catch (final IOException e) {
-            ExceptionUtil.log(LOG, "Failed to close file output stream for file \"" + file.getAbsolutePath() + "\"", e);
+            Loggers.SERVER.warnAndDebugDetails("Failed to close file output stream for file \"" + file.getAbsolutePath() + "\"", e);
           }
         }
       }
@@ -69,7 +67,7 @@ public class XmlUtil {
         return new SAXBuilder().build(file).getRootElement();
       }
       catch (final Exception e) {
-        ExceptionUtil.log(LOG, "Failed to load file \"" + file.getAbsolutePath() + "\"", e);
+        Loggers.SERVER.warnAndDebugDetails("Failed to load file \"" + file.getAbsolutePath() + "\"", e);
       }
     }
     return null;
