@@ -18,18 +18,23 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.HashMap;
 import java.util.Map;
-import jetbrains.buildServer.issueTracker.IssuePluginsManager;
-import jetbrains.buildServer.issueTracker.IssueProviderEx;
-import jetbrains.buildServer.issueTracker.IssueProviderFactory;
+import jetbrains.buildServer.issueTracker.*;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 
 public class IssueTrackerUsageStatisticsProvider extends BaseExtensionUsageStatisticsProvider {
-  @NotNull private final IssuePluginsManager myIssuePluginsManager;
 
-  public IssueTrackerUsageStatisticsProvider(@NotNull final IssuePluginsManager issuePluginsManager) {
-    myIssuePluginsManager = issuePluginsManager;
+  @NotNull
+  private final IssueProvidersManager myIssueProvidersManager;
+
+  @NotNull
+  private final IssueProviderFactories myIssueProviderFactories;
+
+  public IssueTrackerUsageStatisticsProvider(@NotNull final IssueProvidersManager issueProvidersManager,
+                                             @NotNull final IssueProviderFactories issueProviderFactories) {
+    myIssueProvidersManager = issueProvidersManager;
+    myIssueProviderFactories = issueProviderFactories;
   }
 
   @NotNull
@@ -41,15 +46,17 @@ public class IssueTrackerUsageStatisticsProvider extends BaseExtensionUsageStati
   @Override
   protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
     final Map<String, String> issueProviderFactoryType2Name = new HashMap<String, String>();
-    for (final IssueProviderEx issueProvider : myIssuePluginsManager.getProviders()) {
-      final String type = issueProvider.getType();
-      String name = issueProviderFactoryType2Name.get(type);
-      if (name == null) {
-        final IssueProviderFactory factory = myIssuePluginsManager.findFactoryByType(type);
-        name = factory == null ? type : factory.getType();
-        issueProviderFactoryType2Name.put(type, name);
+    for (Map<String, IssueProviderEx> map: myIssueProvidersManager.getAllProviders().values()) {
+      for (final IssueProviderEx issueProvider: map.values()) {
+        final String type = issueProvider.getType();
+        String name = issueProviderFactoryType2Name.get(type);
+        if (name == null) {
+          final IssueProviderFactory factory = myIssueProviderFactories.getFactoryOfType(type);
+          name = factory == null ? type : factory.getType();
+          issueProviderFactoryType2Name.put(type, name);
+        }
+        callback.addUsage(type, name);
       }
-      callback.addUsage(type, name);
     }
   }
 
