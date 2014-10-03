@@ -56,19 +56,12 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     "select" +
     "  max(t.test_count) as max_test_count " +
     "from (" +
-    "  select" +
-    "    count(*) as test_count " +
-    "  from (" +
-    "    select build_id " +
-    "      from history " +
-    "      where build_finish_time_server > ? " +
-    "    union all" +
-    "    select build_id " +
-    "      from light_history" +
-    "      where build_finish_time_server > ? " +
-    "    ) h " +
-    "    join test_info ti on h.build_id = ti.build_id " +
-    "  group by h.build_id" +
+    "  select h.build_id, " +
+    "         count(t.build_id) as test_count " +
+    "  from history h " +
+    "  left join test_info t on t.build_id = h.build_id " +
+    "  where h.build_finish_time_server > ? " +
+    "  group by h.build_id " +
     ") t"
   );
 
@@ -136,7 +129,7 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
         }
         return null;
       }
-    }, fromDate, fromDate);
+    }, fromDate);
   }
 
   private void publishOnlineUsers(@NotNull final UsageStatisticsPublisher publisher,
