@@ -21,8 +21,8 @@ import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.util.BasePluginStatePersister;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class BasePersistentStateComponent extends BasePluginStatePersister {
-  public BasePersistentStateComponent(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
+public abstract class BaseUsageStatisticsStatePersister extends BasePluginStatePersister {
+  public BaseUsageStatisticsStatePersister(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
     super(server, serverPaths);
   }
 

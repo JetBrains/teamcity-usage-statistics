@@ -19,12 +19,12 @@ package jetbrains.buildServer.usageStatistics.impl;
 import java.util.Date;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
-import jetbrains.buildServer.usageStatistics.util.BasePersistentStateComponent;
+import jetbrains.buildServer.usageStatistics.util.BaseUsageStatisticsStatePersister;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class UsageStatisticsCommonDataPersistor extends BasePersistentStateComponent {
+public class UsageStatisticsCommonDataPersistor extends BaseUsageStatisticsStatePersister {
   @NotNull private static final String LAST_REPORTING_DATE = "last-reporting-date";
   @NotNull private static final String REPORTING_SUGGESTION_WAS_CONSIDERED = "reporting-suggestion-was-considered";
   @Nullable private Date myLastReportingDate;

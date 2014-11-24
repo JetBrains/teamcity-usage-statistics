@@ -23,7 +23,7 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
-import jetbrains.buildServer.usageStatistics.util.BasePersistentStateComponent;
+import jetbrains.buildServer.usageStatistics.util.BaseUsageStatisticsStatePersister;
 import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.util.filters.Filter;
 import jetbrains.buildServer.util.filters.FilterUtil;
@@ -215,7 +215,7 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
   }
 
   private void registerPersistor(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
-    new BasePersistentStateComponent(server, serverPaths) {
+    new BaseUsageStatisticsStatePersister(server, serverPaths) {
       @NotNull
       @Override
       protected String getId() {

@@ -23,7 +23,7 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
-import jetbrains.buildServer.usageStatistics.util.BasePersistentStateComponent;
+import jetbrains.buildServer.usageStatistics.util.BaseUsageStatisticsStatePersister;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.Dates;
 import org.jdom.Element;
@@ -146,7 +146,7 @@ public abstract class BaseFeatureUsageStatisticsProvider extends BaseDynamicUsag
   }
 
   private void registerPersistor(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
-    new BasePersistentStateComponent(server, serverPaths) {
+    new BaseUsageStatisticsStatePersister(server, serverPaths) {
       @NotNull
       @Override
       protected String getId() {
