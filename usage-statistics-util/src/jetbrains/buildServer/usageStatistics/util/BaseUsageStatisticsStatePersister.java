@@ -31,13 +31,4 @@ public abstract class BaseUsageStatisticsStatePersister extends BasePluginStateP
   protected String getPluginName() {
     return "usage-statistics";
   }
-
-  @NotNull
-  @Override
-  protected String getStateName() {
-    return getId();
-  }
-
-  @NotNull
-  protected abstract String getId();
 }

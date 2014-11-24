@@ -218,7 +218,7 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
     new BaseUsageStatisticsStatePersister(server, serverPaths) {
       @NotNull
       @Override
-      protected String getId() {
+      protected String getStateName() {
         return BaseToolUsersUsageStatisticsProvider.this.getExternalId();
       }
 

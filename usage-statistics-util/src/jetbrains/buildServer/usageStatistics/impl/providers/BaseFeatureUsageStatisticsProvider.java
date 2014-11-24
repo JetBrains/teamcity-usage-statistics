@@ -149,7 +149,7 @@ public abstract class BaseFeatureUsageStatisticsProvider extends BaseDynamicUsag
     new BaseUsageStatisticsStatePersister(server, serverPaths) {
       @NotNull
       @Override
-      protected String getId() {
+      protected String getStateName() {
         return BaseFeatureUsageStatisticsProvider.this.getExternalId();
       }
 

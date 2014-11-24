@@ -54,7 +54,7 @@ public class UsageStatisticsCommonDataPersistor extends BaseUsageStatisticsState
 
   @NotNull
   @Override
-  protected String getId() {
+  protected String getStateName() {
     return "common";
   }
 
