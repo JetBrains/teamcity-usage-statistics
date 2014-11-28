@@ -140,6 +140,11 @@
     <property name="groupName" value="Agent Java Versions"/>
   </bean>
 
+  <bean id="cloudUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.CloudUsageStatisticsProvider">
+    <property name="idFormat" value="jb.cloud.%s.%s"/>
+    <property name="groupName" value="Clouds"/>
+  </bean>
+
   <!-- Helpers -->
 
   <bean id="getRequestDetector" class="jetbrains.buildServer.usageStatistics.impl.GetRequestDetector"/>

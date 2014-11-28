@@ -55,7 +55,7 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     publishNumberOfAgents(publisher, presentationManager);
-    publishNumberOfVirtualAgents(publisher, presentationManager);
+    //publishNumberOfVirtualAgents(publisher, presentationManager);
     publishNumberOfAgentPools(publisher, presentationManager);
 
     publishNumberOfBuildTypes(publisher, presentationManager);
@@ -65,8 +65,8 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
     publishNumberOfUsers(publisher, presentationManager);
     publishNumberOfVcsRoots(publisher, presentationManager);
 
-    publishNumberOfCloudImages(publisher, presentationManager);
-    publishNumberOfCloudProfiles(publisher, presentationManager);
+    //publishNumberOfCloudImages(publisher, presentationManager);
+    //publishNumberOfCloudProfiles(publisher, presentationManager);
   }
 
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {

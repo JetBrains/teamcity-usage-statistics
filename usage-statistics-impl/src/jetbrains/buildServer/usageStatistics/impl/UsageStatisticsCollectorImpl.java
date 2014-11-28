@@ -174,9 +174,9 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
   private void collectStatisticsWithProvider(@NotNull final UsageStatisticsProvider provider, @NotNull final UsageStatisticsPublisher publisher) {
     try {
       provider.accept(publisher);
-      Thread.sleep(getProviderSleepTime());
+      //Thread.sleep(getProviderSleepTime());
     }
-    catch (final InterruptedException ignore) {}
+    //catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
       LOG.debug("Usage statistics provider failed", e);
     }
@@ -185,9 +185,9 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
   private void applyPresentationsWithProvider(@NotNull final UsageStatisticsPresentationProvider presentationProvider) {
     try {
       presentationProvider.accept(myPresentationManager);
-      Thread.sleep(getProviderSleepTime());
+      //Thread.sleep(getProviderSleepTime());
     }
-    catch (final InterruptedException ignore) {}
+    //catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
       LOG.debug("Usage statistics presentation provider failed", e);
     }

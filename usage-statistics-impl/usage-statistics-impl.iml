@@ -55,6 +55,7 @@
     <orderEntry type="module" module-name="cloud-server" />
     <orderEntry type="library" name="user-agent-utils" level="project" />
     <orderEntry type="module" module-name="web-startup" />
+    <orderEntry type="module" module-name="cloud-api" />
+    <orderEntry type="module" module-name="cloud-shared" />
   </component>
 </module>
-
