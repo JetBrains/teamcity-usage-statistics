@@ -52,7 +52,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   @NotNull
   private ServerConfigurationUsageStatisticsProvider getServerConfigurationUsageStatisticsProvider() {
     return new ServerConfigurationUsageStatisticsProvider(TestDB.getDbManager(), myFixture.getLoginConfiguration(),
-                                                          myFixture.getServer(), myFixture.getServerSettings());
+                                                          myFixture.getServer(), myFixture.getServerSettings(), myFixture.getStartupContext());
   }
 
   @NotNull

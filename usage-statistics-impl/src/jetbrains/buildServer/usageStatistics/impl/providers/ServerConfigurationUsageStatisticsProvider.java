@@ -20,6 +20,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Function;
 import java.util.List;
 import jetbrains.buildServer.controllers.interceptors.auth.HttpAuthenticationScheme;
+import jetbrains.buildServer.maintenance.StartupContext;
 import jetbrains.buildServer.serverSide.LicenseMode;
 import jetbrains.buildServer.serverSide.LicensingPolicy;
 import jetbrains.buildServer.serverSide.SBuildServer;
@@ -33,8 +34,10 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatt
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.SingleValueFormatter;
+import jetbrains.buildServer.usageStatistics.presentation.formatters.TimeFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TrimFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.TypeBasedFormatter;
+import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.version.ServerVersionHolder;
 import org.jetbrains.annotations.NotNull;
@@ -47,15 +50,18 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   @NotNull private final LoginConfiguration myLoginConfiguration;
   @NotNull private final LicensingPolicy myLicensingPolicy;
   @NotNull private final ServerSettings myServerSettings;
+  @NotNull private final StartupContext myStartupContext;
 
   public ServerConfigurationUsageStatisticsProvider(@NotNull final TeamCityDatabaseManager dbManager,
                                                     @NotNull final LoginConfiguration loginConfiguration,
                                                     @NotNull final SBuildServer buildServer,
-                                                    @NotNull final ServerSettings serverSettings) {
+                                                    @NotNull final ServerSettings serverSettings,
+                                                    @NotNull final StartupContext startupContext) {
     myDBManager = dbManager;
     myLoginConfiguration = loginConfiguration;
     myLicensingPolicy = buildServer.getLicensingPolicy();
     myServerSettings = serverSettings;
+    myStartupContext = startupContext;
   }
 
   @NotNull
@@ -75,6 +81,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     publishLicenseTypeAndMode(publisher, presentationManager);
     publishAgentLicenses(publisher, presentationManager);
     publishTCVersion(publisher, presentationManager);
+    publishServerStartData(publisher, presentationManager);
   }
 
   private void publishServerId(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
@@ -191,5 +198,11 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     final String buildId = makeId("build");
     presentationManager.applyPresentation(buildId, "Server build", myGroupName, null, null);
     publisher.publishStatistic(buildId, ServerVersionHolder.getVersion().getBuildNumber());
+  }
+
+  private void publishServerStartData(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final String versionId = makeId("currentUptime");
+    presentationManager.applyPresentation(versionId, "Current uptime", myGroupName, new TimeFormatter(), null);
+    publisher.publishStatistic(versionId, Dates.now().getTime() - myStartupContext.getServerStartupTimestamp().getTime());
   }
 }
