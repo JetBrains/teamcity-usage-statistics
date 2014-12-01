@@ -17,7 +17,6 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.List;
-import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManagerEx;
 import jetbrains.buildServer.serverSide.BuildServerEx;
@@ -34,16 +33,13 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
   @NotNull private final BuildServerEx myServer;
   @NotNull private final UserGroupManager myUserGroupManager;
   @NotNull private final AgentPoolManager myAgentPoolManager;
-  @NotNull private final CloudStatisticsProvider myCloudProvider;
 
   public StaticServerUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                              @NotNull final UserGroupManager userGroupManager,
-                                             @NotNull final AgentPoolManager agentPoolManager,
-                                             @NotNull final CloudStatisticsProvider cloudProvider) {
+                                             @NotNull final AgentPoolManager agentPoolManager) {
     myServer = server;
     myUserGroupManager = userGroupManager;
     myAgentPoolManager = agentPoolManager;
-    myCloudProvider = cloudProvider;
   }
 
   @NotNull
@@ -55,7 +51,6 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     publishNumberOfAgents(publisher, presentationManager);
-    //publishNumberOfVirtualAgents(publisher, presentationManager);
     publishNumberOfAgentPools(publisher, presentationManager);
 
     publishNumberOfBuildTypes(publisher, presentationManager);
@@ -65,8 +60,6 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
     publishNumberOfUsers(publisher, presentationManager);
     publishNumberOfVcsRoots(publisher, presentationManager);
 
-    //publishNumberOfCloudImages(publisher, presentationManager);
-    //publishNumberOfCloudProfiles(publisher, presentationManager);
   }
 
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
@@ -83,28 +76,10 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
     publisher.publishStatistic(authorizedRegisteredAgentNumberId, buildAgentManager.getRegisteredAgents(false).size());
   }
 
-  private void publishNumberOfVirtualAgents(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    final String virtualAgentNumberId = makeId("virtualAgentNumber");
-    presentationManager.applyPresentation(virtualAgentNumberId, "Virtual agents", myGroupName, null, null);
-    publisher.publishStatistic(virtualAgentNumberId, myCloudProvider.getNumberOfRunningInstances());
-  }
-
   private void publishNumberOfAgentPools(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String agentPoolsId = makeId("agentPools");
     presentationManager.applyPresentation(agentPoolsId, "Agent pools", myGroupName, null, null);
     publisher.publishStatistic(agentPoolsId, myAgentPoolManager.getAllAgentPools().size());
-  }
-
-  private void publishNumberOfCloudProfiles(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    final String cloudProfilesId = makeId("cloudProfiles");
-    presentationManager.applyPresentation(cloudProfilesId, "Cloud profiles", myGroupName, null, null);
-    publisher.publishStatistic(cloudProfilesId, myCloudProvider.getNumberOfProfiles());
-  }
-
-  private void publishNumberOfCloudImages(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    final String cloudImagesId = makeId("cloudImages");
-    presentationManager.applyPresentation(cloudImagesId, "Cloud images", myGroupName, null, null);
-    publisher.publishStatistic(cloudImagesId, myCloudProvider.getNumberOfImages());
   }
 
   private void publishNumberOfBuildTypes(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {

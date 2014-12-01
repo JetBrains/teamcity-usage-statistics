@@ -19,6 +19,7 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import jetbrains.buildServer.clouds.*;
+import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.clouds.server.impl.CloudManagerBase;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
@@ -34,9 +35,12 @@ import org.jetbrains.annotations.NotNull;
 public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProvider {
 
   @NotNull private final CloudManagerBase myCloudManager;
+  @NotNull private final CloudStatisticsProvider myRuntimeStatisticsCollector;
 
-  public CloudUsageStatisticsProvider(@NotNull final CloudManagerBase manager) {
+  public CloudUsageStatisticsProvider(@NotNull final CloudManagerBase manager,
+                                      @NotNull final CloudStatisticsProvider runtimeStatisticsProvider) {
     myCloudManager = manager;
+    myRuntimeStatisticsCollector = runtimeStatisticsProvider;
   }
 
   @NotNull
@@ -61,16 +65,12 @@ public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProv
                                 final UsageStatisticsPresentationManager presentationManager,
                                 final Map<String, String> cloudTypeCodeNames
   ){
-    final Map<String, AtomicInteger> instancesCountByType = new HashMap<String, AtomicInteger>();
     final Map<String, AtomicInteger> imagesByType = new HashMap<String, AtomicInteger>();
     final Map<String, AtomicInteger> profileCountByType = new HashMap<String, AtomicInteger>();
 
     for (CloudProfile profile : myCloudManager.listProfiles()) {
       final CloudClient cli = myCloudManager.getClient(profile.getProfileId());
       final String cloudName = profile.getCloudName();
-      if (instancesCountByType.get(cloudName) == null){
-        instancesCountByType.put(cloudName, new AtomicInteger(0));
-      }
       if (imagesByType.get(cloudName) == null){
         imagesByType.put(cloudName, new AtomicInteger(0));
       }
@@ -79,16 +79,7 @@ public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProv
       }
       profileCountByType.get(cloudName).incrementAndGet();
 
-      for (CloudImage image : cli.getImages()) {
-        imagesByType.get(cloudName).incrementAndGet();
-        if (image.getErrorInfo() != null)
-          continue;
-        for (CloudInstance instance : image.getInstances()) {
-          if (instance.getErrorInfo() == null && instance.getStatus().isCanTerminate()) {
-            instancesCountByType.get(cloudName).incrementAndGet();
-          }
-        }
-      }
+      imagesByType.get(cloudName).addAndGet(cli.getImages().size());
     }
 
     for (String cloudCodeName : cloudTypeCodeNames.keySet()) {
@@ -103,10 +94,11 @@ public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProv
                 "imagesCount", "cloud images",
                 cloudCodeName, cloudTypeCodeNames.get(cloudCodeName),
                 imagesByType.get(cloudCodeName).get());
+      final int maxInstances = myRuntimeStatisticsCollector.getMaxValueAndReset(cloudCodeName);
       applyData(publisher, presentationManager,
                 "agentsCount", "cloud agents",
                 cloudCodeName, cloudTypeCodeNames.get(cloudCodeName),
-                instancesCountByType.get(cloudCodeName).get());
+                maxInstances);
 
     }
 

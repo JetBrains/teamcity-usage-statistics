@@ -57,20 +57,6 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
 
   @NotNull
   private StaticServerUsageStatisticsProvider getStaticServerUsageProvider() {
-    final CloudStatisticsProvider mockCloudProvider = new CloudStatisticsProvider() {
-      public int getNumberOfProfiles() {
-        return 2;
-      }
-
-      public int getNumberOfImages() {
-        return 6;
-      }
-
-      public int getNumberOfRunningInstances() {
-        return 9;
-      }
-    };
-
     myProviders.add(new AgentsJavaUsageStatisticsProvider(myServer));
     myProviders.add(new ServerLoadUsageStatisticsProvider(myServer, new WebUsersProvider() {
       @NotNull
@@ -83,7 +69,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
         return Collections.emptySet();
       }
     }));
-    return new StaticServerUsageStatisticsProvider(myServer, myFixture.getUserGroupManager(), myFixture.getAgentPoolManager(), mockCloudProvider);
+    return new StaticServerUsageStatisticsProvider(myServer, myFixture.getUserGroupManager(), myFixture.getAgentPoolManager());
   }
 
   public void provider_should_not_fail_on_publishing_statistics() {
