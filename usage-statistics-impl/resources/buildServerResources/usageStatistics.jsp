@@ -40,12 +40,12 @@
   </authz:authorize>
   <bs:refreshable containerId="usageStatisticsStatus" pageUrl="${pageUrl}">
     <div style="margin-top: 1em">
-      <c:if test="${statisticsData.collectingNow}"><forms:saving className="progressRingInline"/> </c:if
+      <c:if test="${statisticsData.collectingNow}"> </c:if
         >Usage statistics data was <c:choose
           ><c:when test="${statisticsData.statisticsCollected}">collected <bs:date smart="true" no_smart_title="true" value="${statisticsData.lastCollectingFinishDate}"/></c:when
           ><c:otherwise>not collected yet</c:otherwise
         ></c:choose><c:choose
-          ><c:when test="${statisticsData.collectingNow}"> and is being collected now...</c:when
+          ><c:when test="${statisticsData.collectingNow}"> and is being collected now...<forms:progressRing className="progressRingInline"/></c:when
           ><c:otherwise>. <input type="button" value="Collect Now" class="btn btn_mini" onclick="BS.UsageStatistics.forceCollectingNow();"><forms:saving id="usageStatisticsCollectNowProgress" className="progressRingInline"/></c:otherwise
         ></c:choose>
       <c:if test="${statisticsData.statisticsCollected}">
