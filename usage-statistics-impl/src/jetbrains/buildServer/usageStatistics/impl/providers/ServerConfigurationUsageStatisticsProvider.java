@@ -136,12 +136,16 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   private void publishJavaInfo(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String javaId = makeId("java");
     final String javaRuntimeId = makeId("javaRuntime");
+    final String servletContainerId = makeId("servletContainer");
 
     presentationManager.applyPresentation(javaId, "Java version", myGroupName, null, null);
     publisher.publishStatistic(javaId, System.getProperty("java.version"));
 
     presentationManager.applyPresentation(javaRuntimeId, "Java runtime version", myGroupName, null, null);
     publisher.publishStatistic(javaRuntimeId, System.getProperty("java.runtime.version"));
+
+    presentationManager.applyPresentation(servletContainerId, "Servlet container", myGroupName, null, null);
+    publisher.publishStatistic(servletContainerId, myStartupContext.getServletContainerInfo());
   }
 
   private void publishDatabaseInfo(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
