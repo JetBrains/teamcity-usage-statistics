@@ -18,14 +18,12 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.Collection;
 import jetbrains.buildServer.responsibility.ResponsibilityEntry;
-import jetbrains.buildServer.responsibility.TestNameResponsibilityEntry;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.tests.TestName;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class InvestigationUsageStatisticsProvider extends BaseFeatureUsageStatisticsProvider {
   @NotNull @NonNls private static final String TESTS = "tests";
@@ -38,11 +36,6 @@ public class InvestigationUsageStatisticsProvider extends BaseFeatureUsageStatis
       @Override
       public void responsibleChanged(@NotNull final SBuildType bt, @NotNull final ResponsibilityEntry oldValue, @NotNull final ResponsibilityEntry newValue) {
         addUsageIfNeeded(newValue.getState(), BUILD_TYPES, newValue.getReporterUser() != null);
-      }
-
-      @Override
-      public void responsibleChanged(@NotNull final SProject project, @Nullable final TestNameResponsibilityEntry oldValue, @NotNull final TestNameResponsibilityEntry newValue, final boolean isUserAction) {
-        addUsageIfNeeded(newValue.getState(), TESTS, isUserAction);
       }
 
       @Override
