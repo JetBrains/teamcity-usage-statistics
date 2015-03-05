@@ -68,7 +68,7 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
   @NotNull private static final GenericQuery<Void> ourVcsChangesCountQuery = new GenericQuery<Void>(
     "select count(*) as vcs_changes_count " +
     "from vcs_history h " +
-    "where change_date > ?"
+    "where register_date > ?"
   );
 
   @NotNull private final BuildServerEx myServer;
