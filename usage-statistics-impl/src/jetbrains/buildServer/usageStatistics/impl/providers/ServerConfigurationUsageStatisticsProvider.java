@@ -161,7 +161,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
 
   private void publishXmx(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String maxMemoryId = makeId("maxMemory");
-    presentationManager.applyPresentation(maxMemoryId, "Maximum used memory", myGroupName,
+    presentationManager.applyPresentation(maxMemoryId, "Maximum available memory", myGroupName,
                                             new TypeBasedFormatter<Long>(Long.class) {
                                               @Override
                                               protected String doFormat(@NotNull final Long statisticValue) {
