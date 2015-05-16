@@ -28,7 +28,7 @@ import jetbrains.buildServer.serverSide.auth.AuthModule;
 import jetbrains.buildServer.serverSide.auth.AuthModuleType;
 import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
-import jetbrains.buildServer.serverSide.impl.ServerSettings;
+import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
