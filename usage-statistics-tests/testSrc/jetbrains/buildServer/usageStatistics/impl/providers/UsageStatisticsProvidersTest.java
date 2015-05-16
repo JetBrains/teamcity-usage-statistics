@@ -17,12 +17,11 @@
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.*;
-import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
 import jetbrains.buildServer.serverSide.db.TestDB;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
-import jetbrains.buildServer.serverSide.impl.ServerSettings;
+import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import org.jetbrains.annotations.NotNull;
