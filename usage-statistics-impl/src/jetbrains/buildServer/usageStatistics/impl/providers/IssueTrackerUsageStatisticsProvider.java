@@ -52,7 +52,7 @@ public class IssueTrackerUsageStatisticsProvider extends BaseExtensionUsageStati
         String name = issueProviderFactoryType2Name.get(type);
         if (name == null) {
           final IssueProviderFactory factory = myIssueProviderFactories.getFactoryOfType(type);
-          name = factory == null ? type : factory.getType();
+          name = factory == null ? type : factory.getType().getType();
           issueProviderFactoryType2Name.put(type, name);
         }
         callback.addUsage(type, name);
