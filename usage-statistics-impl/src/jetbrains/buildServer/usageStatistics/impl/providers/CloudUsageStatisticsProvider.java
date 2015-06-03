@@ -50,7 +50,7 @@ public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProv
 
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    if (myCloudManager.isIntegrationDisabled())
+    if (!myCloudManager.isIntegrationEnabled())
       return;
     final Collection<? extends CloudType> cloudTypes = myCloudManager.getCloudTypes();
     final Map<String,String> cloudTypeCodeNames = new HashMap<String, String>();
@@ -70,7 +70,7 @@ public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProv
 
     for (CloudProfile profile : myCloudManager.listProfiles()) {
       final CloudClient cli = myCloudManager.getClient(profile.getProfileId());
-      final String cloudName = profile.getCloudName();
+      final String cloudName = profile.getCloudCode();
       if (imagesByType.get(cloudName) == null){
         imagesByType.put(cloudName, new AtomicInteger(0));
       }
