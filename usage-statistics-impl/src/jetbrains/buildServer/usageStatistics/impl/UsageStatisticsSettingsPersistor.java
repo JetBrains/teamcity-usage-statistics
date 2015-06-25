@@ -16,13 +16,18 @@
 
 package jetbrains.buildServer.usageStatistics.impl;
 
+import com.intellij.openapi.diagnostic.Logger;
 import java.io.File;
+import java.io.IOException;
 import jetbrains.buildServer.serverSide.ServerPaths;
-import jetbrains.buildServer.usageStatistics.util.XmlUtil;
+import jetbrains.buildServer.util.FileUtil;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class UsageStatisticsSettingsPersistor {
+  @NotNull private static final Logger LOG = Logger.getInstance(UsageStatisticsSettingsPersistor.class.getName());
   @NotNull private static final String REPORTING_ENABLED = "reporting-enabled";
   @NotNull private final File myConfigFile;
 
@@ -33,14 +38,19 @@ public class UsageStatisticsSettingsPersistor {
   public void saveSettings(@NotNull final UsageStatisticsSettings settings) {
     final Element element = new Element("usage-statistics-settings");
     element.setAttribute(REPORTING_ENABLED, String.valueOf(settings.isReportingEnabled()));
-    XmlUtil.saveXml(element, myConfigFile);
+    synchronized (myConfigFile) {
+      saveXml(element, myConfigFile);
+    }
   }
 
   @NotNull
   public UsageStatisticsSettings loadSettings() {
     final UsageStatisticsSettings settings = new UsageStatisticsSettings();
 
-    final Element element = XmlUtil.loadXml(myConfigFile);
+    final Element element;
+    synchronized (myConfigFile) {
+      element = loadXml(myConfigFile);
+    }
     if (element != null) {
       final String reportingEnabled = element.getAttributeValue(REPORTING_ENABLED);
       if (reportingEnabled != null) {
@@ -49,5 +59,24 @@ public class UsageStatisticsSettingsPersistor {
     }
 
     return settings;
+  }
+
+  private static void saveXml(@NotNull final Element element, @NotNull final File file) {
+    try {
+      FileUtil.saveDocument(new Document(element), file);
+    } catch (final IOException e) {
+      LOG.warnAndDebugDetails("Failed to save usage statistics settings into file \"" + file.getAbsolutePath() + "\"", e);
+    }
+  }
+
+  @Nullable
+  private static Element loadXml(@NotNull final File file) {
+    if (!file.exists() || !file.canRead()) return null;
+    try {
+      return FileUtil.parseDocument(file);
+    } catch (final Exception e) {
+      LOG.warnAndDebugDetails("Failed to load usage statistics settings from file \"" + file.getAbsolutePath() + "\"", e);
+    }
+    return null;
   }
 }
