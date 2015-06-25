@@ -23,9 +23,9 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import jetbrains.buildServer.log.Loggers;
+import jetbrains.buildServer.util.FileUtil;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
@@ -64,7 +64,7 @@ public class XmlUtil {
     synchronized (getOrCreateLock(file)) {
       if (!file.exists() || !file.canRead()) return null;
       try {
-        return new SAXBuilder().build(file).getRootElement();
+        return FileUtil.parseDocument(file);
       }
       catch (final Exception e) {
         Loggers.SERVER.warnAndDebugDetails("Failed to load file \"" + file.getAbsolutePath() + "\"", e);
