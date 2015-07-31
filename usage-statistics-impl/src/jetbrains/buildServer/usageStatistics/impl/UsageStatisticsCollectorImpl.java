@@ -183,9 +183,9 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
           provider.accept(publisher);
         }
       });
-      //Thread.sleep(getProviderSleepTime());
+      Thread.sleep(getProviderSleepTime());
     }
-    //catch (final InterruptedException ignore) {}
+    catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
       LOG.infoAndDebugDetails("Usage statistics provider " + provider.toString() + " failed", e);
     }
@@ -194,9 +194,9 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
   private void applyPresentationsWithProvider(@NotNull final UsageStatisticsPresentationProvider presentationProvider) {
     try {
       presentationProvider.accept(myPresentationManager);
-      //Thread.sleep(getProviderSleepTime());
+      Thread.sleep(getProviderSleepTime());
     }
-    //catch (final InterruptedException ignore) {}
+    catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
       LOG.infoAndDebugDetails("Usage statistics presentation provider " + presentationProvider.toString() + " failed", e);
     }
