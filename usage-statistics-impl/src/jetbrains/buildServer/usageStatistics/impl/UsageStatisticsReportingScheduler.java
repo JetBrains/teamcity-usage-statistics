@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl;
 
+import com.intellij.openapi.diagnostic.Logger;
 import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -25,11 +26,10 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsReporter;
 import jetbrains.buildServer.util.Dates;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 public class UsageStatisticsReportingScheduler extends BuildServerAdapter implements Runnable {
-  @NotNull private static final Logger LOG = Logger.getLogger(UsageStatisticsReportingScheduler.class);
+  @NotNull private static final Logger LOG = Logger.getInstance(UsageStatisticsReportingScheduler.class.getName());
 
   @NotNull private static final String REPORTING_PERIOD = "teamcity.usageStatistics.reporting.period.minutes";
   private static final int DEFAULT_REPORTING_PERIOD = 24 * 60; // day
@@ -71,7 +71,7 @@ public class UsageStatisticsReportingScheduler extends BuildServerAdapter implem
       }
     }
     catch (final Throwable e) {
-      LOG.debug("Cannot report usage statistics: ", e);
+      LOG.infoAndDebugDetails("Error collecting/reporting usage statistics: ", e);
     }
   }
 

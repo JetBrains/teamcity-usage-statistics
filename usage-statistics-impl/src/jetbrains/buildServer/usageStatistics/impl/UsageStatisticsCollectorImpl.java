@@ -16,11 +16,13 @@
 
 package jetbrains.buildServer.usageStatistics.impl;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import jetbrains.buildServer.ExtensionHolder;
 import jetbrains.buildServer.serverSide.BuildServerAdapter;
 import jetbrains.buildServer.serverSide.SBuildServer;
@@ -32,12 +34,12 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresent
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationProvider;
 import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.util.NamedDaemonThreadFactory;
-import org.apache.log4j.Logger;
+import jetbrains.buildServer.util.NamedThreadFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements UsageStatisticsCollector, Runnable {
-  @NotNull private static final Logger LOG = Logger.getLogger(UsageStatisticsCollectorImpl.class);
+  @NotNull private static final Logger LOG = Logger.getInstance(UsageStatisticsCollectorImpl.class.getName());
 
   @NotNull private static final String PROVIDER_SLEEP_TIME = "teamcity.usageStatistics.provider.sleep.time.milliseconds";
   private static final int DEFAULT_PROVIDER_SLEEP_TIME = 1000; // 1 second
@@ -138,6 +140,8 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
         myIsCollectingNow = true;
         myCollectingWasForced = false;
       }
+      LOG.info("Starting usage statistics collection...");
+      final long processStart = System.nanoTime();
 
       final List<Pair<String, Object>> newStatistics = new ArrayList<Pair<String, Object>>();
       collectStatistics(newStatistics);
@@ -148,7 +152,8 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
         myIsCollectingNow = false;
         myLock.notifyAll();
       }
-
+      final long processFinish = System.nanoTime();
+      LOG.info("Finish usage statistics collection, collected in " + TimeUnit.MILLISECONDS.convert(processFinish - processStart, TimeUnit.NANOSECONDS) + " ms");
       waitForEvent();
     }
   }
@@ -173,12 +178,16 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
 
   private void collectStatisticsWithProvider(@NotNull final UsageStatisticsProvider provider, @NotNull final UsageStatisticsPublisher publisher) {
     try {
-      provider.accept(publisher);
+      NamedThreadFactory.executeWithNewThreadName("Collecting usage statistics with provider " + provider.toString(), new Runnable() {
+        public void run() {
+          provider.accept(publisher);
+        }
+      });
       //Thread.sleep(getProviderSleepTime());
     }
     //catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
-      LOG.debug("Usage statistics provider failed", e);
+      LOG.infoAndDebugDetails("Usage statistics provider " + provider.toString() + " failed", e);
     }
   }
 
@@ -189,7 +198,7 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
     }
     //catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
-      LOG.debug("Usage statistics presentation provider failed", e);
+      LOG.infoAndDebugDetails("Usage statistics presentation provider " + presentationProvider.toString() + " failed", e);
     }
   }
 
