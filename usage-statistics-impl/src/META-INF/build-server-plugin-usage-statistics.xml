@@ -145,9 +145,13 @@
     <property name="groupName" value="Clouds"/>
   </bean>
 
+  <bean id="versionedSettingsUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.VersionedSettingsUsageStatisticsProvider">
+    <property name="idFormat" value="jb.versionedSettings[%s]"/>
+    <property name="groupName" value="Projects with Versioned Settings"/>
+  </bean>
+
   <!-- Helpers -->
 
   <bean id="getRequestDetector" class="jetbrains.buildServer.usageStatistics.impl.GetRequestDetector"/>
 
 </beans>
-
