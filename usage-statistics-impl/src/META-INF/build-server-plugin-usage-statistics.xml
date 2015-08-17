@@ -150,6 +150,11 @@
     <property name="groupName" value="Projects with Versioned Settings"/>
   </bean>
 
+  <bean id="versionedSettingsBuildsUsagesStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.VersionedSettingsBuildsUsagesStatisticsProvider">
+    <property name="idFormat" value="jb.%s.%s"/>
+    <property name="groupName" value="Builds with settings from VCS"/>
+  </bean>
+
   <!-- Helpers -->
 
   <bean id="getRequestDetector" class="jetbrains.buildServer.usageStatistics.impl.GetRequestDetector"/>
