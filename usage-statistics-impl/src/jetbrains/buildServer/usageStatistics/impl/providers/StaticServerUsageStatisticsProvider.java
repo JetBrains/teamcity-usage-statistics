@@ -18,10 +18,12 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.util.List;
 import jetbrains.buildServer.groups.UserGroupManager;
+import jetbrains.buildServer.serverSide.BuildAgentEx;
 import jetbrains.buildServer.serverSide.BuildAgentManagerEx;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
+import jetbrains.buildServer.serverSide.impl.agent.PollingRemoteAgentConnection;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
@@ -65,15 +67,26 @@ public class StaticServerUsageStatisticsProvider extends BaseDefaultUsageStatist
   private void publishNumberOfAgents(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String allRegisteredAgentNumberId = makeId("allRegisteredAgentNumber");
     final String authorizedRegisteredAgentNumberId = makeId("authorizedRegisteredAgentNumber");
+    final String unidirectionalRegisteredAgentsNumberId = makeId("unidirectionalRegisteredAgentNumber");
 
     final BuildAgentManagerEx buildAgentManager = myServer.getBuildAgentManager();
-    final int allRegisteredAgentsNumber = buildAgentManager.getRegisteredAgents(true).size();
+    List<BuildAgentEx> registeredAgents = buildAgentManager.getRegisteredAgents(true);
+
+    int authorizedAgents = 0, pollingAgents = 0;
+    for (BuildAgentEx registeredAgent : registeredAgents) {
+      if (registeredAgent.isAuthorized()) authorizedAgents++;
+      if (registeredAgent.getCommunicationProtocolType().equals(PollingRemoteAgentConnection.TYPE)) pollingAgents++;
+    }
+    final int allRegisteredAgentsNumber = registeredAgents.size();
 
     presentationManager.applyPresentation(allRegisteredAgentNumberId, "Connected agents (all)", myGroupName, null, null);
     publisher.publishStatistic(allRegisteredAgentNumberId, allRegisteredAgentsNumber);
 
-    presentationManager.applyPresentation(authorizedRegisteredAgentNumberId, "Connected agents (authorized only)", myGroupName, new PercentageFormatter(allRegisteredAgentsNumber), "Agent count (% of all connected agents)");
-    publisher.publishStatistic(authorizedRegisteredAgentNumberId, buildAgentManager.getRegisteredAgents(false).size());
+    presentationManager.applyPresentation(authorizedRegisteredAgentNumberId, "Connected agents (authorized only)", myGroupName, new PercentageFormatter(allRegisteredAgentsNumber), "Authorized agents count (% of all connected agents)");
+    publisher.publishStatistic(authorizedRegisteredAgentNumberId, authorizedAgents);
+
+    presentationManager.applyPresentation(unidirectionalRegisteredAgentsNumberId, "Connected agents (unidirectional connection)", myGroupName, new PercentageFormatter(allRegisteredAgentsNumber), "Unidirectional agents count (% of all connected agents)");
+    publisher.publishStatistic(unidirectionalRegisteredAgentsNumberId, pollingAgents);
   }
 
   private void publishNumberOfAgentPools(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
