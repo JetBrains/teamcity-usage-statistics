@@ -13,6 +13,6 @@
     <orderEntry type="module" module-name="server-test-core" />
     <orderEntry type="module" module-name="remote-api-impl" />
     <orderEntry type="module" module-name="cloud-server" />
+    <orderEntry type="library" name="ServletApi" level="project" />
   </component>
 </module>
-

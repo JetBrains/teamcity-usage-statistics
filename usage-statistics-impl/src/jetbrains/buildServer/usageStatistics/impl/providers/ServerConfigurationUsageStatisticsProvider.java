@@ -30,6 +30,7 @@ import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.impl.ServerDistributionTypeProvider;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
@@ -51,17 +52,20 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   @NotNull private final LicensingPolicy myLicensingPolicy;
   @NotNull private final ServerSettings myServerSettings;
   @NotNull private final StartupContext myStartupContext;
+  @NotNull private final ServerDistributionTypeProvider myDistributionTypeProvider;
 
   public ServerConfigurationUsageStatisticsProvider(@NotNull final TeamCityDatabaseManager dbManager,
                                                     @NotNull final LoginConfiguration loginConfiguration,
                                                     @NotNull final SBuildServer buildServer,
                                                     @NotNull final ServerSettings serverSettings,
-                                                    @NotNull final StartupContext startupContext) {
+                                                    @NotNull final StartupContext startupContext,
+                                                    @NotNull final ServerDistributionTypeProvider distributionTypeProvider) {
     myDBManager = dbManager;
     myLoginConfiguration = loginConfiguration;
     myLicensingPolicy = buildServer.getLicensingPolicy();
     myServerSettings = serverSettings;
     myStartupContext = startupContext;
+    myDistributionTypeProvider = distributionTypeProvider;
   }
 
   @NotNull
@@ -82,6 +86,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     publishAgentLicenses(publisher, presentationManager);
     publishTCVersion(publisher, presentationManager);
     publishServerStartData(publisher, presentationManager);
+    publishServerDistributionType(publisher, presentationManager);
   }
 
   private void publishServerId(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
@@ -208,5 +213,11 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     final String versionId = makeId("currentUptime");
     presentationManager.applyPresentation(versionId, "Current uptime", myGroupName, new TimeFormatter(), null);
     publisher.publishStatistic(versionId, Dates.now().getTime() - myStartupContext.getServerStartupTimestamp().getTime());
+  }
+
+  private void publishServerDistributionType(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final String id = makeId("distributionType");
+    presentationManager.applyPresentation(id, "Distribution type", myGroupName, null, null);
+    publisher.publishStatistic(id, myDistributionTypeProvider.getDistributionType());
   }
 }

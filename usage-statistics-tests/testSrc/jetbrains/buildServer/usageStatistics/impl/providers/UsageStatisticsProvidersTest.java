@@ -24,8 +24,10 @@ import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.usageStatistics.impl.ServerDistributionTypeProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.mock.web.MockServletContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -51,7 +53,8 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   @NotNull
   private ServerConfigurationUsageStatisticsProvider getServerConfigurationUsageStatisticsProvider() {
     return new ServerConfigurationUsageStatisticsProvider(TestDB.getDbManager(), myFixture.getLoginConfiguration(),
-                                                          myFixture.getServer(), myFixture.getServerSettings(), myFixture.getStartupContext());
+                                                          myFixture.getServer(), myFixture.getServerSettings(), myFixture.getStartupContext(),
+                                                          new ServerDistributionTypeProvider(new MockServletContext()));
   }
 
   @NotNull
