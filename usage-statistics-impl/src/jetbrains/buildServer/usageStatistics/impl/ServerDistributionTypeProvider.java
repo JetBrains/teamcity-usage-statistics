@@ -39,7 +39,7 @@ public class ServerDistributionTypeProvider {
   }
 
   @NotNull
-  public String getDistributionType() {
+  public synchronized String getDistributionType() {
     if (myDistributionType != null) return myDistributionType;
     myDistributionType = doGetDistributionType();
     return myDistributionType;
