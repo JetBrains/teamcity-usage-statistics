@@ -42,6 +42,7 @@ public class ServerDistributionTypeProvider {
   public synchronized String getDistributionType() {
     if (myDistributionType != null) return myDistributionType;
     myDistributionType = doGetDistributionType();
+    LOG.info("Detected TeamCity distribution type: " + myDistributionType);
     return myDistributionType;
   }
 
@@ -50,12 +51,10 @@ public class ServerDistributionTypeProvider {
     try {
       final String path = myContext.getRealPath(FILE_PATH);
       if (path == null) {
-        LOG.warn("Cannot determine TeamCity Distribution Type: cannot access web application filesystem");
         return UNKNOWN;
       }
       final File file = new File(path);
       if (!file.exists() || !file.isFile()) {
-        LOG.warn("Cannot determine TeamCity Distribution Type: corresponding file not found");
         return UNKNOWN;
       }
       final String text = FileUtil.readText(file, "UTF-8");
@@ -63,7 +62,7 @@ public class ServerDistributionTypeProvider {
         return text;
       }
     } catch (IOException e) {
-      LOG.warnAndDebugDetails("Cannot determine TeamCity Distribution Type", e);
+      LOG.warnAndDebugDetails("Exception during TeamCity distribution type detection", e);
       return UNKNOWN;
     }
     return UNKNOWN;
