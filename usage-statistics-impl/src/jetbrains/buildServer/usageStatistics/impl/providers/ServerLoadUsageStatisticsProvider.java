@@ -54,15 +54,10 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
 
   @NotNull private static final GenericQuery<Void> ourBuildTestCountQuery = new GenericQuery<Void>(
     "select" +
-    "  max(t.test_count) as max_test_count " +
-    "from (" +
-    "  select h.build_id, " +
-    "         count(t.build_id) as test_count " +
-    "  from history h " +
-    "  left join test_info t on t.build_id = h.build_id " +
-    "  where h.build_finish_time_server > ? " +
-    "  group by h.build_id " +
-    ") t"
+    "  max(s.test_count) as max_test_count " +
+    "  from stats s " +
+    "  inner join history h on s.build_id = h.build_id " +
+    "  where h.build_finish_time_server > ? "
   );
 
   @NotNull private static final GenericQuery<Void> ourVcsChangesCountQuery = new GenericQuery<Void>(
