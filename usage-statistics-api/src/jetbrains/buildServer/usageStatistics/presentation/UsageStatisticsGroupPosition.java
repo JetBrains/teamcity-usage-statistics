@@ -45,7 +45,8 @@ public enum UsageStatisticsGroupPosition implements PositionAware {
   IDE_FEATURES(after(INVESTIGATION_MUTE)),
   COVERAGE_ENGINES(after(IDE_FEATURES)),
   AGENT_JAVA_VERSIONS(after(IDE_FEATURES, COVERAGE_ENGINES)),
-  WEB_PAGES_USAGE(after(IDE_FEATURES, COVERAGE_ENGINES, AGENT_JAVA_VERSIONS)),
+  AGENT_PLATFORMS(after(AGENT_JAVA_VERSIONS)),
+  WEB_PAGES_USAGE(after(IDE_FEATURES, COVERAGE_ENGINES, AGENT_PLATFORMS)),
   DEFAULT(PositionConstraint.last());
 
   @NotNull private final PositionConstraint myConstraint;

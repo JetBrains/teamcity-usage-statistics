@@ -60,6 +60,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   @NotNull
   private StaticServerUsageStatisticsProvider getStaticServerUsageProvider() {
     myProviders.add(new AgentsJavaUsageStatisticsProvider(myServer));
+    myProviders.add(new AgentsPlatformUsageStatisticsProvider(myServer));
     myProviders.add(new ServerLoadUsageStatisticsProvider(myServer, new WebUsersProvider() {
       @NotNull
       public Set<String> getWebUsers(final long fromTimestamp) {

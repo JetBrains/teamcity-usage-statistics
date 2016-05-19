@@ -140,6 +140,11 @@
     <property name="groupName" value="Agent Java Versions"/>
   </bean>
 
+  <bean id="agentsPlatformUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.AgentsPlatformUsageStatisticsProvider">
+    <property name="idFormat" value="jb.agent.platform[%s]"/>
+    <property name="groupName" value="Agent Platforms"/>
+  </bean>
+
   <bean id="cloudUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.CloudUsageStatisticsProvider">
     <property name="idFormat" value="jb.cloud.%s.%s"/>
     <property name="groupName" value="Clouds"/>
