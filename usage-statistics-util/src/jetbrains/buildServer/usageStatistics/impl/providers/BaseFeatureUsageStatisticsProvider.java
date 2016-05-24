@@ -26,6 +26,7 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresent
 import jetbrains.buildServer.usageStatistics.util.BaseUsageStatisticsStatePersister;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.Dates;
+import org.jdom.Content;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -113,11 +114,11 @@ public abstract class BaseFeatureUsageStatisticsProvider extends BaseDynamicUsag
     for (final Map.Entry<String, List<Long>> entry : myFeatureUsages.entrySet()) {
       final Element featureElement = new Element(FEATURE);
       featureElement.setAttribute(NAME, entry.getKey());
-      element.addContent(featureElement);
+      element.addContent((Content) featureElement);
       for (final long timestamp : entry.getValue()) {
         final Element usageElement = new Element(USAGE);
         usageElement.setAttribute(TIMESTAMP, String.valueOf(timestamp));
-        featureElement.addContent(usageElement);
+        featureElement.addContent((Content) usageElement);
       }
     }
   }

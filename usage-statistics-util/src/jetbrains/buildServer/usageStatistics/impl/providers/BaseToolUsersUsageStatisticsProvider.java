@@ -27,6 +27,7 @@ import jetbrains.buildServer.usageStatistics.util.BaseUsageStatisticsStatePersis
 import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.util.filters.Filter;
 import jetbrains.buildServer.util.filters.FilterUtil;
+import org.jdom.Content;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -175,13 +176,13 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
     for (final Map.Entry<ICString, Set<ToolUsage>> entry : myToolUsages.entrySet()) {
       final Element toolElement = new Element(getToolName());
       toolElement.setAttribute(getToolIdName(), entry.getKey().getSource());
-      element.addContent(toolElement);
+      element.addContent((Content) toolElement);
       for (final ToolUsage usage : entry.getValue()) {
         if (!filter.accept(usage)) continue;
         final Element usageElement = new Element(USAGE);
         usageElement.setAttribute(USER_ID, usage.getUserId());
         usageElement.setAttribute(TIMESTAMP, String.valueOf(usage.getTimestamp()));
-        toolElement.addContent(usageElement);
+        toolElement.addContent((Content) usageElement);
       }
     }
   }
