@@ -48,7 +48,7 @@ public class VersionedSettingsBuildsUsagesStatisticsProvider extends BaseDynamic
     "from build_state bs " +
     "inner join build_attrs attr on attr.build_state_id = bs.id " +
     "where attr.attr_name = '" + BuildAttributes.HAS_FROZEN_SETTINGS + "' " +
-    "and attr.attr_value = 'true' " +
+    "and (attr.attr_value = 'true' or attr.attr_value = 'vcs') " +
     "and queued_time > ? " +
     "group by bs.build_type_id",
     new GenericQuery.ResultSetProcessor<Map<String, Integer>>() {
