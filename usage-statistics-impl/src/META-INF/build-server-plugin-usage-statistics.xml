@@ -155,6 +155,11 @@
     <property name="groupName" value="Projects with Versioned Settings"/>
   </bean>
 
+  <bean id="versionedSettingsFormatUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.VersionedSettingsFormatUsageStatisticsProvider">
+    <property name="idFormat" value="jb.versionedSettingsFormat[%s]"/>
+    <property name="groupName" value="Versioned Settings Format"/>
+  </bean>
+
   <bean id="versionedSettingsBuildsUsagesStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.VersionedSettingsBuildsUsagesStatisticsProvider">
     <property name="idFormat" value="jb.%s.%s"/>
     <property name="groupName" value="Builds with settings from VCS"/>
