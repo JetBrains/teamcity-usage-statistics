@@ -58,7 +58,7 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
                                  @NotNull final Vector params,
                                  @Nullable final XmlRpcSession session) {
     if (targetClass == XmlRpcBasedRemoteServer.class && session != null) {
-      final Long userId = session.getUserId();
+      final Long userId = session.getAttribute(XmlRpcSession.USER_ID_ATTR, Long.class);
       if (userId != null && !myUserModel.isSpecialUserId(userId)) {
         addUsage(prepareUserAgent(session.getUserAgent()), userId);
       }

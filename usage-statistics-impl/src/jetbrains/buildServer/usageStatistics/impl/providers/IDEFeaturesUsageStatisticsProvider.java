@@ -89,7 +89,7 @@ public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatis
                                  @NotNull final Vector params,
                                  @Nullable final XmlRpcSession session) {
     if (targetClass == XmlRpcBasedRemoteServer.class && session != null) {
-      final Long userId = session.getUserId();
+      final Long userId = session.getAttribute(XmlRpcSession.USER_ID_ATTR, Long.class);
       if (userId != null) {
         if (methodName.endsWith(".findTests")) {
           addUsage(TEST_STATUS_WITH_SUCCESSFUL.getSource(), userId);
