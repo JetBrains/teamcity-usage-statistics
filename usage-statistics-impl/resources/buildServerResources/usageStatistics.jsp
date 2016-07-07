@@ -50,7 +50,7 @@
         ></c:choose>
       <c:if test="${statisticsData.statisticsCollected}">
         <div class="downloadLink">
-          <a class="downloadLink" href="<c:url value="/admin/downloadUsageStatistics.html"/>">Download (~${statisticsData.sizeEstimate})</a>
+          <a class="downloadLink tc-icon_before icon16 tc-icon_download" href="<c:url value="/admin/downloadUsageStatistics.html"/>">Download (~${statisticsData.sizeEstimate})</a>
         </div>
       </c:if>
       <script type="text/javascript">
