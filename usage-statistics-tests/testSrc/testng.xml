@@ -19,6 +19,7 @@
   <test name="Usage Statistics Test">
     <classes>
       <class name="jetbrains.buildServer.usageStatistics.impl.providers.UsageStatisticsProvidersTest"/>
+      <class name="jetbrains.buildServer.usageStatistics.impl.providers.IDEUsageStatisticsProviderTest"/>
     </classes>
   </test>
 </suite>
