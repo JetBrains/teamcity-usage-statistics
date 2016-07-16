@@ -30,7 +30,6 @@ import jetbrains.buildServer.serverSide.impl.XmlRpcListener;
 import jetbrains.buildServer.serverSide.impl.XmlRpcSession;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.UserModelEx;
-import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -110,36 +109,7 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
   }
 
   static String doPrepareUserAgent(@NotNull final String userAgent) {
-    int endPos = -1;
-    // Let's include first 'version' number (digit or dot)
-    int numberStart = StringUtil.findFirst(userAgent, ch -> Character.isDigit(ch));
-    if (numberStart != -1) {
-      int i = numberStart;
-      int lastDigit = numberStart;
-      while (i < userAgent.length()) {
-        char c = userAgent.charAt(i);
-        if (Character.isDigit(c)) {
-          i++;
-          lastDigit = i;
-        } else if (c == '.') {
-          i++;
-        } else {
-          break;
-        }
-      }
-      endPos = lastDigit;
-    }
-
-    // Fallback to previous logic if there's no number
-    if (endPos == -1) {
-      endPos = userAgent.indexOf('/');
-      if (endPos == -1) {
-        endPos = userAgent.indexOf('(');
-      } else {
-        endPos = userAgent.indexOf('.', endPos + 1);
-      }
-    }
-
+    int endPos = userAgent.indexOf('(');
     String preparedUserAgent = userAgent.replace('/', ' ');
     if (endPos != -1) {
       preparedUserAgent = preparedUserAgent.substring(0, endPos);
