@@ -17,11 +17,12 @@
 package jetbrains.buildServer.usageStatistics.impl;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.util.text.CharFilter;
 import java.io.File;
 import java.io.IOException;
 import javax.servlet.ServletContext;
 import jetbrains.buildServer.util.FileUtil;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -57,7 +58,7 @@ public class ServerDistributionTypeProvider {
       if (!file.exists() || !file.isFile()) {
         return UNKNOWN;
       }
-      final String text = FileUtil.readText(file, "UTF-8");
+      final String text = StringUtil.stripLeftAndRight(FileUtil.readText(file, "UTF-8"), CharFilter.WHITESPACE_FILTER);
       if (!StringUtil.isEmptyOrSpaces(text)) {
         return text;
       }
