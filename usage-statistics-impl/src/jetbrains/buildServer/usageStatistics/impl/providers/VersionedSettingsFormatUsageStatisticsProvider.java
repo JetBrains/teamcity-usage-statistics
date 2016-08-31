@@ -19,7 +19,6 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.impl.versionedSettings.VersionedSettingsConfig;
-import jetbrains.buildServer.serverSide.impl.versionedSettings.VersionedSettingsOptions;
 import jetbrains.buildServer.serverSide.versionedSettings.VersionedSettingsManager;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.util.positioning.PositionAware;
@@ -41,10 +40,8 @@ public class VersionedSettingsFormatUsageStatisticsProvider extends BaseExtensio
   protected void collectUsages(@NotNull final UsagesCollectorCallback callback) {
     for (SProject p : myProjectManager.getProjects()) {
       VersionedSettingsConfig rawConfig = myVersionedSettingsManager.readConfig(p);
-      if (!Boolean.FALSE.equals(rawConfig.getEnabled()) && !rawConfig.isSameSettingsAsParent()) {
+      if (rawConfig.isEnabled() && !rawConfig.isSameSettingsAsParent()) {
         String format = rawConfig.getGenerator();
-        if (format == null)
-          format = VersionedSettingsOptions.XML_GENERATOR;
         callback.addUsage(format, format);
       }
     }
