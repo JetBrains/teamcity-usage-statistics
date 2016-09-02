@@ -41,7 +41,7 @@ public class VersionedSettingsFormatUsageStatisticsProvider extends BaseExtensio
     for (SProject p : myProjectManager.getProjects()) {
       VersionedSettingsConfig rawConfig = myVersionedSettingsManager.readConfig(p);
       if (rawConfig.isEnabled() && !rawConfig.isSameSettingsAsParent()) {
-        String format = rawConfig.getGenerator();
+        String format = rawConfig.getFormat();
         callback.addUsage(format, format);
       }
     }
