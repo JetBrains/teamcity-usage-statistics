@@ -50,8 +50,10 @@ public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProv
 
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    if (!myCloudManager.isIntegrationEnabled())
-      return;
+    //TODO handle if necessary
+    //if (!myCloudManager.isIntegrationEnabled())
+    //  return;
+
     final Collection<? extends CloudType> cloudTypes = myCloudManager.getCloudTypes();
     final Map<String,String> cloudTypeCodeNames = new HashMap<String, String>();
     for (CloudType cloudType : cloudTypes) {
@@ -68,8 +70,8 @@ public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProv
     final Map<String, AtomicInteger> imagesByType = new HashMap<String, AtomicInteger>();
     final Map<String, AtomicInteger> profileCountByType = new HashMap<String, AtomicInteger>();
 
-    for (CloudProfile profile : myCloudManager.listProfiles()) {
-      final CloudClient cli = myCloudManager.getClient(profile.getProfileId());
+    for (CloudProfile profile : myCloudManager.listAllProfiles()) {
+      final CloudClient cli = myCloudManager.getClient(profile.getProjectExtId(), profile.getProfileId());
       final String cloudName = profile.getCloudCode();
       if (imagesByType.get(cloudName) == null){
         imagesByType.put(cloudName, new AtomicInteger(0));
