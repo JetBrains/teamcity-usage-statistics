@@ -37,13 +37,13 @@ public class ServerDistributionTypeProvider {
 
   public ServerDistributionTypeProvider(@NotNull final ServletContext context) {
     myContext = context;
+    LOG.info("TeamCity distribution type: " + getDistributionType());
   }
 
   @NotNull
   public synchronized String getDistributionType() {
     if (myDistributionType != null) return myDistributionType;
     myDistributionType = doGetDistributionType();
-    LOG.info("Detected TeamCity distribution type: " + myDistributionType);
     return myDistributionType;
   }
 
