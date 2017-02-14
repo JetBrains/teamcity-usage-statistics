@@ -82,7 +82,7 @@ public class DownloadUsageStatisticsController extends BaseController {
     }
     catch (final Exception e) {
       LOG.error("Failed to download usage statistics", e);
-      response.sendError(500, "Failed to download usage statistics");
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to download usage statistics");
     }
     finally {
       if (out != null) {
