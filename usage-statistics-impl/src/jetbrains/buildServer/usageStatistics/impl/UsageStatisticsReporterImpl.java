@@ -17,20 +17,21 @@
 package jetbrains.buildServer.usageStatistics.impl;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsReporter;
 import jetbrains.buildServer.util.Dates;
+import jetbrains.buildServer.util.HTTPRequestHelper;
+import jetbrains.buildServer.util.XmlUtil;
 import jetbrains.buildServer.web.util.WebUtil;
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,6 +40,8 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
 
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
   @NotNull private final UsageStatisticsCommonDataPersistor myCommonDataPersistor;
+  @NotNull private final HTTPRequestHelper myHTTPRequestHelper = new HTTPRequestHelper(
+    TeamCityProperties.getInteger("teamcity.usageStatistics.timeout", (int)TimeUnit.MINUTES.toSeconds(5)));
 
   public UsageStatisticsReporterImpl(@NotNull final UsageStatisticsCollector statisticsCollector,
                                      @NotNull final UsageStatisticsCommonDataPersistor commonDataPersistor) {
@@ -58,40 +61,58 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   }
 
   private boolean doReportStatistics(@NotNull final String data) {
-    final String serverUrl = TeamCityProperties.getProperty("teamcity.usageStatistics.server.url", "http://teamcity-stats.jetbrains.net/report.html");
     try {
-      final URLConnection urlConnection = new URL(serverUrl).openConnection();
-      if (!(urlConnection instanceof HttpURLConnection)) {
-        LOG.debug("Invalid protocol: " + serverUrl);
+      final String result =
+        myHTTPRequestHelper.request(TeamCityProperties.getProperty("teamcity.usageStatistics.server.url", "https://teamcity-stats.services.jetbrains.com/report.html"))
+                           .allowNonSecureConnection(true)
+                           .withDomainCheck(TeamCityProperties.getBooleanOrTrue("teamcity.usageStatistics.server.checkDomain"))
+                           .withMethod("POST")
+                           .withUrlEncodedData(data.getBytes("UTF-8"))
+                           .onError((state, text) -> {
+                             if (state == 404) {
+                               LOG.info("Cannot send usage statistics: server unavailable");
+                             } else {
+                               if (text != null) {
+                                 LOG.info("Cannot send usage statistics: " + text);
+                               } else {
+                                 LOG.info("Cannot send usage statistics: return code " + state);
+                               }
+                             }
+                           })
+                           .onException(ex -> {
+                             if (LOG.isDebugEnabled()) {
+                               LOG.debug("Cannot send usage statistics", ex);
+                             } else {
+                               LOG.warn("Cannot send usage statistics: " + ex.getMessage());
+                             }
+                           })
+                           .doRequest();
+
+      if (result == null) return false;
+
+      if (result.isEmpty()) return true; // legacy
+
+      final Element element = XmlUtil.from_s(result);
+      if (element.getChild("ok") != null) {
+        return true;
+      }
+      final Element ignored = element.getChild("ignored");
+      if (ignored != null) {
+        LOG.info("Usage statistics server has filtered the request: " + ignored.getText());
+        return true;
+      }
+      final Element error = element.getChild("error");
+      if (error != null) {
+        LOG.info("Statistics server failed to process usage data: " + error.getText());
         return false;
       }
 
-      final HttpURLConnection connection = (HttpURLConnection) urlConnection;
-      connection.setRequestMethod("POST");
-
-      final byte[] bytes = data.getBytes("UTF-8");
-
-      connection.setDoOutput(true);
-      connection.setRequestProperty("Content-Length", String.valueOf(bytes.length));
-      final OutputStream outputStream = connection.getOutputStream();
-      outputStream.write(bytes);
-      outputStream.flush();          
-
-      connection.connect();
-
-      final int responseCode = connection.getResponseCode();
-
-      LOG.debug("Usage statistics report sent. Server response: " + responseCode + " " + connection.getResponseMessage());
-      logErrorAndClose(connection.getErrorStream());
-
-      return responseCode == HttpURLConnection.HTTP_OK;
+      return true;
+    } catch (UnsupportedEncodingException ignore) {
+    } catch (URISyntaxException e) {
+      LOG.info("Cannot send usage statistics: " + e.getMessage());
     }
-    catch (final MalformedURLException e) {
-      LOG.debug("Invalid usage statistics server URL: " + serverUrl, e);
-    }
-    catch (final IOException e) {
-      LOG.debug("Failed to connect to usage statistics server: " + serverUrl, e);
-    }
+
     return false;
   }
 
