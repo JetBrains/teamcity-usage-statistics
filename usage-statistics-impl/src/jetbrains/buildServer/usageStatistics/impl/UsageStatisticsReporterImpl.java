@@ -16,18 +16,17 @@
 
 package jetbrains.buildServer.usageStatistics.impl;
 
-import java.io.*;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsReporter;
 import jetbrains.buildServer.util.Dates;
-import jetbrains.buildServer.util.HTTPRequestHelper;
+import jetbrains.buildServer.util.HTTPRequestBuilder;
 import jetbrains.buildServer.util.XmlUtil;
 import jetbrains.buildServer.web.util.WebUtil;
 import org.apache.log4j.Logger;
@@ -40,13 +39,14 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
 
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
   @NotNull private final UsageStatisticsCommonDataPersistor myCommonDataPersistor;
-  @NotNull private final HTTPRequestHelper myHTTPRequestHelper = new HTTPRequestHelper(
-    TeamCityProperties.getInteger("teamcity.usageStatistics.timeout", (int)TimeUnit.MINUTES.toSeconds(5)));
+  @NotNull private final HTTPRequestBuilder.RequestHandler myRequestHandler;
 
   public UsageStatisticsReporterImpl(@NotNull final UsageStatisticsCollector statisticsCollector,
-                                     @NotNull final UsageStatisticsCommonDataPersistor commonDataPersistor) {
+                                     @NotNull final UsageStatisticsCommonDataPersistor commonDataPersistor,
+                                     @NotNull final HTTPRequestBuilder.RequestHandler requestHandler) {
     myStatisticsCollector = statisticsCollector;
     myCommonDataPersistor = commonDataPersistor;
+    myRequestHandler = requestHandler;
   }
 
   public boolean reportStatistics(final long statisticsExpirationPeriod) {
@@ -62,31 +62,32 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
 
   private boolean doReportStatistics(@NotNull final String data) {
     try {
-      final String result =
-        myHTTPRequestHelper.request(TeamCityProperties.getProperty("teamcity.usageStatistics.server.url", "https://teamcity-stats.services.jetbrains.com/report.html"))
-                           .allowNonSecureConnection(true)
-                           .withDomainCheck(TeamCityProperties.getBooleanOrTrue("teamcity.usageStatistics.server.checkDomain"))
-                           .withMethod("POST")
-                           .withUrlEncodedData(data.getBytes("UTF-8"))
-                           .onError((state, text) -> {
-                             if (state == 404) {
-                               LOG.info("Cannot send usage statistics: server unavailable");
-                             } else {
-                               if (text != null) {
-                                 LOG.info("Cannot send usage statistics: " + text);
-                               } else {
-                                 LOG.info("Cannot send usage statistics: return code " + state);
-                               }
-                             }
-                           })
-                           .onException(ex -> {
-                             if (LOG.isDebugEnabled()) {
-                               LOG.debug("Cannot send usage statistics", ex);
-                             } else {
-                               LOG.warn("Cannot send usage statistics: " + ex.getMessage());
-                             }
-                           })
-                           .doRequest();
+      final HTTPRequestBuilder.Request post =
+        new HTTPRequestBuilder(TeamCityProperties.getProperty("teamcity.usageStatistics.server.url", "https://teamcity-stats.services.jetbrains.com/report.html"))
+          .allowNonSecureConnection(true)
+          .withDomainCheck(TeamCityProperties.getBooleanOrTrue("teamcity.usageStatistics.server.checkDomain"))
+          .withMethod("POST")
+          .withUrlEncodedData(data.getBytes("UTF-8"))
+          .onErrorResponse((state, text) -> {
+            if (state == 404) {
+              LOG.info("Cannot send usage statistics: server unavailable");
+            } else {
+              if (text != null) {
+                LOG.info("Cannot send usage statistics: " + text);
+              } else {
+                LOG.info("Cannot send usage statistics: return code " + state);
+              }
+            }
+          })
+          .onException(ex -> {
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Cannot send usage statistics", ex);
+            } else {
+              LOG.warn("Cannot send usage statistics: " + ex.getMessage());
+            }
+          })
+          .build();
+      final String result = myRequestHandler.doRequest(post);
 
       if (result == null) return false;
 
@@ -114,29 +115,6 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
     }
 
     return false;
-  }
-
-  private void logErrorAndClose(@Nullable final InputStream errorStream) {
-    if (errorStream == null) return;
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
-    try {
-      final StringBuilder sb = new StringBuilder("Usage statistics server error response:\n");
-      String line;
-      while ((line = reader.readLine()) != null) {
-        sb.append(line).append("\n");
-      }
-      LOG.debug(sb.toString());
-    }
-    catch (final IOException e) {
-      LOG.debug("Failed to read error stream", e);
-    }
-    finally {
-      try {
-        reader.close();
-      } catch (final IOException e) {
-        LOG.debug("Failed to close error stream", e);
-      }
-    }
   }
 
   @NotNull
