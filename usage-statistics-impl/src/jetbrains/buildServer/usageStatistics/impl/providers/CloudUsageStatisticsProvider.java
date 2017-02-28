@@ -71,7 +71,7 @@ public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProv
     final Map<String, AtomicInteger> profileCountByType = new HashMap<String, AtomicInteger>();
 
     for (CloudProfile profile : myCloudManager.listAllProfiles()) {
-      final CloudClient cli = myCloudManager.getClient(profile.getProjectExtId(), profile.getProfileId());
+      final CloudClient cli = myCloudManager.getClient(profile.getProjectId(), profile.getProfileId());
       final String cloudName = profile.getCloudCode();
       if (imagesByType.get(cloudName) == null){
         imagesByType.put(cloudName, new AtomicInteger(0));
