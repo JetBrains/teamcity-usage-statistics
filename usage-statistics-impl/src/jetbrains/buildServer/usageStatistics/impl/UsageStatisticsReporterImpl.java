@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl;
 
+import com.intellij.openapi.diagnostic.Logger;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.Date;
@@ -29,13 +30,12 @@ import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.util.HTTPRequestBuilder;
 import jetbrains.buildServer.util.XmlUtil;
 import jetbrains.buildServer.web.util.WebUtil;
-import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
-  @NotNull private static final Logger LOG = Logger.getLogger(UsageStatisticsReporterImpl.class);
+  @NotNull private static final Logger LOG = Logger.getInstance(UsageStatisticsReporterImpl.class.getName());
 
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
   @NotNull private final UsageStatisticsCommonDataPersistor myCommonDataPersistor;
@@ -80,11 +80,7 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
             }
           })
           .onException(ex -> {
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("Cannot send usage statistics", ex);
-            } else {
-              LOG.warn("Cannot send usage statistics: " + ex.getMessage());
-            }
+            LOG.warnAndDebugDetails("Cannot send usage statistics", ex);
           })
           .build();
       final String result = myRequestHandler.doRequest(post);
