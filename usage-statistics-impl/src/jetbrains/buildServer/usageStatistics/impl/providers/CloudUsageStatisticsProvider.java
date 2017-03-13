@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
-import jetbrains.buildServer.clouds.server.impl.CloudManagerBase;
+import jetbrains.buildServer.clouds.server.CloudManagerBase;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
