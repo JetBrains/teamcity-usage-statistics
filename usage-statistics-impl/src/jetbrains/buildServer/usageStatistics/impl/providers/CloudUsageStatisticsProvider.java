@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2016 JetBrains s.r.o.
+ * Copyright 2000-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,15 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import jetbrains.buildServer.clouds.*;
-import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
+import jetbrains.buildServer.clouds.CloudClient;
+import jetbrains.buildServer.clouds.CloudProfile;
+import jetbrains.buildServer.clouds.CloudType;
 import jetbrains.buildServer.clouds.server.CloudManagerBase;
+import jetbrains.buildServer.clouds.server.CloudStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;

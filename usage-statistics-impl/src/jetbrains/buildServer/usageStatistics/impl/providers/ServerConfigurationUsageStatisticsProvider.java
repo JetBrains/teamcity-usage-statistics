@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2016 JetBrains s.r.o.
+ * Copyright 2000-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ import jetbrains.buildServer.maintenance.StartupContext;
 import jetbrains.buildServer.serverSide.LicenseMode;
 import jetbrains.buildServer.serverSide.LicensingPolicy;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.serverSide.auth.AuthModule;
 import jetbrains.buildServer.serverSide.auth.AuthModuleType;
 import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
 import jetbrains.buildServer.serverSide.db.TeamCityDatabaseManager;
-import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.impl.ServerDistributionTypeProvider;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;

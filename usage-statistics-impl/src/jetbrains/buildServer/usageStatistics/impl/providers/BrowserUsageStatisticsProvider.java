@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2016 JetBrains s.r.o.
+ * Copyright 2000-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import eu.bitwalker.useragentutils.*;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import jetbrains.buildServer.serverSide.SBuildServer;
@@ -26,7 +27,6 @@ import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.users.UserModelEx;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.web.util.UserAgentUtil;
-import eu.bitwalker.useragentutils.*;
 import org.jetbrains.annotations.NotNull;
 
 public class BrowserUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements WebUsersProvider, GetRequestDetector.Listener {
