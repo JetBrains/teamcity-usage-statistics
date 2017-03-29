@@ -19,6 +19,10 @@
   padding-bottom: 10px; /* if you want to use margins here make sure you updated BS.UsageStatistics.sortGroups() JS method */
 }
 
+.statisticGroup .settingsBlockContent {
+  width: 100%;
+}
+
 .statisticGroupLeft {
   float: left;
   clear: left;
