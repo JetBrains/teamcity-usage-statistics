@@ -20,6 +20,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import java.io.File;
 import java.io.IOException;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.util.FilePersisterUtil;
 import jetbrains.buildServer.util.FileUtil;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -63,7 +64,7 @@ public class UsageStatisticsSettingsPersistor {
 
   private static void saveXml(@NotNull final Element element, @NotNull final File file) {
     try {
-      FileUtil.saveDocument(new Document(element), file);
+      FilePersisterUtil.saveDocument(new Document(element), file);
     } catch (final IOException e) {
       LOG.warnAndDebugDetails("Failed to save usage statistics settings into file \"" + file.getAbsolutePath() + "\"", e);
     }
