@@ -55,7 +55,7 @@ public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProv
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     //TODO handle if necessary
-    //if (!myCloudManager.isIntegrationEnabled())
+    //if (!myCloudManager.getIntegrationStatus())
     //  return;
 
     final Collection<? extends CloudType> cloudTypes = myCloudManager.getCloudTypes();
