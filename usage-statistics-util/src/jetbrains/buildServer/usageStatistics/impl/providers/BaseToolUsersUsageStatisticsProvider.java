@@ -290,11 +290,13 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
     public boolean equals(final Object o) {
       if (this == o) return true;
       if (!(o instanceof ICString)) return false;
+      //noinspection NonFinalFieldReferenceInEquals
       return mySource.equalsIgnoreCase(((ICString)o).mySource);
     }
 
     @Override
     public int hashCode() {
+      //noinspection NonFinalFieldReferencedInHashCode
       return mySource.toLowerCase().hashCode();
     }
   }
