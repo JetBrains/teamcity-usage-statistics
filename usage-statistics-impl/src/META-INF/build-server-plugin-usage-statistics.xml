@@ -168,6 +168,5 @@
   <!-- Helpers -->
 
   <bean id="getRequestDetector" class="jetbrains.buildServer.usageStatistics.impl.GetRequestDetector"/>
-  <bean id="serverDistributionTypeProvider" class="jetbrains.buildServer.usageStatistics.impl.ServerDistributionTypeProvider"/>
 
 </beans>
