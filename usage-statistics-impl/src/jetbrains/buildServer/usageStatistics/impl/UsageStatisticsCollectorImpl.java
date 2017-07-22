@@ -167,11 +167,13 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
 
     final Collection<UsageStatisticsProvider> providers = myExtensionHolder.getExtensions(UsageStatisticsProvider.class);
     for (final UsageStatisticsProvider provider : providers) {
+      if (!serverIsActive()) return;
       collectStatisticsWithProvider(provider, publisher);
     }
 
     final Collection<UsageStatisticsPresentationProvider> presentationProviders = myExtensionHolder.getExtensions(UsageStatisticsPresentationProvider.class);
     for (final UsageStatisticsPresentationProvider presentationProvider : presentationProviders) {
+      if (!serverIsActive()) return;
       applyPresentationsWithProvider(presentationProvider);
     }
   }
