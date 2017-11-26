@@ -30,6 +30,7 @@ import jetbrains.buildServer.serverSide.impl.XmlRpcListener;
 import jetbrains.buildServer.serverSide.impl.XmlRpcSession;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.UserModelEx;
+import jetbrains.buildServer.users.impl.UserModelImpl;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +65,7 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
                                  @Nullable final XmlRpcSession session) {
     if (targetClass == XmlRpcBasedRemoteServer.class && session != null) {
       final Long userId = session.getAttribute(XmlRpcSession.USER_ID_ATTR, Long.class);
-      if (userId != null && !myUserModel.isSpecialUserId(userId)) {
+      if (userId != null && !UserModelImpl.isSpecialUserId(userId)) {
         addUsage(prepareUserAgent(session.getUserAgent()), userId);
       }
     }
