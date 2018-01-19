@@ -22,6 +22,7 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -62,6 +63,7 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
 
   private boolean doReportStatistics(@NotNull final String data) {
     try {
+      final AtomicReference<String> result = new AtomicReference<>();
       final HTTPRequestBuilder.Request post =
         new HTTPRequestBuilder(TeamCityProperties.getProperty("teamcity.usageStatistics.server.url", "https://teamcity-stats.services.jetbrains.com/report.html"))
           .allowNonSecureConnection(true)
@@ -79,17 +81,19 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
               }
             }
           })
+          .onSuccess(response -> result.set(response.getBodyAsString()))
           .onException(ex -> {
             LOG.warnAndDebugDetails("Cannot send usage statistics", ex);
           })
           .build();
-      final String result = myRequestHandler.doRequest(post);
 
-      if (result == null) return false;
+      myRequestHandler.doRequest(post);
 
-      if (result.isEmpty()) return true; // legacy
+      if (result.get() == null) return false;
 
-      final Element element = XmlUtil.from_s(result);
+      if (result.get().isEmpty()) return true; // legacy
+
+      final Element element = XmlUtil.from_s(result.get());
       if (element.getChild("ok") != null) {
         return true;
       }
