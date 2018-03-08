@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import jetbrains.buildServer.serverSide.ServerResponsibility;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -41,13 +42,16 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
   @NotNull private final UsageStatisticsCommonDataPersistor myCommonDataPersistor;
   @NotNull private final HTTPRequestBuilder.RequestHandler myRequestHandler;
+  @NotNull private final ServerResponsibility myServerResponsibility;
 
   public UsageStatisticsReporterImpl(@NotNull final UsageStatisticsCollector statisticsCollector,
                                      @NotNull final UsageStatisticsCommonDataPersistor commonDataPersistor,
-                                     @NotNull final HTTPRequestBuilder.RequestHandler requestHandler) {
+                                     @NotNull final HTTPRequestBuilder.RequestHandler requestHandler,
+                                     @NotNull final ServerResponsibility serverResponsibility) {
     myStatisticsCollector = statisticsCollector;
     myCommonDataPersistor = commonDataPersistor;
     myRequestHandler = requestHandler;
+    myServerResponsibility = serverResponsibility;
   }
 
   public boolean reportStatistics(final long statisticsExpirationPeriod) {
@@ -62,6 +66,10 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   }
 
   private boolean doReportStatistics(@NotNull final String data) {
+    if (!myServerResponsibility.canReportStatistics()) {
+      LOG.debug("Server is not responsible for sending statistics");
+      return true;
+    }
     try {
       final AtomicReference<String> result = new AtomicReference<>();
       final HTTPRequestBuilder.Request post =
