@@ -25,6 +25,7 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresent
 import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
 import jetbrains.buildServer.usageStatistics.util.BaseUsageStatisticsStatePersister;
 import jetbrains.buildServer.util.Dates;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.util.filters.Filter;
 import jetbrains.buildServer.util.filters.FilterUtil;
 import org.jdom.Content;
@@ -175,7 +176,7 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
     final Filter<ToolUsage> filter = createDateFilter(getThresholdDate());
     for (final Map.Entry<ICString, Set<ToolUsage>> entry : myToolUsages.entrySet()) {
       final Element toolElement = new Element(getToolName());
-      toolElement.setAttribute(getToolIdName(), entry.getKey().getSource());
+      toolElement.setAttribute(getToolIdName(), StringUtil.replaceInvalidXmlChars(entry.getKey().getSource()));
       element.addContent((Content) toolElement);
       for (final ToolUsage usage : entry.getValue()) {
         if (!filter.accept(usage)) continue;
