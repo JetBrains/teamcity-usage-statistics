@@ -72,26 +72,27 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
     }
     try {
       final AtomicReference<String> result = new AtomicReference<>();
+      String serverUrl = TeamCityProperties.getProperty("teamcity.usageStatistics.server.url", "https://teamcity-stats.services.jetbrains.com/report.html");
       final HTTPRequestBuilder.Request post =
-        new HTTPRequestBuilder(TeamCityProperties.getProperty("teamcity.usageStatistics.server.url", "https://teamcity-stats.services.jetbrains.com/report.html"))
+        new HTTPRequestBuilder(serverUrl)
           .allowNonSecureConnection(true)
           .withDomainCheck(TeamCityProperties.getBooleanOrTrue("teamcity.usageStatistics.server.checkDomain"))
           .withMethod("POST")
           .withUrlEncodedData(data.getBytes("UTF-8"))
           .onErrorResponse((state, text) -> {
             if (state == 404) {
-              LOG.info("Cannot send usage statistics: server unavailable");
+              LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": server unavailable");
             } else {
               if (text != null) {
-                LOG.info("Cannot send usage statistics: " + text);
+                LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": " + text);
               } else {
-                LOG.info("Cannot send usage statistics: return code " + state);
+                LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": return code " + state);
               }
             }
           })
           .onSuccess(response -> result.set(response.getBodyAsString()))
           .onException(ex -> {
-            LOG.warnAndDebugDetails("Cannot send usage statistics", ex);
+            LOG.warnAndDebugDetails("Cannot send usage statistics to \"" + serverUrl + "\"", ex);
           })
           .build();
 
