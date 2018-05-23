@@ -27,7 +27,6 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.WebLinks;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCollectorImpl;
@@ -42,17 +41,13 @@ public class DownloadUsageStatisticsController extends BaseController {
   @NotNull private static final Logger LOG = Logger.getInstance(DownloadUsageStatisticsController.class.getName());
   @NotNull private static final SimpleDateFormat FILE_NAME_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HHmmss");
   @NotNull private static final SimpleDateFormat FILE_CONTENT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-
-  @NotNull private final WebLinks myWebLinks;
   @NotNull private final UsageStatisticsCollector myStatisticsCollector;
 
   public DownloadUsageStatisticsController(@NotNull final SBuildServer server,
-                                           @NotNull final WebLinks webLinks,
                                            @NotNull final AuthorizationInterceptor authInterceptor,
                                            @NotNull final WebControllerManager webControllerManager,
                                            @NotNull final UsageStatisticsCollector statisticsCollector) {
     super(server);
-    myWebLinks = webLinks;
     myStatisticsCollector = statisticsCollector;
 
     UsageStatisticsControllerUtil.register(this, authInterceptor, webControllerManager, "/admin/downloadUsageStatistics.html");
@@ -97,7 +92,7 @@ public class DownloadUsageStatisticsController extends BaseController {
   private void writeStatistics(@NotNull final OutputStream out, @NotNull final Date collectingFinishDate) throws IOException {
     final BufferedWriter writer = new BufferedWriter(new PrintWriter(out));
 
-    writer.write("#TeamCity URL: " + myWebLinks.getRootUrl());
+    writer.write("#TeamCity URL: " + myServer.getRootUrl());
     writer.newLine();
 
     writer.write("#Usage statistics collecting finish date: " + FILE_CONTENT_DATE_FORMAT.format(collectingFinishDate));
