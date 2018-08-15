@@ -22,19 +22,17 @@ import jetbrains.buildServer.Used;
 import jetbrains.buildServer.controllers.admin.AdminPage;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.SecurityContextEx;
 import jetbrains.buildServer.serverSide.audit.ActionType;
 import jetbrains.buildServer.serverSide.audit.AuditLog;
 import jetbrains.buildServer.serverSide.audit.AuditLogFactory;
 import jetbrains.buildServer.serverSide.auth.Permission;
-import jetbrains.buildServer.serverSide.impl.auth.ServerAuthUtil;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCommonDataPersistor;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettings;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
-import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.openapi.*;
-import jetbrains.buildServer.web.util.SessionUser;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
@@ -49,6 +47,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
   @NotNull private final UsageStatisticsPresentationManagerEx myPresentationManager;
   @NotNull private final AuditLog myAuditLog;
   @NotNull private final String myJspPagePath;
+  @NotNull private final SecurityContextEx mySecurityContext;
 
   @Used("spring")
   public UsageStatisticsController(@NotNull final SBuildServer server,
@@ -60,7 +59,8 @@ public class UsageStatisticsController extends BaseFormXmlController {
                                    @NotNull final UsageStatisticsSettingsPersistor settingsPersistor,
                                    @NotNull final UsageStatisticsCommonDataPersistor dataPersistor,
                                    @NotNull final UsageStatisticsCollector statisticsCollector,
-                                   @NotNull final UsageStatisticsPresentationManagerEx presentationManager) {
+                                   @NotNull final UsageStatisticsPresentationManagerEx presentationManager,
+                                   @NotNull final SecurityContextEx securityContext) {
     super(server);
     mySettingsPersistor = settingsPersistor;
     myDataPersistor = dataPersistor;
@@ -68,6 +68,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
     myPresentationManager = presentationManager;
     myAuditLog = auditLogFactory.createForServer();
     myJspPagePath = pluginDescriptor.getPluginResourcesPath("usageStatistics.jsp");
+    mySecurityContext = securityContext;
 
     UsageStatisticsControllerUtil.register(this, authInterceptor, webControllerManager, "/admin/usageStatistics.html");
 
@@ -110,7 +111,7 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
     final String reportingEnabledStr = request.getParameter("reportingEnabled");
     if (reportingEnabledStr != null) {
-      checkCanChangeServerSettings(request);
+      mySecurityContext.getAccessChecker().checkHasGlobalPermission(Permission.CHANGE_SERVER_SETTINGS);
       myDataPersistor.markReportingSuggestionAsConsidered();
       final boolean reportingEnabled = "true".equalsIgnoreCase(reportingEnabledStr);
       try {
@@ -126,14 +127,6 @@ public class UsageStatisticsController extends BaseFormXmlController {
         xmlResponse.addContent("error");
       }
     }
-  }
-
-  private void checkCanChangeServerSettings(@NotNull final HttpServletRequest request) {
-    final SUser user = SessionUser.getUser(request);
-    if (user == null) {
-      throw new IllegalStateException("Session is expired or user is not specified");
-    }
-    ServerAuthUtil.checkHasGlobalPermission(user, Permission.CHANGE_SERVER_SETTINGS);
   }
 
   private void setReportingEnabled(final boolean reportingEnabled) {

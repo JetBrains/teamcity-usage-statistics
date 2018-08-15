@@ -16,9 +16,6 @@
 
 package jetbrains.buildServer.controllers;
 
-import javax.servlet.http.HttpServletRequest;
-import jetbrains.buildServer.serverSide.auth.AccessDeniedException;
-import jetbrains.buildServer.serverSide.auth.AuthorityHolder;
 import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jetbrains.annotations.NotNull;
@@ -29,13 +26,7 @@ abstract class UsageStatisticsControllerUtil {
                               @NotNull final AuthorizationInterceptor authInterceptor,
                               @NotNull final WebControllerManager webControllerManager,
                               @NotNull final String path) {
-    authInterceptor.addPathBasedPermissionsChecker(path, new RequestPermissionsChecker() {
-      public void checkPermissions(@NotNull final AuthorityHolder authorityHolder, @NotNull final HttpServletRequest request) throws AccessDeniedException {
-        if (!authorityHolder.isPermissionGrantedGlobally(Permission.VIEW_USAGE_STATISTICS)) {
-          throw new AccessDeniedException(authorityHolder, "You do not have enough permissions to view usage statistics");
-        }
-      }
-    });
+    authInterceptor.addPathBasedPermissionsChecker(path, RequestPermissionsCheckerEx.globalPermissionChecker(Permission.VIEW_USAGE_STATISTICS));
 
     webControllerManager.registerController(path, controller);
   }
