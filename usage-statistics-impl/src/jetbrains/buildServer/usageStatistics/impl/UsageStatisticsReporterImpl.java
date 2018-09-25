@@ -83,8 +83,8 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
             if (state == 404) {
               LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": server unavailable");
             } else {
-              if (text != null) {
-                LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": " + text);
+              if (LOG.isDebugEnabled() && text != null) {
+                LOG.debug("Cannot send usage statistics to \"" + serverUrl + "\": return code " + state + "; text: " + text);
               } else {
                 LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": return code " + state);
               }
