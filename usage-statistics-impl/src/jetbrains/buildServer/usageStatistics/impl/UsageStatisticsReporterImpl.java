@@ -30,6 +30,7 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsReporter;
 import jetbrains.buildServer.util.Dates;
 import jetbrains.buildServer.util.HTTPRequestBuilder;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.util.XmlUtil;
 import jetbrains.buildServer.web.util.WebUtil;
 import org.jdom.Element;
@@ -83,8 +84,8 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
             if (state == 404) {
               LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": server unavailable");
             } else {
-              if (LOG.isDebugEnabled() && text != null) {
-                LOG.debug("Cannot send usage statistics to \"" + serverUrl + "\": return code " + state + "; text: " + text);
+              if (text != null) {
+                LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": return code " + state + ", text: " + StringUtil.truncateStringValueWithDotsAtEnd(text, 5000));
               } else {
                 LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": return code " + state);
               }
