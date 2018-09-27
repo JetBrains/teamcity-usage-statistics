@@ -85,7 +85,11 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
               LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": server unavailable");
             } else {
               if (text != null) {
-                LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": return code " + state + ", text: " + StringUtil.truncateStringValueWithDotsAtEnd(text, 5000));
+                if (LOG.isDebugEnabled()) {
+                  LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": return code " + state + ", text: " + text);
+                } else {
+                  LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": return code " + state + ", text: " + StringUtil.truncateStringValueWithDotsAtEnd(text, 5000));
+                }
               } else {
                 LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": return code " + state);
               }
