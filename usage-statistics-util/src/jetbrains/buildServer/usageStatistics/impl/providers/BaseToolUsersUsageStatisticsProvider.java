@@ -16,12 +16,10 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import gnu.trove.TLongHashSet;
-import gnu.trove.TLongLongHashMap;
-import gnu.trove.TLongLongIterator;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
@@ -29,6 +27,7 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatt
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
 import jetbrains.buildServer.usageStatistics.util.BaseUsageStatisticsStatePersister;
+import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.util.TimeService;
 import org.jdom.Content;
@@ -39,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
 
   @NotNull
-  private final Map<String, TLongLongHashMap> myToolUsages = new ConcurrentHashMap<>();
+  private final Map<String, Map<Long, Long>> myToolUsages = new ConcurrentHashMap<>();
 
   @NotNull
   private final ReentrantReadWriteLock myLock = new ReentrantReadWriteLock();
@@ -77,7 +76,7 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
                         @NotNull final String periodDescription,
                         final long startDate) {
     removeObsolete();
-    final Map<String, TLongLongHashMap> filtered = filter(startDate);
+    final Map<String, Map<Long, Long>> filtered = filter(startDate);
     final UsageStatisticsFormatter formatter = new PercentageFormatter(getTotalUsersCount(startDate));
     filtered.keySet().stream()
             .filter(this::publishToolUsages)
@@ -97,7 +96,7 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
   protected void addUsage(@NotNull final String toolIdSource, final long userId) {
     myLock.readLock().lock();
     try {
-      myToolUsages.computeIfAbsent(toolIdSource, k -> new TLongLongHashMap())
+      myToolUsages.computeIfAbsent(toolIdSource, k -> new ConcurrentHashMap<>())
                   .put(userId, myTimeService.now());
     } finally {
       myLock.readLock().unlock();
@@ -106,26 +105,17 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
 
   @NotNull
   Set<String> getUsers(final long fromTimestamp) {
-    final Set<String> result = new HashSet<>();
-    filter(fromTimestamp).values().forEach(map -> {
-      map.forEachKey(userId -> {
-        result.add(String.valueOf(userId));
-        return true;
-      });
-    });
-    return result;
+    return filter(fromTimestamp).values()
+                                .stream()
+                                .map(it -> it.keySet())
+                                .flatMap(it -> it.stream())
+                                .map(it -> it.toString())
+                                .collect(Collectors.toSet());
   }
 
   protected int getTotalUsersCount(final long startDate) {
-    final TLongHashSet userIds = new TLongHashSet();
-    myToolUsages.values().forEach(map -> {
-      map.forEachEntry((userId, timestamp) -> {
-        if (timestamp > startDate) {
-          userIds.add(userId);
-        }
-        return true;
-      });
-    });
+    final Set<Long> userIds = new HashSet<>();
+    myToolUsages.values().stream().map(Map::values).forEach(userIds::addAll);
     return userIds.size();
   }
 
@@ -138,14 +128,7 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
           if (existingMap == null || existingMap.isEmpty()) {
             return existingMap;
           }
-          final TLongLongIterator iter = existingMap.iterator();
-          while (iter.hasNext()) {
-            iter.advance();
-            long timestamp = iter.value();
-            if (timestamp < date) {
-              iter.remove();
-            }
-          }
+          existingMap.entrySet().removeIf(e -> e.getValue() < date);
           return existingMap;
         });
       });
@@ -154,10 +137,10 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
     }
   }
 
-  private Map<String, TLongLongHashMap> filter(final long startDate) {
-    final Map<String, TLongLongHashMap> result = new HashMap<>();
+  private Map<String, Map<Long, Long>> filter(final long startDate) {
+    final Map<String, Map<Long, Long>> result = new HashMap<>();
     myToolUsages.forEach((id, map) -> {
-      final TLongLongHashMap filtered = filter(map, startDate);
+      final Map<Long, Long> filtered = filter(map, startDate);
       if (!filtered.isEmpty()) {
         result.put(id, filtered);
       }
@@ -165,15 +148,8 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
     return result;
   }
 
-  private TLongLongHashMap filter(TLongLongHashMap map, long threshold) {
-    final TLongLongHashMap result = new TLongLongHashMap();
-    map.forEachEntry((key, value) -> {
-      if (value > threshold) {
-        result.put(key, value);
-      }
-      return true;
-    });
-    return result;
+  private Map<Long, Long> filter(Map<Long, Long> map, long threshold) {
+    return CollectionsUtil.filterMapByValues(map, val -> val > threshold);
   }
 
   @NonNls @NotNull private static final String USAGE = "usage";
@@ -188,14 +164,13 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
         final Element toolElement = new Element(getToolName());
         toolElement.setAttribute(getToolIdName(), StringUtil.replaceInvalidXmlChars(id));
         element.addContent((Content)toolElement);
-        usageMap.forEachEntry((userId, timestamp) -> {
+        usageMap.forEach((userId, timestamp) -> {
           if (timestamp > threshold) {
             final Element usageElement = new Element(USAGE);
             usageElement.setAttribute(USER_ID, String.valueOf(userId));
             usageElement.setAttribute(TIMESTAMP, String.valueOf(timestamp));
             toolElement.addContent((Content)usageElement);
           }
-          return true;
         });
       });
     } finally {
@@ -213,7 +188,7 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
         final Element toolElement = (Element)tool;
         final String toolIdSource = toolElement.getAttributeValue(getToolIdName());
         if (toolIdSource == null) continue;
-        final TLongLongHashMap value = new TLongLongHashMap();
+        final Map<Long, Long> value = new ConcurrentHashMap<>();
         myToolUsages.put(toolIdSource, value);
         for (final Object usage : toolElement.getChildren(USAGE)) {
           if (!(usage instanceof Element)) continue;
