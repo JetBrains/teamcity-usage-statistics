@@ -25,6 +25,7 @@ import jetbrains.buildServer.usageStatistics.impl.GetRequestDetector;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.users.UserModelEx;
+import jetbrains.buildServer.util.TimeService;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.web.util.UserAgentUtil;
 import org.jetbrains.annotations.NotNull;
@@ -35,8 +36,9 @@ public class BrowserUsageStatisticsProvider extends BaseToolUsersUsageStatistics
   public BrowserUsageStatisticsProvider(@NotNull final SBuildServer server,
                                         @NotNull final ServerPaths serverPaths,
                                         @NotNull final UserModelEx userModel,
-                                        @NotNull final GetRequestDetector getRequestDetector) {
-    super(server, serverPaths, createDWMPeriodDescriptions());
+                                        @NotNull final GetRequestDetector getRequestDetector,
+                                        @NotNull final TimeService timeService) {
+    super(server, serverPaths, createDWMPeriodDescriptions(), timeService);
     myUserModel = userModel;
     getRequestDetector.addListener(this);
   }

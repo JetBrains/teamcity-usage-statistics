@@ -19,14 +19,14 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import java.util.*;
 import jetbrains.buildServer.groups.UserGroupManager;
 import jetbrains.buildServer.serverSide.BuildAgentManager;
+import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.serverSide.db.TestDB;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
-import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
+import jetbrains.buildServer.util.TimeService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.mock.web.MockServletContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -40,7 +40,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   protected void setUp() throws Exception {
     super.setUp();
     myProviders = new ArrayList<BaseUsageStatisticsProvider>();
-    myProviders.add(new IDEUsageStatisticsProvider(myServer, myFixture.getServerPaths(), getUserModelEx(), myFixture.getXmlRpcDispatcher()));
+    myProviders.add(new IDEUsageStatisticsProvider(myServer, myFixture.getServerPaths(), myFixture.getXmlRpcDispatcher(), myFixture.getSingletonService(TimeService.class)));
     myProviders.add(new NotificatorUsageStatisticsProvider(myServer, myFixture.getNotificatorRegistry(), myFixture.getNotificationRulesManager()));
     myProviders.add(new RunnerUsageStatisticsProvider(myServer));
     myProviders.add(getServerConfigurationUsageStatisticsProvider());
@@ -116,24 +116,6 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
 
     assertEquals(myServer.getSingletonService(ServerSettings.class).getServerUUID(), statistics.get("id"));
   }
-
-/*
-  private Collection<? extends BaseUsageStatisticsProvider> getAllProviders() {
-
-    return Arrays.asList(
-      myServer.getSingletonService(AgentsJavaUsageStatisticsProvider.class),
-      myServer.getSingletonService(ServerLoadUsageStatisticsProvider.class),
-      myServer.getSingletonService(IDEUsageStatisticsProvider.class),
-      myServer.getSingletonService(NotificatorUsageStatisticsProvider.class),
-      myServer.getSingletonService(RunnerUsageStatisticsProvider.class),
-      myServer.getSingletonService(ServerConfigurationUsageStatisticsProvider.class),
-      myServer.getSingletonService(StaticServerUsageStatisticsProvider.class),
-      myServer.getSingletonService(TriggerUsageStatisticsProvider.class),
-      myServer.getSingletonService(VCSUsageStatisticsProvider.class)
-//    myServer.getSingletonService(WebPagesUsageStatisticsProvider.class)
-    );
-  }
-*/
 
   private Map<String, Object> collectStatisticsByProvider(@NotNull final UsageStatisticsProvider provider) {
     final Map<String, Object> statistics = new HashMap<String, Object>();

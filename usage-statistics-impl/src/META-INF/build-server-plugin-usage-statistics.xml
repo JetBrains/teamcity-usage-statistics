@@ -56,7 +56,7 @@
   </bean>
 
   <bean id="ideUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.IDEUsageStatisticsProvider">
-    <constructor-arg index="3" ref="xmlRpcDispatcher"/>
+    <constructor-arg index="2" ref="xmlRpcDispatcher"/>
     <property name="idFormat" value="jb.ide.%s[%s]"/>
     <property name="groupName" value="IDE Plugins"/>
   </bean>

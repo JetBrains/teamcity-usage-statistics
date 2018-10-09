@@ -23,6 +23,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class IDEUsageStatisticsProviderTest {
+
   @DataProvider(name = "UserAgents")
   public static Iterator<String[]> UserAgents() {
     ArrayList<String[]> list = new ArrayList<>();
@@ -47,7 +48,7 @@ public class IDEUsageStatisticsProviderTest {
   }
 
   @Test(dataProvider = "UserAgents")
-  public void testPrepareUserAgent(String expected, String userAgent) throws Exception {
+  public void testPrepareUserAgent(String expected, String userAgent) {
     Assert.assertEquals(IDEUsageStatisticsProvider.doPrepareUserAgent(userAgent), expected, "UA parsed incorrectly");
   }
 

@@ -18,9 +18,6 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.ServerPaths;
@@ -34,35 +31,45 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
+import jetbrains.buildServer.util.TimeService;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener {
-  @NotNull private static final ICString TEST_STATUS_WITH_SUCCESSFUL = new ICString("Test Status (with successful)");
-  @NotNull private static final ICString TEST_STATUS_WITHOUT_SUCCESSFUL = new ICString("Test Status (without successful)");
-  @NotNull private static final ICString[] ourFeatures = new ICString[] { TEST_STATUS_WITH_SUCCESSFUL, TEST_STATUS_WITHOUT_SUCCESSFUL };
 
-  @NotNull private static final GenericQuery<Void> ourRemoteDebugSessionsCountQuery = new GenericQuery<Void>(
+  @NotNull
+  private static final String TEST_STATUS_WITH_SUCCESSFUL = "Test Status (with successful)";
+
+  @NotNull
+  private static final String TEST_STATUS_WITHOUT_SUCCESSFUL = "Test Status (without successful)";
+
+  @NotNull
+  private static final GenericQuery<Void> ourRemoteDebugSessionsCountQuery = new GenericQuery<Void>(
     "select count(*) as debug_sessions_count " +
     "from personal_vcs_history h " +
     "where scheduled_for_deletion = 0 and commit_changes = -1 and user_id is not null and change_date > ?"
   );
 
-  @NotNull private static final GenericQuery<Void> ourRemoteDebugSessionUsersCountQuery = new GenericQuery<Void>(
+  @NotNull
+  private static final GenericQuery<Void> ourRemoteDebugSessionUsersCountQuery = new GenericQuery<Void>(
     "select count(distinct user_id) as debug_session_users_count " +
     "from personal_vcs_history h " +
     "where scheduled_for_deletion = 0 and commit_changes = -1 and user_id is not null and change_date > ?"
   );
 
-  @NotNull private final SQLRunnerEx mySQLRunner;
-  @NotNull private final IDEUsersProvider myIdeUsersProvider;
+  @NotNull
+  private final SQLRunnerEx mySQLRunner;
+
+  @NotNull
+  private final IDEUsersProvider myIdeUsersProvider;
 
   public IDEFeaturesUsageStatisticsProvider(@NotNull final BuildServerEx server,
                                             @NotNull final ServerPaths serverPaths,
                                             @NotNull final XmlRpcDispatcher xmlRpcDispatcher,
-                                            @NotNull final IDEUsersProvider ideUsersProvider) {
-    super(server, serverPaths, createDWMPeriodDescriptions());
+                                            @NotNull final IDEUsersProvider ideUsersProvider,
+                                            @NotNull final TimeService timeService) {
+    super(server, serverPaths, createDWMPeriodDescriptions(), timeService);
     mySQLRunner = server.getSQLRunner();
     myIdeUsersProvider = ideUsersProvider;
     xmlRpcDispatcher.addListener(this);
@@ -84,6 +91,7 @@ public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatis
     publishDebugSessionUsers(publisher, presentationManager, periodDescription, startDate);
   }
 
+  @Override
   public void remoteMethodCalled(@NotNull final Class targetClass,
                                  @NotNull final String methodName,
                                  @NotNull final Vector params,
@@ -92,10 +100,10 @@ public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatis
       final Long userId = session.getAttribute(XmlRpcSession.USER_ID_ATTR, Long.class);
       if (userId != null) {
         if (methodName.endsWith(".findTests")) {
-          addUsage(TEST_STATUS_WITH_SUCCESSFUL.getSource(), userId);
+          addUsage(TEST_STATUS_WITH_SUCCESSFUL, userId);
         }
         else if (methodName.endsWith(".findFailedTests")) {
-          addUsage(TEST_STATUS_WITHOUT_SUCCESSFUL.getSource(), userId);
+          addUsage(TEST_STATUS_WITHOUT_SUCCESSFUL, userId);
         }
       }
     }
@@ -109,6 +117,7 @@ public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatis
     final String statisticId = makeId(periodDescription, featureName) + ".sessions";
     presentationManager.applyPresentation(statisticId, featureName + " (sessions)", myGroupName, null, null);
     ourRemoteDebugSessionsCountQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
+      @Override
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
           publisher.publishStatistic(statisticId, rs.getInt(1));
@@ -124,8 +133,7 @@ public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatis
                                         final long fromDate) {
     final String featureName = "Remote Debug";
     final String statisticId = makeId(periodDescription, featureName);
-    presentationManager.applyPresentation(statisticId, featureName, myGroupName, new PercentageFormatter(getTotalUsersCount(fromDate)),
-                                          getValueTooltip());
+    presentationManager.applyPresentation(statisticId, featureName, myGroupName, new PercentageFormatter(getTotalUsersCount(fromDate)), getValueTooltip());
     ourRemoteDebugSessionUsersCountQuery.execute(mySQLRunner, new GenericQuery.ResultSetProcessor<Void>() {
       public Void process(final ResultSet rs) throws SQLException {
         if (rs.next()) {
@@ -137,20 +145,7 @@ public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatis
   }
 
   @Override
-  protected void patchUsagesIfNeeded(@NotNull final Map<ICString, Set<ToolUsage>> usages) {
-    for (final ICString feature : ourFeatures) {
-      if (!usages.containsKey(feature)) {
-        usages.put(feature, Collections.<ToolUsage>emptySet());
-      }
-    }
-  }
-
-  @Override
-  protected int getTotalUsersCount(@NotNull final Map<ICString, Set<ToolUsage>> usages, final long startDate) {
-    return getTotalUsersCount(startDate);
-  }
-
-  private int getTotalUsersCount(final long startDate) {
+  protected int getTotalUsersCount(final long startDate) {
     return myIdeUsersProvider.getIDEUsers(startDate).size();
   }
 

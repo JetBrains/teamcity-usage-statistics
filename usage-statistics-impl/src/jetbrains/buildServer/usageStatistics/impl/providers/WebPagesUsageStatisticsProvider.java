@@ -34,27 +34,36 @@ import jetbrains.buildServer.usageStatistics.impl.GetRequestDetector;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.util.Dates;
+import jetbrains.buildServer.util.TimeService;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.web.util.WebUtil;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements GetRequestDetector.Listener {
-  @NotNull private static final Logger LOG = Logger.getLogger(WebPagesUsageStatisticsProvider.class);
 
-  @NotNull private final List<Pattern> myPathPatterns = new ArrayList<Pattern>();
-  @NotNull private final ServerPluginInfo myPluginDescriptor;
-  @NotNull private final WebUsersProvider myWebUsersProvider;
+  @NotNull
+  private static final Logger LOG = Logger.getLogger(WebPagesUsageStatisticsProvider.class);
+
+  @NotNull
+  private final List<Pattern> myPathPatterns = new ArrayList<>();
+
+  @NotNull
+  private final ServerPluginInfo myPluginDescriptor;
+
+  @NotNull
+  private final WebUsersProvider myWebUsersProvider;
 
   public WebPagesUsageStatisticsProvider(@NotNull final SBuildServer server,
                                          @NotNull final ServerPaths serverPaths,
                                          @NotNull final GetRequestDetector getRequestDetector,
                                          @NotNull final ServerPluginInfo pluginDescriptor,
-                                         @NotNull final WebUsersProvider webUsersProvider) {
+                                         @NotNull final WebUsersProvider webUsersProvider,
+                                         @NotNull final TimeService timeService) {
     super(server, serverPaths, new LinkedHashMap<Long, String>() {{
       put(Dates.ONE_WEEK, "Week");
       put(30 * Dates.ONE_DAY, "Month");
-    }});
+    }}, timeService);
     myPluginDescriptor = pluginDescriptor;
     myWebUsersProvider = webUsersProvider;
     getRequestDetector.addListener(this);
@@ -99,13 +108,13 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   }
 
   @Override
-  protected int getTotalUsersCount(@NotNull final Map<ICString, Set<ToolUsage>> usages, final long startDate) {
+  protected int getTotalUsersCount(final long startDate) {
     return myWebUsersProvider.getWebUsers(startDate).size();
   }
 
   @Override
   protected boolean publishToolUsages(@NotNull final String path) {
-    for (final Pattern pathPattern : myPathPatterns) {
+    for (final Pattern pathPattern: myPathPatterns) {
       if (pathPattern.matcher(path).matches()) {
         return true;
       }

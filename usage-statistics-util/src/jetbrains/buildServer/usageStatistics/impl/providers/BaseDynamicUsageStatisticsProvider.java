@@ -31,11 +31,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatisticsProvider {
-  @NotNull private final LinkedHashMap<Long, String> myPeriodDescriptions;
-  @Nullable private final String myDefaultValue;
 
-  protected BaseDynamicUsageStatisticsProvider(@NotNull final LinkedHashMap<Long, String> periodDescriptions,
-                                               @Nullable final String defaultValue) {
+  @NotNull
+  private final LinkedHashMap<Long, String> myPeriodDescriptions;
+
+  @Nullable
+  private final String myDefaultValue;
+
+  @SuppressWarnings("WeakerAccess")
+  public BaseDynamicUsageStatisticsProvider(@NotNull final LinkedHashMap<Long, String> periodDescriptions,
+                                            @Nullable final String defaultValue) {
     myPeriodDescriptions = periodDescriptions;
     myDefaultValue = defaultValue;
   }
@@ -48,6 +53,7 @@ public abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatis
     }
   }
 
+  @SuppressWarnings("WeakerAccess")
   @NotNull
   protected static LinkedHashMap<Long, String> createDWMPeriodDescriptions() {
     return new LinkedHashMap<Long, String>() {{
@@ -57,9 +63,9 @@ public abstract class BaseDynamicUsageStatisticsProvider extends BaseUsageStatis
     }};
   }
 
-  protected long getThresholdDate() {
+  long getThresholdDate() {
     long maxPeriod = 0;
-    for (final Long period : myPeriodDescriptions.keySet()) {
+    for (final Long period: myPeriodDescriptions.keySet()) {
       if (period > maxPeriod) {
         maxPeriod = period;
       }

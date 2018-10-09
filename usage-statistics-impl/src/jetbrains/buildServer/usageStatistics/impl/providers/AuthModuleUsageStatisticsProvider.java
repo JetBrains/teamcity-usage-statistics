@@ -16,8 +16,6 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import java.util.Map;
-import java.util.Set;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.auth.AuthenticatedUserInfo;
@@ -26,17 +24,21 @@ import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPo
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.users.UserModelEx;
 import jetbrains.buildServer.util.EventDispatcher;
+import jetbrains.buildServer.util.TimeService;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 
 public class AuthModuleUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements UserAuthListener {
-  @NotNull private final UserModelEx myUserModel;
+
+  @NotNull
+  private final UserModelEx myUserModel;
 
   public AuthModuleUsageStatisticsProvider(@NotNull final SBuildServer server,
                                            @NotNull final ServerPaths serverPaths,
                                            @NotNull final UserModelEx userModel,
-                                           @NotNull final EventDispatcher<UserAuthListener> userAuthDispatcher) {
-    super(server, serverPaths, createDWMPeriodDescriptions());
+                                           @NotNull final EventDispatcher<UserAuthListener> userAuthDispatcher,
+                                           @NotNull final TimeService timeService) {
+    super(server, serverPaths, createDWMPeriodDescriptions(), timeService);
     myUserModel = userModel;
     userAuthDispatcher.addListener(this);
   }
@@ -78,7 +80,7 @@ public class AuthModuleUsageStatisticsProvider extends BaseToolUsersUsageStatist
   }
 
   @Override
-  protected int getTotalUsersCount(@NotNull final Map<ICString, Set<ToolUsage>> usages, final long startDate) {
+  protected int getTotalUsersCount(final long startDate) {
     return myUserModel.getAllUsers().getUsers().size();
   }
 

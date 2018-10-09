@@ -31,20 +31,21 @@ import jetbrains.buildServer.serverSide.impl.XmlRpcSession;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.UserModelEx;
 import jetbrains.buildServer.users.impl.UserModelImpl;
+import jetbrains.buildServer.util.TimeService;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements XmlRpcListener, IDEUsersProvider {
-  @NotNull private final UserModelEx myUserModel;
-  @NotNull private final Cache<String, String> myUserAgentCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterAccess(10, TimeUnit.MINUTES).build();
+
+  @NotNull
+  private final Cache<String, String> myUserAgentCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterAccess(10, TimeUnit.MINUTES).build();
 
   public IDEUsageStatisticsProvider(@NotNull final SBuildServer server,
                                     @NotNull final ServerPaths serverPaths,
-                                    @NotNull final UserModelEx userModel,
-                                    @NotNull final XmlRpcDispatcher xmlRpcDispatcher) {
-    super(server, serverPaths, createDWMPeriodDescriptions());
-    myUserModel = userModel;
+                                    @NotNull final XmlRpcDispatcher xmlRpcDispatcher,
+                                    @NotNull final TimeService timeService) {
+    super(server, serverPaths, createDWMPeriodDescriptions(), timeService);
     xmlRpcDispatcher.addListener(this);
   }
 
