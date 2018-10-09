@@ -103,8 +103,10 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
     }
   }
 
+
+  @SuppressWarnings("WeakerAccess")
   @NotNull
-  Set<String> getUsers(final long fromTimestamp) {
+  public Set<String> getUsers(final long fromTimestamp) {
     return filter(fromTimestamp).values()
                                 .stream()
                                 .map(it -> it.keySet())
