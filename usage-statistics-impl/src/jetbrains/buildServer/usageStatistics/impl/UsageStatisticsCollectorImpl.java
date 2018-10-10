@@ -180,7 +180,7 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
 
   private void collectStatisticsWithProvider(@NotNull final UsageStatisticsProvider provider, @NotNull final UsageStatisticsPublisher publisher) {
     try {
-      NamedThreadFactory.executeWithNewThreadName("Collecting usage statistics with provider " + provider.toString(), new Runnable() {
+      NamedThreadFactory.executeWithNewThreadName("Collecting usage statistics with provider " + provider.getClass().getSimpleName(), new Runnable() {
         public void run() {
           provider.accept(publisher);
         }
@@ -189,7 +189,7 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
     }
     catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
-      LOG.infoAndDebugDetails("Usage statistics provider " + provider.toString() + " failed", e);
+      LOG.warnAndDebugDetails("Usage statistics provider " + provider.getClass().getSimpleName() + " failed", e);
     }
   }
 
@@ -200,7 +200,7 @@ public class UsageStatisticsCollectorImpl extends BuildServerAdapter implements 
     }
     catch (final InterruptedException ignore) {}
     catch (final Throwable e) {
-      LOG.infoAndDebugDetails("Usage statistics presentation provider " + presentationProvider.toString() + " failed", e);
+      LOG.warnAndDebugDetails("Usage statistics presentation provider " + presentationProvider.getClass().getSimpleName() + " failed", e);
     }
   }
 
