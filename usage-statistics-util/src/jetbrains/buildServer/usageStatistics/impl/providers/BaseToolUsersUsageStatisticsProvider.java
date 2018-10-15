@@ -125,15 +125,7 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
     myLock.writeLock().lock();
     try {
       final long date = getThresholdDate();
-      myToolUsages.keySet().forEach(key -> {
-        myToolUsages.compute(key, (k, existingMap) -> {
-          if (existingMap == null || existingMap.isEmpty()) {
-            return existingMap;
-          }
-          existingMap.entrySet().removeIf(e -> e.getValue() < date);
-          return existingMap;
-        });
-      });
+      myToolUsages.values().forEach(it -> it.entrySet().removeIf(e -> e.getValue() < date));
     } finally {
       myLock.writeLock().unlock();
     }
