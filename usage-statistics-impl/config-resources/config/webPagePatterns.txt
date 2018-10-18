@@ -29,3 +29,5 @@
 /promoDetailsPopup\.html
 /systemProblems\.html
 /stacktrace\.html
+/agents\.html
+/queue\.html
