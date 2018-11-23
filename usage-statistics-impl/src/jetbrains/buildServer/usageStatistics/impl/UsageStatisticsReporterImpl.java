@@ -67,7 +67,7 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
   }
 
   private boolean doReportStatistics(@NotNull final String data) {
-    if (!myServerResponsibility.canReportStatistics()) {
+    if (!myServerResponsibility.canReportUsageStatistics()) {
       LOG.debug("Server is not responsible for sending statistics");
       return true;
     }
