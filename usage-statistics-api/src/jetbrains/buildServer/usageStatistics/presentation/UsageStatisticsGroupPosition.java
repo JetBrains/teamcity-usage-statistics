@@ -28,7 +28,8 @@ import org.jetbrains.annotations.NotNull;
 public enum UsageStatisticsGroupPosition implements PositionAware {
   GENERAL(PositionConstraint.first()),
   SERVER_CONFIGURATION(after(GENERAL)),
-  SERVER_LOAD(after(SERVER_CONFIGURATION)),
+  SERVER_CLUSTER(after(SERVER_CONFIGURATION)),
+  SERVER_LOAD(after(SERVER_CLUSTER)),
   RUNNERS(after(SERVER_LOAD)),
   CLOUD(after(SERVER_LOAD,RUNNERS)),
   BUILD_FEATURES(after(CLOUD,SERVER_LOAD, RUNNERS)),

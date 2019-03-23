@@ -99,6 +99,11 @@
     <property name="groupName" value="Server Configuration"/>
   </bean>
 
+  <bean id="clusterStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.ClusterStatisticsProvider">
+    <property name="idFormat" value="jb.cluster.%s"/>
+    <property name="groupName" value="Nodes and Responsibilities"/>
+  </bean>
+
   <bean id="vcsUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.VCSUsageStatisticsProvider">
     <property name="idFormat" value="jb.vcs[%s]"/>
     <property name="groupName" value="VCS Root Types"/>
