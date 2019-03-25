@@ -56,7 +56,7 @@ public class ClusterStatisticsProvider extends BaseDefaultUsageStatisticsProvide
     final String id = makeId("secondaryNodes");
     presentationManager.applyPresentation(id, "Number of secondary nodes", myGroupName, null, null);
     publisher.publishStatistic(id, secondaryNodesCount);
-    final Map<NodeResponsibility, Long> stats = myTeamCityNodes.getNodes().stream()
+    final Map<NodeResponsibility, Long> stats = myTeamCityNodes.getOnlineNodes().stream()
                                                                .filter(TeamCityNode::isSecondaryNode)
                                                                .map(TeamCityNode::getEnabledResponsibilities)
                                                                .flatMap(it -> it.stream())
