@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import jetbrains.buildServer.serverSide.NodeResponsibility;
@@ -50,17 +51,18 @@ public class ClusterStatisticsProvider extends BaseDefaultUsageStatisticsProvide
   }
 
   private void publishClusterInfo(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    final Long secondaryNodesCount = myTeamCityNodes.getNodes().stream()
-                                                    .filter(TeamCityNode::isSecondaryNode)
-                                                    .count();
+    final List<TeamCityNode> onlineNodes = myTeamCityNodes.getOnlineNodes();
+    final Long secondaryNodesCount = onlineNodes.stream()
+                                                .filter(TeamCityNode::isSecondaryNode)
+                                                .count();
     final String id = makeId("secondaryNodes");
     presentationManager.applyPresentation(id, "Number of secondary nodes", myGroupName, null, null);
     publisher.publishStatistic(id, secondaryNodesCount);
-    final Map<NodeResponsibility, Long> stats = myTeamCityNodes.getOnlineNodes().stream()
-                                                               .filter(TeamCityNode::isSecondaryNode)
-                                                               .map(TeamCityNode::getEnabledResponsibilities)
-                                                               .flatMap(it -> it.stream())
-                                                               .collect(Collectors.groupingBy(identity(), Collectors.counting()));
+    final Map<NodeResponsibility, Long> stats = onlineNodes.stream()
+                                                           .filter(TeamCityNode::isSecondaryNode)
+                                                           .map(TeamCityNode::getEnabledResponsibilities)
+                                                           .flatMap(it -> it.stream())
+                                                           .collect(Collectors.groupingBy(identity(), Collectors.counting()));
     stats.forEach((nodeResponsibility, count) -> {
       final String rId = makeId("nodeResponsibility." + nodeResponsibility.name().toLowerCase());
       presentationManager.applyPresentation(rId, nodeResponsibility.getDisplayName(), myGroupName, null, null);
