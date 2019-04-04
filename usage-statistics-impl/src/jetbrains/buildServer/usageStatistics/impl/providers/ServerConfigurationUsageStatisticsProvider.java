@@ -25,6 +25,9 @@ import jetbrains.buildServer.serverSide.LicenseMode;
 import jetbrains.buildServer.serverSide.LicensingPolicy;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerSettings;
+import jetbrains.buildServer.serverSide.audit.ActionType;
+import jetbrains.buildServer.serverSide.audit.AuditLogBuilder;
+import jetbrains.buildServer.serverSide.audit.AuditLogProvider;
 import jetbrains.buildServer.serverSide.auth.AuthModule;
 import jetbrains.buildServer.serverSide.auth.AuthModuleType;
 import jetbrains.buildServer.serverSide.auth.LoginConfiguration;
@@ -50,18 +53,21 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   @NotNull private final LoginConfiguration myLoginConfiguration;
   @NotNull private final LicensingPolicy myLicensingPolicy;
   @NotNull private final ServerSettings myServerSettings;
+  @NotNull private final AuditLogProvider myAuditLogProvider;
   @NotNull private final StartupContext myStartupContext;
 
   public ServerConfigurationUsageStatisticsProvider(@NotNull final TeamCityDatabaseManager dbManager,
                                                     @NotNull final LoginConfiguration loginConfiguration,
                                                     @NotNull final SBuildServer buildServer,
                                                     @NotNull final ServerSettings serverSettings,
+                                                    @NotNull final AuditLogProvider auditLogProvider,
                                                     @NotNull final StartupContext startupContext
-                                                    ) {
+  ) {
     myDBManager = dbManager;
     myLoginConfiguration = loginConfiguration;
     myLicensingPolicy = buildServer.getLicensingPolicy();
     myServerSettings = serverSettings;
+    myAuditLogProvider = auditLogProvider;
     myStartupContext = startupContext;
   }
 
@@ -84,6 +90,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     publishTCVersion(publisher, presentationManager);
     publishServerStartData(publisher, presentationManager);
     publishServerDistributionType(publisher, presentationManager);
+    publishUpgradesCount(publisher, presentationManager);
   }
 
   private void publishServerId(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
@@ -216,5 +223,13 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
     final String id = makeId("distributionType");
     presentationManager.applyPresentation(id, "Distribution type", myGroupName, null, null);
     publisher.publishStatistic(id, myStartupContext.getDistributionType());
+  }
+
+  private void publishUpgradesCount(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
+    final String id = makeId("upgradesCount");
+    presentationManager.applyPresentation(id, "Automatic updates count", myGroupName, null, null);
+    AuditLogBuilder builder = myAuditLogProvider.getBuilder();
+    builder.setActionTypes(ActionType.SERVER_UPDATE);
+    publisher.publishStatistic(id, builder.getLogActions(-1).size());
   }
 }

@@ -22,6 +22,7 @@ import jetbrains.buildServer.serverSide.BuildAgentManager;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.serverSide.db.TestDB;
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase;
+import jetbrains.buildServer.updates.TeamCityUpdater;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsProvider;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.util.TimeService;
@@ -52,7 +53,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   @NotNull
   private ServerConfigurationUsageStatisticsProvider getServerConfigurationUsageStatisticsProvider() {
     return new ServerConfigurationUsageStatisticsProvider(TestDB.getDbManager(), myFixture.getLoginConfiguration(),
-                                                          myFixture.getServer(), myFixture.getServerSettings(), myFixture.getStartupContext());
+                                                          myFixture.getServer(), myFixture.getServerSettings(), myFixture.getAuditLogProvider(), myFixture.getStartupContext());
   }
 
   @NotNull
@@ -115,6 +116,23 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
     final Map<String, Object> statistics = collectStatisticsByProvider(provider);
 
     assertEquals(myServer.getSingletonService(ServerSettings.class).getServerUUID(), statistics.get("id"));
+  }
+
+  public void auto_updates_count() {
+    makeLoggedIn(createAdmin("admin"));
+    final ServerConfigurationUsageStatisticsProvider provider = getServerConfigurationUsageStatisticsProvider();
+    provider.setIdFormat("%s");
+
+    Map<String, Object> statistics = collectStatisticsByProvider(provider);
+    assertEquals(0, statistics.get("upgradesCount"));
+
+    new TeamCityUpdater.LogUpdateToAudit(myFixture.getAuditLogFactory(), "2019.1").run();
+    statistics = collectStatisticsByProvider(provider);
+    assertEquals(1, statistics.get("upgradesCount"));
+
+    new TeamCityUpdater.LogUpdateToAudit(myFixture.getAuditLogFactory(), "2019.2").run();
+    statistics = collectStatisticsByProvider(provider);
+    assertEquals(2, statistics.get("upgradesCount"));
   }
 
   private Map<String, Object> collectStatisticsByProvider(@NotNull final UsageStatisticsProvider provider) {
