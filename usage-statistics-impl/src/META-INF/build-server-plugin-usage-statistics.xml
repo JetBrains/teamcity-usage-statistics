@@ -170,6 +170,11 @@
     <property name="groupName" value="Builds with settings from VCS"/>
   </bean>
 
+  <bean id="uiFeaturesStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.UIFeaturesStatisticsProvider">
+    <property name="idFormat" value="jb.ui.%s"/>
+    <property name="groupName" value="UI Features"/>
+  </bean>
+
   <!-- Helpers -->
 
   <bean id="getRequestDetector" class="jetbrains.buildServer.usageStatistics.impl.GetRequestDetector"/>
