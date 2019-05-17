@@ -171,7 +171,7 @@
   </bean>
 
   <bean id="uiFeaturesStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.UIFeaturesStatisticsProvider">
-    <property name="idFormat" value="jb.ui.%s"/>
+    <property name="idFormat" value="jb.ui.%s.%s[%s]"/>
     <property name="groupName" value="UI Features"/>
   </bean>
 
