@@ -19,6 +19,7 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
@@ -56,6 +57,9 @@ public class UIFeaturesStatisticsProvider extends BaseDynamicUsageStatisticsProv
                         @NotNull final UsageStatisticsPresentationManager presentationManager,
                         @NotNull final String periodDescription,
                         final long startDate) {
+    if (!TeamCityProperties.getBoolean("teamcity.experimental.ui.features.statistic.reporter.enabled")) {
+      return;
+    }
 
     final Map<SimplePropertyKey, Integer> counters = new HashMap<>();
     PROPERTIES.keySet().forEach(key -> counters.put(new SimplePropertyKey(key), 0));
