@@ -57,10 +57,6 @@ public class UIFeaturesStatisticsProvider extends BaseDynamicUsageStatisticsProv
                         @NotNull final UsageStatisticsPresentationManager presentationManager,
                         @NotNull final String periodDescription,
                         final long startDate) {
-    if (!TeamCityProperties.getBoolean("teamcity.experimental.ui.features.statistic.reporter.enabled")) {
-      return;
-    }
-
     final Map<SimplePropertyKey, Integer> counters = new HashMap<>();
     PROPERTIES.keySet().forEach(key -> counters.put(new SimplePropertyKey(key), 0));
     final List<Long> userIds = CollectionsUtil.convertCollection(myWebUsersProvider.getWebUsers(startDate), Long::valueOf);
