@@ -29,5 +29,5 @@
 /promoDetailsPopup\.html
 /systemProblems\.html
 /stacktrace\.html
-/agents\.html
+/agents\.html(\?tab=.*)?
 /queue\.html
