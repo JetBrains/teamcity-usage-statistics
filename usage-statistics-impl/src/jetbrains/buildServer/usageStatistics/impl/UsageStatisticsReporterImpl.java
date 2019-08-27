@@ -105,7 +105,10 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
 
       if (result.get() == null) return false;
 
-      if (result.get().isEmpty()) return true; // legacy
+      if (result.get().isEmpty()) {
+        LOG.info("Statistics server answered empty response");
+        return false;
+      }
 
       final Element element = XmlUtil.from_s(result.get());
       if (element.getChild("ok") != null) {
