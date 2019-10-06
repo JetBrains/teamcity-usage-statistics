@@ -214,9 +214,13 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   }
 
   private void publishServerStartData(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    final String versionId = makeId("currentUptime");
-    presentationManager.applyPresentation(versionId, "Current uptime", myGroupName, new TimeFormatter(), null);
-    publisher.publishStatistic(versionId, Dates.now().getTime() - myStartupContext.getServerStartupTimestamp().getTime());
+    final String uptimeId = makeId("currentUptime");
+    presentationManager.applyPresentation(uptimeId, "Current uptime", myGroupName, new TimeFormatter(), null);
+    publisher.publishStatistic(uptimeId, Dates.now().getTime() - myStartupContext.getServerStartupTimestamp().getTime());
+
+    final String startupDurationId = makeId("startupDuration");
+    presentationManager.applyPresentation(startupDurationId, "Startup duration", myGroupName, new TimeFormatter(), null);
+    publisher.publishStatistic(startupDurationId, myStartupContext.getServerStartupDuration());
   }
 
   private void publishServerDistributionType(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
