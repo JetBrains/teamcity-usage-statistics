@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.Set;
 import jetbrains.buildServer.serverSide.BuildServerEx;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
+import jetbrains.buildServer.serverSide.impl.CompositeRunningBuild;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
@@ -33,33 +34,48 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
-  @NotNull private static final UsageStatisticsFormatter ourTimeFormatter = new TimeFormatter();
 
-  @NotNull private static final GenericQuery<Void> ourMainBuildDataQuery = new GenericQuery<Void>(
-    "select" +
-     " count(h.build_id) as build_count," +
-     " sum(h.is_personal) as personal_build_count," +
-     " avg(h.remove_from_queue_time - h.queued_time) as avg_build_queue_time," +
-     " avg(h.build_finish_time_server - h.build_start_time_server) as avg_build_duration" +
+  @NotNull
+  private static final UsageStatisticsFormatter ourTimeFormatter = new TimeFormatter();
+
+  @NotNull
+  private static final GenericQuery<Void> ourCompositeBuildsQuery = new GenericQuery<>(
+    "select count(h.build_id) as build_count" +
     " from (" +
-    " select history.build_id, history.is_personal,build_finish_time_server,build_start_time_server, history.remove_from_queue_time as remove_from_queue_time, history.queued_time as queued_time" +
-     " from history where build_finish_time_server > ?" +
+    " select history.build_id from history where build_finish_time_server > ? and agent_name like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "'" +
     " union all" +
-    " select build_id, is_personal,build_finish_time_server,build_start_time_server, remove_from_queue_time, queued_time" +
-     " from light_history" +
-     " where build_finish_time_server > ?" +
+    " select build_id from light_history where build_finish_time_server > ? and agent_name like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "'" +
     ") h"
   );
 
-  @NotNull private static final GenericQuery<Void> ourBuildTestCountQuery = new GenericQuery<Void>(
+  @NotNull
+  private static final GenericQuery<Void> ourRegularBuildsQuery = new GenericQuery<>(
+    "select" +
+    " count(h.build_id) as build_count," +
+    " sum(h.is_personal) as personal_build_count," +
+    " avg(h.remove_from_queue_time - h.queued_time) as avg_build_queue_time," +
+    " avg(h.build_finish_time_server - h.build_start_time_server) as avg_build_duration" +
+    " from (" +
+    " select history.build_id, history.is_personal,build_finish_time_server,build_start_time_server, history.remove_from_queue_time as remove_from_queue_time, history.queued_time as queued_time" +
+    " from history where build_finish_time_server > ? and agent_name not like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "'" +
+    " union all" +
+    " select build_id, is_personal,build_finish_time_server,build_start_time_server, remove_from_queue_time, queued_time" +
+    " from light_history" +
+    " where build_finish_time_server > ? and agent_name not like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "' " +
+    ") h"
+  );
+
+  @NotNull
+  private static final GenericQuery<Void> ourBuildTestCountQuery = new GenericQuery<>(
     "select" +
     " max(s.test_count) as max_test_count" +
     " from stats s" +
     " inner join history h on s.build_id = h.build_id" +
-    " where h.build_finish_time_server > ?"
+    " where h.build_finish_time_server > ? and agent_name not like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "'"
   );
 
-  @NotNull private static final GenericQuery<Void> ourVcsChangesCountQuery = new GenericQuery<Void>(
+  @NotNull
+  private static final GenericQuery<Void> ourVcsChangesCountQuery = new GenericQuery<>(
     "select count(*) as vcs_changes_count" +
     " from vcs_history h" +
     " where register_date > ?"
@@ -99,30 +115,34 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
                                 @NotNull final String periodDescription,
                                 final long fromDate) {
     apply(presentationManager, periodDescription, "buildCount", "Build count", null, null);
+    apply(presentationManager, periodDescription, "compositeBuildCount", "Composite build count", null, null);
     apply(presentationManager, periodDescription, "personalBuildCount", "Personal build count", null, null);
     apply(presentationManager, periodDescription, "avgBuildWaitInQueueTime", "Average build waiting in queue time", ourTimeFormatter, null);
     apply(presentationManager, periodDescription, "avgBuildDuration", "Average build duration", ourTimeFormatter, null);
     apply(presentationManager, periodDescription, "maxBuildTestCount", "Maximum test count per build", null, null);
 
-    ourMainBuildDataQuery.execute(myServer.getSQLRunner(), new GenericQuery.ResultSetProcessor<Void>() {
-      public Void process(final ResultSet rs) throws SQLException {
-        if (rs.next()) {
-          publish(publisher, periodDescription, "buildCount", rs.getLong(1));
-          publish(publisher, periodDescription, "personalBuildCount", rs.getLong(2));
-          publish(publisher, periodDescription, "avgBuildWaitInQueueTime", getNullableLong(rs, 3));
-          publish(publisher, periodDescription, "avgBuildDuration", getNullableLong(rs, 4));
-        }
-        return null;
+    ourRegularBuildsQuery.execute(myServer.getSQLRunner(), rs -> {
+      if (rs.next()) {
+        publish(publisher, periodDescription, "buildCount", rs.getLong(1));
+        publish(publisher, periodDescription, "personalBuildCount", rs.getLong(2));
+        publish(publisher, periodDescription, "avgBuildWaitInQueueTime", getNullableLong(rs, 3));
+        publish(publisher, periodDescription, "avgBuildDuration", getNullableLong(rs, 4));
       }
+      return null;
     }, fromDate, fromDate);
 
-    ourBuildTestCountQuery.execute(myServer.getSQLRunner(), new GenericQuery.ResultSetProcessor<Void>() {
-      public Void process(final ResultSet rs) throws SQLException {
-        if (rs.next()) {
-          publish(publisher, periodDescription, "maxBuildTestCount", getNullableLong(rs, 1));
-        }
-        return null;
+    ourCompositeBuildsQuery.execute(myServer.getSQLRunner(), rs -> {
+      if (rs.next()) {
+        publish(publisher, periodDescription, "compositeBuildCount", rs.getLong(1));
       }
+      return null;
+    }, fromDate, fromDate);
+
+    ourBuildTestCountQuery.execute(myServer.getSQLRunner(), rs -> {
+      if (rs.next()) {
+        publish(publisher, periodDescription, "maxBuildTestCount", getNullableLong(rs, 1));
+      }
+      return null;
     }, fromDate);
   }
 
@@ -158,13 +178,11 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
                                  final long fromDate) {
     final String vcsChangesId = "vcsChanges";
     apply(presentationManager, periodDescription, vcsChangesId, "VCS changes", null, null);
-    ourVcsChangesCountQuery.execute(myServer.getSQLRunner(), new GenericQuery.ResultSetProcessor<Void>() {
-      public Void process(final ResultSet rs) throws SQLException {
-        if (rs.next()) {
-          publish(publisher, periodDescription, vcsChangesId, rs.getInt(1));
-        }
-        return null;
+    ourVcsChangesCountQuery.execute(myServer.getSQLRunner(), rs -> {
+      if (rs.next()) {
+        publish(publisher, periodDescription, vcsChangesId, rs.getInt(1));
       }
+      return null;
     }, fromDate);
   }
 
