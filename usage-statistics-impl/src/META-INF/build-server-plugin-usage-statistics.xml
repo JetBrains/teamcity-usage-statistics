@@ -56,13 +56,13 @@
   </bean>
 
   <bean id="ideUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.IDEUsageStatisticsProvider">
-    <constructor-arg index="2" ref="xmlRpcDispatcher"/>
+    <constructor-arg index="3" ref="xmlRpcDispatcher"/>
     <property name="idFormat" value="jb.ide.%s[%s]"/>
     <property name="groupName" value="IDE Plugins"/>
   </bean>
 
   <bean id="ideFeaturesUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.IDEFeaturesUsageStatisticsProvider">
-    <constructor-arg index="2" ref="xmlRpcDispatcher"/>
+    <constructor-arg index="4" ref="xmlRpcDispatcher"/>
     <property name="idFormat" value="jb.ideFeature.%s[%s]"/>
     <property name="groupName" value="IDE Features"/>
   </bean>

@@ -41,7 +41,7 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
   protected void setUp() throws Exception {
     super.setUp();
     myProviders = new ArrayList<BaseUsageStatisticsProvider>();
-    myProviders.add(new IDEUsageStatisticsProvider(myServer, myFixture.getServerPaths(), myFixture.getXmlRpcDispatcher(), myFixture.getSingletonService(TimeService.class)));
+    myProviders.add(new IDEUsageStatisticsProvider(myFixture.getEventDispatcher(), myFixture.getServerPaths(), myFixture.getServerResponsibility(), myFixture.getXmlRpcDispatcher(), myFixture.getSingletonService(TimeService.class)));
     myProviders.add(new NotificatorUsageStatisticsProvider(myServer, myFixture.getNotificatorRegistry(), myFixture.getNotificationRulesManager()));
     myProviders.add(new RunnerUsageStatisticsProvider(myServer));
     myProviders.add(getServerConfigurationUsageStatisticsProvider());

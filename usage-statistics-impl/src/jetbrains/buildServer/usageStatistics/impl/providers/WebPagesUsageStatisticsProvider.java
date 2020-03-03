@@ -20,7 +20,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
@@ -28,12 +30,14 @@ import java.util.zip.ZipFile;
 import javax.servlet.http.HttpServletRequest;
 import jetbrains.buildServer.Used;
 import jetbrains.buildServer.plugins.bean.ServerPluginInfo;
-import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.ServerResponsibility;
 import jetbrains.buildServer.usageStatistics.impl.GetRequestDetector;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.util.Dates;
+import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.TimeService;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.web.util.WebUtil;
@@ -54,13 +58,14 @@ public class WebPagesUsageStatisticsProvider extends BaseToolUsersUsageStatistic
   @NotNull
   private final WebUsersProvider myWebUsersProvider;
 
-  public WebPagesUsageStatisticsProvider(@NotNull final SBuildServer server,
-                                         @NotNull final ServerPaths serverPaths,
-                                         @NotNull final GetRequestDetector getRequestDetector,
-                                         @NotNull final ServerPluginInfo pluginDescriptor,
-                                         @NotNull final WebUsersProvider webUsersProvider,
-                                         @NotNull final TimeService timeService) {
-    super(server, serverPaths, new LinkedHashMap<Long, String>() {{
+  public WebPagesUsageStatisticsProvider(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                         @NotNull ServerPaths serverPaths,
+                                         @NotNull ServerResponsibility serverResponsibility,
+                                         @NotNull GetRequestDetector getRequestDetector,
+                                         @NotNull ServerPluginInfo pluginDescriptor,
+                                         @NotNull WebUsersProvider webUsersProvider,
+                                         @NotNull TimeService timeService) {
+    super(eventDispatcher, serverPaths, serverResponsibility, new LinkedHashMap<Long, String>() {{
       put(Dates.ONE_WEEK, "Week");
       put(30 * Dates.ONE_DAY, "Month");
     }}, timeService);

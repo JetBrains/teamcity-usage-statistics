@@ -22,15 +22,16 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.ServerResponsibility;
 import jetbrains.buildServer.serverSide.impl.XmlRpcBasedRemoteServer;
 import jetbrains.buildServer.serverSide.impl.XmlRpcDispatcher;
 import jetbrains.buildServer.serverSide.impl.XmlRpcListener;
 import jetbrains.buildServer.serverSide.impl.XmlRpcSession;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
-import jetbrains.buildServer.users.UserModelEx;
 import jetbrains.buildServer.users.impl.UserModelImpl;
+import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.TimeService;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
@@ -41,11 +42,12 @@ public class IDEUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProv
   @NotNull
   private final Cache<String, String> myUserAgentCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterAccess(10, TimeUnit.MINUTES).build();
 
-  public IDEUsageStatisticsProvider(@NotNull final SBuildServer server,
-                                    @NotNull final ServerPaths serverPaths,
+  public IDEUsageStatisticsProvider(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                    @NotNull ServerPaths serverPaths,
+                                    @NotNull ServerResponsibility serverResponsibility,
                                     @NotNull final XmlRpcDispatcher xmlRpcDispatcher,
                                     @NotNull final TimeService timeService) {
-    super(server, serverPaths, createDWMPeriodDescriptions(), timeService);
+    super(eventDispatcher, serverPaths, serverResponsibility, createDWMPeriodDescriptions(), timeService);
     xmlRpcDispatcher.addListener(this);
   }
 

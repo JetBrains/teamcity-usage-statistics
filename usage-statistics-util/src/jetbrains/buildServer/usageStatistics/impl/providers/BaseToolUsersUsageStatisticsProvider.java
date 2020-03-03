@@ -20,14 +20,17 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.ServerResponsibility;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsFormatter;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
 import jetbrains.buildServer.usageStatistics.util.BaseUsageStatisticsStatePersister;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.util.TimeService;
 import org.jdom.Content;
@@ -47,13 +50,14 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
   private final TimeService myTimeService;
 
   @SuppressWarnings("WeakerAccess")
-  public BaseToolUsersUsageStatisticsProvider(@NotNull final SBuildServer server,
-                                              @NotNull final ServerPaths serverPaths,
+  public BaseToolUsersUsageStatisticsProvider(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                              @NotNull ServerPaths serverPaths,
+                                              @NotNull ServerResponsibility serverResponsibility,
                                               @NotNull final LinkedHashMap<Long, String> periodDescriptions,
                                               @NotNull final TimeService timeService) {
     super(periodDescriptions, new PercentageFormatter(1).format(0));
     myTimeService = timeService;
-    registerPersistor(server, serverPaths);
+    registerPersistor(eventDispatcher, serverPaths, serverResponsibility);
   }
 
   @NotNull
@@ -206,8 +210,10 @@ public abstract class BaseToolUsersUsageStatisticsProvider extends BaseDynamicUs
     }
   }
 
-  private void registerPersistor(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
-    new BaseUsageStatisticsStatePersister(server, serverPaths) {
+  private void registerPersistor(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                 @NotNull ServerPaths serverPaths,
+                                 @NotNull ServerResponsibility serverResponsibility) {
+    new BaseUsageStatisticsStatePersister(eventDispatcher, serverPaths, serverResponsibility) {
       @NotNull
       @Override
       protected String getStateName() {

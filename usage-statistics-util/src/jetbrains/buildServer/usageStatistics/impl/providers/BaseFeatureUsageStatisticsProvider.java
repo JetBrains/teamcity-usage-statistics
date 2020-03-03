@@ -19,13 +19,16 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Pair;
 import java.util.*;
+import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.ServerResponsibility;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.util.BaseUsageStatisticsStatePersister;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.Dates;
+import jetbrains.buildServer.util.EventDispatcher;
 import org.jdom.Content;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
@@ -34,11 +37,12 @@ import org.jetbrains.annotations.NotNull;
 public abstract class BaseFeatureUsageStatisticsProvider extends BaseDynamicUsageStatisticsProvider {
   @NotNull private final Map<String, List<Long>> myFeatureUsages = new HashMap<String, List<Long>>(); // feature name -> timestamps
 
-  protected BaseFeatureUsageStatisticsProvider(@NotNull final SBuildServer server,
-                                               @NotNull final ServerPaths serverPaths,
-                                               @NotNull final LinkedHashMap<Long, String> periodDescriptions) {
+  protected BaseFeatureUsageStatisticsProvider(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                               @NotNull ServerPaths serverPaths,
+                                               @NotNull ServerResponsibility serverResponsibility,
+                                               @NotNull LinkedHashMap<Long, String> periodDescriptions) {
     super(periodDescriptions, null);
-    registerPersistor(server, serverPaths);
+    registerPersistor(eventDispatcher, serverPaths, serverResponsibility);
   }
 
   @NotNull
@@ -146,12 +150,12 @@ public abstract class BaseFeatureUsageStatisticsProvider extends BaseDynamicUsag
     removeObsoleteUsages();
   }
 
-  private void registerPersistor(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
-    new BaseUsageStatisticsStatePersister(server, serverPaths) {
+  private void registerPersistor(@NotNull EventDispatcher<BuildServerListener> eventDispatcher, @NotNull ServerPaths serverPaths, @NotNull ServerResponsibility serverResponsibility) {
+    new BaseUsageStatisticsStatePersister(eventDispatcher, serverPaths, serverResponsibility) {
       @NotNull
       @Override
       protected String getStateName() {
-        return BaseFeatureUsageStatisticsProvider.this.getExternalId();
+        return getExternalId();
       }
 
       @Override

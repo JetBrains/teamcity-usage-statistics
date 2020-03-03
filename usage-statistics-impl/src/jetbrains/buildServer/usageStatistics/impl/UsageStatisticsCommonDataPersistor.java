@@ -17,9 +17,12 @@
 package jetbrains.buildServer.usageStatistics.impl;
 
 import java.util.Date;
+import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.ServerResponsibility;
 import jetbrains.buildServer.usageStatistics.util.BaseUsageStatisticsStatePersister;
+import jetbrains.buildServer.util.EventDispatcher;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,8 +33,10 @@ public class UsageStatisticsCommonDataPersistor extends BaseUsageStatisticsState
   @Nullable private Date myLastReportingDate;
   private boolean myReportingSuggestionWasConsidered;
 
-  public UsageStatisticsCommonDataPersistor(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
-    super(server, serverPaths);
+  public UsageStatisticsCommonDataPersistor(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                            @NotNull ServerPaths serverPaths,
+                                            @NotNull ServerResponsibility serverResponsibility) {
+    super(eventDispatcher, serverPaths, serverResponsibility);
   }
 
   @Nullable

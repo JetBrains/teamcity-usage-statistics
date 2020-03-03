@@ -19,12 +19,15 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import eu.bitwalker.useragentutils.*;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
+import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.ServerResponsibility;
 import jetbrains.buildServer.usageStatistics.impl.GetRequestDetector;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.users.UserModelEx;
+import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.TimeService;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.web.util.UserAgentUtil;
@@ -33,12 +36,13 @@ import org.jetbrains.annotations.NotNull;
 public class BrowserUsageStatisticsProvider extends BaseToolUsersUsageStatisticsProvider implements WebUsersProvider, GetRequestDetector.Listener {
   @NotNull private final UserModelEx myUserModel;
 
-  public BrowserUsageStatisticsProvider(@NotNull final SBuildServer server,
-                                        @NotNull final ServerPaths serverPaths,
+  public BrowserUsageStatisticsProvider(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                        @NotNull ServerPaths serverPaths,
+                                        @NotNull ServerResponsibility serverResponsibility,
                                         @NotNull final UserModelEx userModel,
                                         @NotNull final GetRequestDetector getRequestDetector,
                                         @NotNull final TimeService timeService) {
-    super(server, serverPaths, createDWMPeriodDescriptions(), timeService);
+    super(eventDispatcher, serverPaths, serverResponsibility, createDWMPeriodDescriptions(), timeService);
     myUserModel = userModel;
     getRequestDetector.addListener(this);
   }

@@ -16,11 +16,10 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import jetbrains.buildServer.serverSide.BuildServerAdapter;
-import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.mute.MuteInfo;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
+import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -29,9 +28,11 @@ public class MuteUsageStatisticsProvider extends BaseFeatureUsageStatisticsProvi
   @NotNull @NonNls private static final String TESTS = "tests";
   @NotNull private static final Feature[] FEATURES = { new Feature(TESTS, "Test mutes") };
 
-  public MuteUsageStatisticsProvider(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
-    super(server, serverPaths, createDWMPeriodDescriptions());
-    server.addListener(new BuildServerAdapter() {
+  public MuteUsageStatisticsProvider(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                     @NotNull ServerPaths serverPaths,
+                                     @NotNull ServerResponsibility serverResponsibility) {
+    super(eventDispatcher, serverPaths, serverResponsibility, createDWMPeriodDescriptions());
+    eventDispatcher.addListener(new BuildServerAdapter() {
       @Override
       public void testsMuted(@NotNull final MuteInfo muteInfo) {
         doAddUsage();

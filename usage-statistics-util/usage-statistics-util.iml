@@ -9,5 +9,6 @@
     <orderEntry type="library" name="annotations.jar" level="project" />
     <orderEntry type="module" module-name="usage-statistics-api" exported="" />
     <orderEntry type="module" module-name="server-openapi" />
+    <orderEntry type="module" module-name="server" />
   </component>
 </module>

@@ -20,7 +20,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 import jetbrains.buildServer.serverSide.BuildServerEx;
+import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.ServerResponsibility;
 import jetbrains.buildServer.serverSide.db.SQLRunnerEx;
 import jetbrains.buildServer.serverSide.db.queries.GenericQuery;
 import jetbrains.buildServer.serverSide.impl.XmlRpcBasedRemoteServer;
@@ -31,6 +33,7 @@ import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
 import jetbrains.buildServer.usageStatistics.presentation.formatters.PercentageFormatter;
+import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.TimeService;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
@@ -64,13 +67,15 @@ public class IDEFeaturesUsageStatisticsProvider extends BaseToolUsersUsageStatis
   @NotNull
   private final IDEUsersProvider myIdeUsersProvider;
 
-  public IDEFeaturesUsageStatisticsProvider(@NotNull final BuildServerEx server,
-                                            @NotNull final ServerPaths serverPaths,
-                                            @NotNull final XmlRpcDispatcher xmlRpcDispatcher,
-                                            @NotNull final IDEUsersProvider ideUsersProvider,
-                                            @NotNull final TimeService timeService) {
-    super(server, serverPaths, createDWMPeriodDescriptions(), timeService);
-    mySQLRunner = server.getSQLRunner();
+  public IDEFeaturesUsageStatisticsProvider(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                            @NotNull ServerPaths serverPaths,
+                                            @NotNull ServerResponsibility serverResponsibility,
+                                            @NotNull SQLRunnerEx sqlRunner,
+                                            @NotNull XmlRpcDispatcher xmlRpcDispatcher,
+                                            @NotNull IDEUsersProvider ideUsersProvider,
+                                            @NotNull TimeService timeService) {
+    super(eventDispatcher, serverPaths, serverResponsibility, createDWMPeriodDescriptions(), timeService);
+    mySQLRunner = sqlRunner;
     myIdeUsersProvider = ideUsersProvider;
     xmlRpcDispatcher.addListener(this);
   }

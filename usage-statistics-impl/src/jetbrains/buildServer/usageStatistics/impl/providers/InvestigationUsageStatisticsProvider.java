@@ -21,6 +21,7 @@ import jetbrains.buildServer.responsibility.ResponsibilityEntry;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.tests.TestName;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
+import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -30,9 +31,11 @@ public class InvestigationUsageStatisticsProvider extends BaseFeatureUsageStatis
   @NotNull @NonNls private static final String BUILD_TYPES = "buildTypes";
   @NotNull private static final Feature[] FEATURES = { new Feature(TESTS, "Test investigations"), new Feature(BUILD_TYPES, "Build configuration investigations") };
 
-  public InvestigationUsageStatisticsProvider(@NotNull final SBuildServer server, @NotNull final ServerPaths serverPaths) {
-    super(server, serverPaths, createDWMPeriodDescriptions());
-    server.addListener(new BuildServerAdapter() {
+  public InvestigationUsageStatisticsProvider(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                              @NotNull ServerPaths serverPaths,
+                                              @NotNull ServerResponsibility serverResponsibility) {
+    super(eventDispatcher, serverPaths, serverResponsibility, createDWMPeriodDescriptions());
+    eventDispatcher.addListener(new BuildServerAdapter() {
       @Override
       public void responsibleChanged(@NotNull final SBuildType bt, @NotNull final ResponsibilityEntry oldValue, @NotNull final ResponsibilityEntry newValue) {
         addUsageIfNeeded(newValue.getState(), BUILD_TYPES, newValue.getReporterUser() != null);

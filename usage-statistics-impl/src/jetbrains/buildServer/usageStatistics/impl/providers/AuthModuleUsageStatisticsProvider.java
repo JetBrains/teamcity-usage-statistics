@@ -16,8 +16,10 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
+import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.ServerResponsibility;
 import jetbrains.buildServer.serverSide.auth.AuthenticatedUserInfo;
 import jetbrains.buildServer.serverSide.auth.UserAuthListener;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
@@ -33,12 +35,13 @@ public class AuthModuleUsageStatisticsProvider extends BaseToolUsersUsageStatist
   @NotNull
   private final UserModelEx myUserModel;
 
-  public AuthModuleUsageStatisticsProvider(@NotNull final SBuildServer server,
-                                           @NotNull final ServerPaths serverPaths,
+  public AuthModuleUsageStatisticsProvider(@NotNull EventDispatcher<BuildServerListener> eventDispatcher,
+                                           @NotNull ServerPaths serverPaths,
+                                           @NotNull ServerResponsibility serverResponsibility,
                                            @NotNull final UserModelEx userModel,
                                            @NotNull final EventDispatcher<UserAuthListener> userAuthDispatcher,
                                            @NotNull final TimeService timeService) {
-    super(server, serverPaths, createDWMPeriodDescriptions(), timeService);
+    super(eventDispatcher, serverPaths, serverResponsibility, createDWMPeriodDescriptions(), timeService);
     myUserModel = userModel;
     userAuthDispatcher.addListener(this);
   }
