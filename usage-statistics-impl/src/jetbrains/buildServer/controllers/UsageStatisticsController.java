@@ -18,10 +18,12 @@ package jetbrains.buildServer.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import jetbrains.buildServer.TeamCityCloud;
 import jetbrains.buildServer.Used;
 import jetbrains.buildServer.controllers.admin.AdminPage;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.SecurityContextEx;
 import jetbrains.buildServer.serverSide.audit.ActionType;
 import jetbrains.buildServer.serverSide.audit.AuditLog;
@@ -111,7 +113,11 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
     final String reportingEnabledStr = request.getParameter("reportingEnabled");
     if (reportingEnabledStr != null) {
-      mySecurityContext.getAccessChecker().checkHasGlobalPermission(Permission.CHANGE_SERVER_SETTINGS);
+      if (TeamCityCloud.isCloud()) {
+        mySecurityContext.getAccessChecker().checkHasAnyPermissionForProject(SProject.ROOT_PROJECT_ID, Permission.EDIT_PROJECT);
+      } else {
+        mySecurityContext.getAccessChecker().checkHasGlobalPermission(Permission.CHANGE_SERVER_SETTINGS);
+      }
       myDataPersistor.markReportingSuggestionAsConsidered();
       final boolean reportingEnabled = "true".equalsIgnoreCase(reportingEnabledStr);
       try {
