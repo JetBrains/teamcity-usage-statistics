@@ -126,11 +126,11 @@ public class UsageStatisticsProvidersTest extends BaseServerTestCase {
     Map<String, Object> statistics = collectStatisticsByProvider(provider);
     assertEquals(0, statistics.get("upgradesCount"));
 
-    new TeamCityUpdater.LogUpdateToAudit(myFixture.getAuditLogFactory(), "2019.1").run();
+    new TeamCityUpdater.LogUpdateToAudit(myFixture.getAuditLogFactory(), myFixture.getServerResponsibility(), "2019.1").run();
     statistics = collectStatisticsByProvider(provider);
     assertEquals(1, statistics.get("upgradesCount"));
 
-    new TeamCityUpdater.LogUpdateToAudit(myFixture.getAuditLogFactory(), "2019.2").run();
+    new TeamCityUpdater.LogUpdateToAudit(myFixture.getAuditLogFactory(), myFixture.getServerResponsibility(), "2019.2").run();
     statistics = collectStatisticsByProvider(provider);
     assertEquals(2, statistics.get("upgradesCount"));
   }
