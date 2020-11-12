@@ -61,7 +61,7 @@ public abstract class BasePluginStatePersister extends BuildServerAdapter {
 
   @Override
   public void serverShutdown() {
-    if (myServerResponsibility.canManageServerConfiguration()) {
+    if (myServerResponsibility.canWriteToConfigDirectory()) {
       saveState();
     }
   }
