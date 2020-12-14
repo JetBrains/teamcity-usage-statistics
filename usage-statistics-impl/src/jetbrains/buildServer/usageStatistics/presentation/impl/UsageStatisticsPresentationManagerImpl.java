@@ -18,6 +18,7 @@ package jetbrains.buildServer.usageStatistics.presentation.impl;
 
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.UserDataHolder;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -64,12 +65,9 @@ public class UsageStatisticsPresentationManagerImpl implements UsageStatisticsPr
 
   @NotNull
   public LinkedHashMap<String, Pair<String, UsageStatisticsGroup>> groupStatistics(@NotNull final UsageStatisticsCollector collector) {
-    final MultiMap<String, UsageStatisticPresentation> groupedStatistics = new MultiMap<String, UsageStatisticPresentation>(); // group name -> collection of statistics
-    collector.publishCollectedStatistics(new UsageStatisticsPublisher() {
-      public void publishStatistic(@NotNull final String id, @Nullable final Object value) {
-        groupedStatistics.putValue(getGroupName(id), getPresentationFactory(id).createFor(value));
-      }
-    });
+    final MultiMap<String, UsageStatisticPresentation> groupedStatistics = new MultiMap<>(); // group name -> collection of statistics
+    collector.publishCollectedStatistics((id, value) -> groupedStatistics.putValue(getGroupName(id), getPresentationFactory(id).createFor(value)));
+    groupedStatistics.values().forEach(list -> list.sort(Comparator.comparing(UsageStatisticPresentation::getDisplayName)));
 
     final PositionAwareCollection<Pair<String, GroupInfo>> groupInfos = new PositionAwareCollection<Pair<String, GroupInfo>>();
     for (final String groupName : groupedStatistics.keySet()) {
