@@ -57,5 +57,6 @@
     <orderEntry type="module" module-name="web-startup" />
     <orderEntry type="module" module-name="cloud-api" />
     <orderEntry type="module" module-name="cloud-shared" />
+    <orderEntry type="module" module-name="oauth-integration" />
   </component>
 </module>

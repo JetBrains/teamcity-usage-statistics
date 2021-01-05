@@ -175,6 +175,11 @@
     <property name="groupName" value="UI Features"/>
   </bean>
 
+  <bean id="oauthConnectionsUsageStatisticsProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.OAuthConnectionsUsageStatisticsProvider">
+    <property name="idFormat" value="jb.oauthConnection[%s]"/>
+    <property name="groupName" value="OAuth Connections"/>
+  </bean>
+
   <!-- Helpers -->
 
   <bean id="getRequestDetector" class="jetbrains.buildServer.usageStatistics.impl.GetRequestDetector"/>
