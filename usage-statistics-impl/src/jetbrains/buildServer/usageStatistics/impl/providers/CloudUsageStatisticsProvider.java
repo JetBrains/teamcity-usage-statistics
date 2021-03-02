@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import jetbrains.buildServer.TeamCityCloud;
 import jetbrains.buildServer.clouds.CloudClient;
 import jetbrains.buildServer.clouds.CloudProfile;
 import jetbrains.buildServer.clouds.CloudType;
@@ -61,6 +62,10 @@ public class CloudUsageStatisticsProvider extends BaseDefaultUsageStatisticsProv
     final Collection<? extends CloudType> cloudTypes = myCloudManager.getCloudTypes();
     final Map<String,String> cloudTypeCodeNames = new HashMap<String, String>();
     for (CloudType cloudType : cloudTypes) {
+      if (TeamCityCloud.isCloud() && cloudType.getCloudCode().equals("tc")) {
+        continue;
+      }
+
       cloudTypeCodeNames.put(cloudType.getCloudCode(), cloudType.getDisplayName());
     }
 

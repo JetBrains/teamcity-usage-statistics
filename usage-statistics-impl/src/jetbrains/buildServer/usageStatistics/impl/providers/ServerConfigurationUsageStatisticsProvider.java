@@ -19,6 +19,7 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Function;
 import java.util.List;
+import jetbrains.buildServer.TeamCityCloud;
 import jetbrains.buildServer.controllers.interceptors.auth.HttpAuthenticationScheme;
 import jetbrains.buildServer.maintenance.StartupContext;
 import jetbrains.buildServer.serverSide.LicenseMode;
@@ -80,17 +81,20 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     publishServerId(publisher, presentationManager);
-    publishPlatform(publisher, presentationManager);
     publishAuthModules(publisher, presentationManager);
-    publishDatabaseInfo(publisher, presentationManager);
-    publishJavaInfo(publisher, presentationManager);
-    publishXmx(publisher, presentationManager);
-    publishLicenseTypeAndMode(publisher, presentationManager);
-    publishAgentLicenses(publisher, presentationManager);
     publishTCVersion(publisher, presentationManager);
-    publishServerStartData(publisher, presentationManager);
     publishServerDistributionType(publisher, presentationManager);
-    publishUpgradesCount(publisher, presentationManager);
+
+    if (!TeamCityCloud.isCloud()) {
+      publishServerStartData(publisher, presentationManager);
+      publishPlatform(publisher, presentationManager);
+      publishDatabaseInfo(publisher, presentationManager);
+      publishJavaInfo(publisher, presentationManager);
+      publishXmx(publisher, presentationManager);
+      publishLicenseTypeAndMode(publisher, presentationManager);
+      publishAgentLicenses(publisher, presentationManager);
+      publishUpgradesCount(publisher, presentationManager);
+    }
   }
 
   private void publishServerId(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
@@ -226,7 +230,7 @@ public class ServerConfigurationUsageStatisticsProvider extends BaseDefaultUsage
   private void publishServerDistributionType(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
     final String id = makeId("distributionType");
     presentationManager.applyPresentation(id, "Distribution type", myGroupName, null, null);
-    publisher.publishStatistic(id, myStartupContext.getDistributionType());
+    publisher.publishStatistic(id, TeamCityCloud.isCloud() ? "Cloud" : myStartupContext.getDistributionType());
   }
 
   private void publishUpgradesCount(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {

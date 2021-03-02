@@ -19,6 +19,7 @@ package jetbrains.buildServer.usageStatistics.impl.providers;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import jetbrains.buildServer.TeamCityCloud;
 import jetbrains.buildServer.serverSide.NodeResponsibility;
 import jetbrains.buildServer.serverSide.TeamCityNode;
 import jetbrains.buildServer.serverSide.TeamCityNodes;
@@ -41,7 +42,9 @@ public class ClusterStatisticsProvider extends BaseDefaultUsageStatisticsProvide
 
   @Override
   protected void accept(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    publishClusterInfo(publisher, presentationManager);
+    if (!TeamCityCloud.isCloud()) {
+      publishClusterInfo(publisher, presentationManager);
+    }
   }
 
   @NotNull
