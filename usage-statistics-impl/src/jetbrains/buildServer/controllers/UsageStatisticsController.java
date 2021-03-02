@@ -18,13 +18,16 @@ package jetbrains.buildServer.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import jetbrains.buildServer.StampedExtensionsSupplier;
 import jetbrains.buildServer.TeamCityCloud;
+import jetbrains.buildServer.TeamCityExtension;
 import jetbrains.buildServer.Used;
 import jetbrains.buildServer.controllers.admin.AdminPage;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.SecurityContextEx;
+import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.serverSide.audit.ActionType;
 import jetbrains.buildServer.serverSide.audit.AuditLog;
 import jetbrains.buildServer.serverSide.audit.AuditLogFactory;
@@ -34,7 +37,9 @@ import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCommonDataPersi
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettings;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsSettingsPersistor;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManagerEx;
+import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.openapi.*;
+import jetbrains.buildServer.web.util.SessionUser;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
@@ -50,6 +55,8 @@ public class UsageStatisticsController extends BaseFormXmlController {
   @NotNull private final AuditLog myAuditLog;
   @NotNull private final String myJspPagePath;
   @NotNull private final SecurityContextEx mySecurityContext;
+  @NotNull private final DefaultUsageStatisticsPermissionsChecker myDefaultPermissionsChecker = new DefaultUsageStatisticsPermissionsChecker();
+  @NotNull private final StampedExtensionsSupplier<String, UsageStatisticsPermissionsChecker> myPermissionsCheckerSupplier;
 
   @Used("spring")
   public UsageStatisticsController(@NotNull final SBuildServer server,
@@ -64,6 +71,17 @@ public class UsageStatisticsController extends BaseFormXmlController {
                                    @NotNull final UsageStatisticsPresentationManagerEx presentationManager,
                                    @NotNull final SecurityContextEx securityContext) {
     super(server);
+
+    myPermissionsCheckerSupplier = server.getStampedExtensionsSupplier(UsageStatisticsPermissionsChecker.class, extenstions -> {
+      for (UsageStatisticsPermissionsChecker checker : extenstions.data) {
+        if (checker.getClass().getName().equals(extenstions.context)) {
+          return checker;
+        }
+      }
+
+      return myDefaultPermissionsChecker;
+    });
+
     mySettingsPersistor = settingsPersistor;
     myDataPersistor = dataPersistor;
     myStatisticsCollector = statisticsCollector;
@@ -97,9 +115,13 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
   @Override
   protected ModelAndView doGet(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response) {
+    final UsageStatisticsPermissionsChecker usageStatisticsPermissionsChecker =
+      myPermissionsCheckerSupplier.get(TeamCityProperties.getProperty("teamcity.usageStatistics.permissionsCheckerImplementation"));
+
     final ModelAndView modelAndView = new ModelAndView(myJspPagePath);
     //noinspection unchecked
     modelAndView.getModel().put("statisticsData", new UsageStatisticsBean(mySettingsPersistor, myStatisticsCollector, myPresentationManager));
+    modelAndView.getModel().put("editAllowed", usageStatisticsPermissionsChecker.editAllowed(SessionUser.getUser(request)));
     return modelAndView;
   }
 
@@ -140,5 +162,17 @@ public class UsageStatisticsController extends BaseFormXmlController {
     settings.setReportingEnabled(reportingEnabled);
     mySettingsPersistor.saveSettings(settings);
     myAuditLog.logUserAction(reportingEnabled ? ActionType.USAGE_STATISTICS_REPORTING_ENABLED : ActionType.USAGE_STATISTICS_REPORTING_DISABLED, null, null);
+  }
+
+  public interface UsageStatisticsPermissionsChecker extends TeamCityExtension {
+    public boolean editAllowed(@NotNull final SUser user);
+  }
+
+  private static class DefaultUsageStatisticsPermissionsChecker implements UsageStatisticsPermissionsChecker {
+
+    @Override
+    public boolean editAllowed(@NotNull SUser user) {
+      return user.isPermissionGrantedGlobally(Permission.CHANGE_SERVER_SETTINGS);
+    }
   }
 }

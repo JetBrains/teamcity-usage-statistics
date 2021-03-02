@@ -17,6 +17,7 @@
 <%@ include file="/include.jsp"%>
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <jsp:useBean id="statisticsData" scope="request" type="jetbrains.buildServer.controllers.UsageStatisticsBean"/>
+<%--@elvariable id="editAllowed" type="java.lang.Boolean"--%>
 
 <div>
   <bs:refreshable containerId="usageStatisticsReportingStatusMessageContainer" pageUrl="${pageUrl}">
@@ -24,7 +25,7 @@
   </bs:refreshable>
 </div>
 <c:if test="${empty param['updateMessages']}">
-  <authz:authorize allPermissions="CHANGE_SERVER_SETTINGS">
+  <c:if test="${editAllowed}">
     <div>
       <div style="margin-bottom: 1em">Please let us learn a bit more about your TeamCity usage. We are not watching you and not collecting any user- or project-sensitive data, just numbers. Help us improve the tool!</div>
       <bs:refreshable containerId="usageStatisticsReportingCheckboxContainer" pageUrl="${pageUrl}">
@@ -37,7 +38,7 @@
         <forms:saving id="usageStatisticsReportingStatusUpdatingProgress" className="progressRingInline"/>
       </bs:refreshable>
     </div>
-  </authz:authorize>
+  </c:if>
   <bs:refreshable containerId="usageStatisticsStatus" pageUrl="${pageUrl}">
     <div style="margin-top: 1em">
       <c:if test="${statisticsData.collectingNow}"> </c:if
