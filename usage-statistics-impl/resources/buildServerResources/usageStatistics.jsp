@@ -53,6 +53,7 @@
           </script>
         </div>
       </bs:refreshable>
+      <div class="clearfix">
       <bs:refreshable containerId="usageStatisticsContent" pageUrl="${pageUrl}">
         <c:if test="${statisticsData.statisticsCollected}">
           <br/><br/>
@@ -81,6 +82,7 @@
           </div>
         </c:if>
       </bs:refreshable>
+      </div>
       <script type="text/javascript">
         BS.UsageStatistics.scheduleStatusUpdating();
       </script>
