@@ -19,18 +19,17 @@ package jetbrains.buildServer.controllers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.StampedExtensionsSupplier;
-import jetbrains.buildServer.TeamCityCloud;
 import jetbrains.buildServer.TeamCityExtension;
 import jetbrains.buildServer.Used;
 import jetbrains.buildServer.controllers.admin.AdminPage;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.SecurityContextEx;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.serverSide.audit.ActionType;
 import jetbrains.buildServer.serverSide.audit.AuditLog;
 import jetbrains.buildServer.serverSide.audit.AuditLogFactory;
+import jetbrains.buildServer.serverSide.auth.AccessDeniedException;
 import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsCollector;
 import jetbrains.buildServer.usageStatistics.impl.UsageStatisticsCommonDataPersistor;
@@ -135,11 +134,13 @@ public class UsageStatisticsController extends BaseFormXmlController {
 
     final String reportingEnabledStr = request.getParameter("reportingEnabled");
     if (reportingEnabledStr != null) {
-      if (TeamCityCloud.isCloud()) {
-        mySecurityContext.getAccessChecker().checkHasAnyPermissionForProject(SProject.ROOT_PROJECT_ID, Permission.EDIT_PROJECT);
-      } else {
-        mySecurityContext.getAccessChecker().checkHasGlobalPermission(Permission.CHANGE_SERVER_SETTINGS);
+      final UsageStatisticsPermissionsChecker usageStatisticsPermissionsChecker =
+        myPermissionsCheckerSupplier.get(TeamCityProperties.getProperty("teamcity.usageStatistics.permissionsCheckerImplementation"));
+
+      if (!usageStatisticsPermissionsChecker.editAllowed(SessionUser.getUser(request))) {
+        throw new AccessDeniedException(SessionUser.getUser(request), usageStatisticsPermissionsChecker.getAccessDeniedDescription());
       }
+
       myDataPersistor.markReportingSuggestionAsConsidered();
       final boolean reportingEnabled = "true".equalsIgnoreCase(reportingEnabledStr);
       try {
@@ -164,8 +165,12 @@ public class UsageStatisticsController extends BaseFormXmlController {
     myAuditLog.logUserAction(reportingEnabled ? ActionType.USAGE_STATISTICS_REPORTING_ENABLED : ActionType.USAGE_STATISTICS_REPORTING_DISABLED, null, null);
   }
 
+  @Used("TeamCity Cloud")
   public interface UsageStatisticsPermissionsChecker extends TeamCityExtension {
     public boolean editAllowed(@NotNull final SUser user);
+
+    @NotNull
+    public String getAccessDeniedDescription();
   }
 
   private static class DefaultUsageStatisticsPermissionsChecker implements UsageStatisticsPermissionsChecker {
@@ -173,6 +178,12 @@ public class UsageStatisticsController extends BaseFormXmlController {
     @Override
     public boolean editAllowed(@NotNull SUser user) {
       return user.isPermissionGrantedGlobally(Permission.CHANGE_SERVER_SETTINGS);
+    }
+
+    @NotNull
+    @Override
+    public String getAccessDeniedDescription() {
+      return "You don't have '" + Permission.CHANGE_SERVER_SETTINGS.getDescription() + "' global permission.";
     }
   }
 }
