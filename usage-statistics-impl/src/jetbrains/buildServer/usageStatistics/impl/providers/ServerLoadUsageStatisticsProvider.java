@@ -44,6 +44,8 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     " from (" +
     " select history.build_id from history where build_finish_time_server > ? and agent_name like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "'" +
     " union all" +
+    " select build_id from removed_builds_history where build_finish_time_server > ? and agent_name like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "'" +
+    " union all" +
     " select build_id from light_history where build_finish_time_server > ? and agent_name like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "'" +
     ") h"
   );
@@ -59,6 +61,9 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     " select history.build_id, history.is_personal,build_finish_time_server,build_start_time_server, history.remove_from_queue_time as remove_from_queue_time, history.queued_time as queued_time" +
     " from history where build_finish_time_server > ? and agent_name not like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "'" +
     " union all" +
+    " select build_id, is_personal,build_finish_time_server,build_start_time_server, remove_from_queue_time, queued_time" +
+    " from removed_builds_history" +
+    " where build_finish_time_server > ? and agent_name not like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "' " +
     " select build_id, is_personal,build_finish_time_server,build_start_time_server, remove_from_queue_time, queued_time" +
     " from light_history" +
     " where build_finish_time_server > ? and agent_name not like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "' " +
