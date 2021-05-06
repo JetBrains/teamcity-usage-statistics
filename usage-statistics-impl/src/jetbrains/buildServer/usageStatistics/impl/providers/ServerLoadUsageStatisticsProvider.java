@@ -64,6 +64,7 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
     " select build_id, is_personal,build_finish_time_server,build_start_time_server, remove_from_queue_time, queued_time" +
     " from removed_builds_history" +
     " where build_finish_time_server > ? and agent_name not like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "' " +
+    " union all" +
     " select build_id, is_personal,build_finish_time_server,build_start_time_server, remove_from_queue_time, queued_time" +
     " from light_history" +
     " where build_finish_time_server > ? and agent_name not like '" + CompositeRunningBuild.FAKE_SERVER_AGENT + "' " +
@@ -134,14 +135,14 @@ public class ServerLoadUsageStatisticsProvider extends BaseDynamicUsageStatistic
         publish(publisher, periodDescription, "avgBuildDuration", getNullableLong(rs, 4));
       }
       return null;
-    }, fromDate, fromDate);
+    }, fromDate, fromDate, fromDate);
 
     ourCompositeBuildsQuery.execute(myServer.getSQLRunner(), rs -> {
       if (rs.next()) {
         publish(publisher, periodDescription, "compositeBuildCount", rs.getLong(1));
       }
       return null;
-    }, fromDate, fromDate);
+    }, fromDate, fromDate, fromDate);
 
     ourBuildTestCountQuery.execute(myServer.getSQLRunner(), rs -> {
       if (rs.next()) {
