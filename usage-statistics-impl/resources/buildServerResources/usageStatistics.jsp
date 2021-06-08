@@ -42,7 +42,6 @@
   <div>
     <div class="grayNote" style="margin-bottom: 0.5em; margin-left: 1.8em;">Help us improve TeamCity by sending anonymous data about your usage statistics.<br>
       We do not collect any private or personal data related to users or source projects. The statistics is gathered anonymously and used by the TeamCity team only for analyzing and prioritizing the needs of our users when working on the future versions of TeamCity. The collected data complies with the <a href="https://www.jetbrains.com/legal/docs/privacy/privacy.html">JetBrains Privacy Policy</a>.<br>
-      By enabling this option, you agree to schedule daily autocollection of this server's usage statistics. You will be able to turn off this option anytime.
     </div>
 
     <hr/>
