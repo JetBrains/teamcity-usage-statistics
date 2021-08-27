@@ -79,7 +79,7 @@ public class UsageStatisticsReporterImpl implements UsageStatisticsReporter {
           .allowNonSecureConnection(true)
           .withDomainCheck(TeamCityProperties.getBooleanOrTrue("teamcity.usageStatistics.server.checkDomain"))
           .withMethod("POST")
-          .withUrlEncodedData(data.getBytes("UTF-8"))
+          .withData(data.getBytes("UTF-8"))
           .onErrorResponse((state, text) -> {
             if (state == 404) {
               LOG.info("Cannot send usage statistics to \"" + serverUrl + "\": server unavailable");
