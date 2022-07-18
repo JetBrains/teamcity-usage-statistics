@@ -23,6 +23,7 @@ import jetbrains.buildServer.TeamCityCloud;
 import jetbrains.buildServer.serverSide.NodeResponsibility;
 import jetbrains.buildServer.serverSide.TeamCityNode;
 import jetbrains.buildServer.serverSide.TeamCityNodes;
+import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
@@ -54,7 +55,8 @@ public class ClusterStatisticsProvider extends BaseDefaultUsageStatisticsProvide
   }
 
   private void publishClusterInfo(@NotNull final UsageStatisticsPublisher publisher, @NotNull final UsageStatisticsPresentationManager presentationManager) {
-    final List<TeamCityNode> onlineNodes = myTeamCityNodes.getOnlineNodes();
+    int activityThresholdSeconds = TeamCityProperties.getInteger("teamcity.usageStatistics.nodeInactivityTime.seconds", 120);
+    final List<TeamCityNode> onlineNodes = myTeamCityNodes.getOnlineNodes(activityThresholdSeconds);
     final Long secondaryNodesCount = onlineNodes.stream()
                                                 .filter(TeamCityNode::isSecondaryNode)
                                                 .count();
