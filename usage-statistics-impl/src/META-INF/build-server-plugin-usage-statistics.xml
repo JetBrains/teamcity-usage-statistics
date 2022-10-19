@@ -180,6 +180,11 @@
     <property name="groupName" value="OAuth Connections"/>
   </bean>
 
+  <bean id="httpsConnectorUsageStatisticProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.HttpsConnectorUsageStatisticsProvider">
+    <property name="idFormat" value="jb.httpsConnector.%s[%s]" />
+    <property name="groupName" value="Https Connector" />
+  </bean>
+
   <!-- Helpers -->
 
   <bean id="getRequestDetector" class="jetbrains.buildServer.usageStatistics.impl.GetRequestDetector"/>
