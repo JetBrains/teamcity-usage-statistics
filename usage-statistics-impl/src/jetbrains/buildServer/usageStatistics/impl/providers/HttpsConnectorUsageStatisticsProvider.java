@@ -16,8 +16,7 @@
 
 package jetbrains.buildServer.usageStatistics.impl.providers;
 
-import jetbrains.buildServer.https.HttpsConfigurationUpdateNotificationListener;
-import jetbrains.buildServer.https.HttpsConfigurationUpdateNotifier;
+import jetbrains.buildServer.https.HttpsConfigurator;
 import jetbrains.buildServer.usageStatistics.UsageStatisticsPublisher;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsGroupPosition;
 import jetbrains.buildServer.usageStatistics.presentation.UsageStatisticsPresentationManager;
@@ -25,34 +24,21 @@ import jetbrains.buildServer.usageStatistics.presentation.formatters.TypeBasedFo
 import jetbrains.buildServer.util.positioning.PositionAware;
 import org.jetbrains.annotations.NotNull;
 
-public class HttpsConnectorUsageStatisticsProvider extends BaseDefaultUsageStatisticsProvider
-  implements HttpsConfigurationUpdateNotificationListener {
-  public static final String CERT_SOURCE_ID_SUBPATH = "certificateSource";
-  private volatile int myManualCertUploadsCount = 0;
-  private volatile int myAcmeCertUploadsCount = 0;
+public class HttpsConnectorUsageStatisticsProvider extends BaseDefaultUsageStatisticsProvider {
   private final IntFormatter myFormatter = new IntFormatter();
+  private final HttpsConfigurator myHttpsConfigurator;
 
-  public HttpsConnectorUsageStatisticsProvider(@NotNull HttpsConfigurationUpdateNotifier httpsConfigurationUpdateNotifier) {
-    httpsConfigurationUpdateNotifier.register(this);
+  public HttpsConnectorUsageStatisticsProvider(@NotNull HttpsConfigurator httpsConfigurator) {
+    myHttpsConfigurator = httpsConfigurator;
   }
 
   @Override
   protected void accept(@NotNull UsageStatisticsPublisher publisher, @NotNull UsageStatisticsPresentationManager presentationManager) {
-    final String acmeStatId = makeId(CERT_SOURCE_ID_SUBPATH, "acme");
-    publisher.publishStatistic(acmeStatId, myAcmeCertUploadsCount);
+    final String statId = makeId("enabled");
+    publisher.publishStatistic(statId, myHttpsConfigurator.isEnabled() ? 1 : 0);
     presentationManager.applyPresentation(
-      acmeStatId,
-      "Certificate obtained from ACME server",
-      myGroupName,
-      myFormatter,
-      null
-    );
-
-    final String manualStatId = makeId(CERT_SOURCE_ID_SUBPATH, "manual");
-    publisher.publishStatistic(manualStatId, myManualCertUploadsCount);
-    presentationManager.applyPresentation(
-      manualStatId,
-      "Manually uploaded certificate",
+      statId,
+      "HTTPS connector is in use",
       myGroupName,
       myFormatter,
       null
@@ -64,18 +50,6 @@ public class HttpsConnectorUsageStatisticsProvider extends BaseDefaultUsageStati
   protected PositionAware getGroupPosition() {
     return UsageStatisticsGroupPosition.HTTPS;
   }
-
-  @Override
-  public void certificateUpdated(boolean fetchedFromAcme) {
-    if(fetchedFromAcme) {
-      myAcmeCertUploadsCount++;
-    } else {
-      myManualCertUploadsCount++;
-    }
-  }
-
-  @Override
-  public void serverUrlChanged(@NotNull String serverUrl) { }
 
   private class IntFormatter extends TypeBasedFormatter<Integer> {
     public IntFormatter() {

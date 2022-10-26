@@ -181,8 +181,8 @@
   </bean>
 
   <bean id="httpsConnectorUsageStatisticProvider" class="jetbrains.buildServer.usageStatistics.impl.providers.HttpsConnectorUsageStatisticsProvider">
-    <property name="idFormat" value="jb.httpsConnector.%s[%s]" />
-    <property name="groupName" value="Https Connector" />
+    <property name="idFormat" value="jb.httpsConnector.%s" />
+    <property name="groupName" value="HTTPS Connector" />
   </bean>
 
   <!-- Helpers -->
