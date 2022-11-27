@@ -1,3 +1,5 @@
+This repository is moved into main TeamCity repo. Do not commit new changes here.
+
 TeamCity Usage Statistics 
 ___
 This repository was migrated from the svn http://svn.jetbrains.org/teamcity/plugins/usage-statistics/
