@@ -1,3 +1,5 @@
+[![official JetBrains project](https://jb.gg/badges/official-flat-square.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+
 This repository is moved into main TeamCity repo. Do not commit new changes here.
 
 TeamCity Usage Statistics 
