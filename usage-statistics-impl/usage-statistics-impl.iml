@@ -1,62 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
-  <component name="FacetManager">
-    <facet type="Spring" name="Spring">
-      <configuration>
-        <fileset id="fileset1" name="usage-statistics-impl" removed="false">
-          <file>file://$MODULE_DIR$/src/META-INF/build-server-plugin-usage-statistics.xml</file>
-          <file>file://$MODULE_DIR$/../../../server/src/META-INF/build-server-declarative-extensibility.xml</file>
-          <file>file://$MODULE_DIR$/../../../server/src/META-INF/build-server-plugin-agents-statistics.xml</file>
-          <file>file://$MODULE_DIR$/../../../server/src/META-INF/buildServerCompatMode.xml</file>
-          <file>file://$MODULE_DIR$/../../../server/src/META-INF/buildServerPermissions.xml</file>
-          <file>file://$MODULE_DIR$/../../../server/src/META-INF/buildServerPluginsSupport.xml</file>
-          <file>file://$MODULE_DIR$/../../../server/src/META-INF/buildServerSpring.xml</file>
-          <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/per-plugin-shared-spring.xml</file>
-          <file>file://$MODULE_DIR$/../../../plugin-model-common/src/META-INF/plugin-model-shared-spring-common.xml</file>
-          <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/plugin-model-shared-spring.xml</file>
-          <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/shared-spring-sub-container.xml</file>
-          <file>file://$MODULE_DIR$/../../../common-impl/src/META-INF/shared-agent-server-spring.xml</file>
-          <file>file://$MODULE_DIR$/../../../cloud-server/src/META-INF/build-server-plugin-clouds-server.xml</file>
-          <file>file://$MODULE_DIR$/../../../cloud-server/src/META-INF/build-server-plugin-clouds-server-web.xml</file>
-          <file>file://$MODULE_DIR$/../../../web-startup/fake-predefined-implicit-spring-beans.xml</file>
-          <file>file://$MODULE_DIR$/../../../web/WEB-INF/buildServerConfigurator.xml</file>
-          <file>file://$MODULE_DIR$/../../../web/WEB-INF/buildServerPluginsSupportWeb.xml</file>
-          <file>file://$MODULE_DIR$/../../../web/WEB-INF/buildServerSpringWeb.xml</file>
-          <file>file://$MODULE_DIR$/../../../server-openapi/fake-predefined-implicit-spring-server-plugin-beans.xml</file>
-          <file>file://$MODULE_DIR$/../../../remote-api-impl/src/META-INF/buildServerSpring-RemoteApiImpl.xml</file>
-          <file>file://$MODULE_DIR$/../usage-statistics-api-impl/src/META-INF/buildServerSpring-usage-statistics.xml</file>
-        </fileset>
-      </configuration>
-    </facet>
-    <facet type="web" name="usage-statistics">
-      <configuration>
-        <webroots>
-          <root url="file://$MODULE_DIR$/resources/buildServerResources" relative="/plugins/usage-statistics" />
-        </webroots>
-        <sourceRoots>
-          <root url="file://$MODULE_DIR$/src" />
-        </sourceRoots>
-      </configuration>
-    </facet>
-  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/resources" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="web-openapi" />
     <orderEntry type="module" module-name="usage-statistics-util" />
-    <orderEntry type="module" module-name="usage-statistics-api" />
-    <orderEntry type="module" module-name="server" />
-    <orderEntry type="module" module-name="remote-api-impl" />
-    <orderEntry type="module" module-name="web" />
-    <orderEntry type="module" module-name="cloud-server" />
-    <orderEntry type="library" name="user-agent-utils" level="project" />
-    <orderEntry type="module" module-name="web-startup" />
-    <orderEntry type="module" module-name="cloud-api" />
-    <orderEntry type="module" module-name="cloud-shared" />
-    <orderEntry type="module" module-name="oauth-integration" />
   </component>
 </module>

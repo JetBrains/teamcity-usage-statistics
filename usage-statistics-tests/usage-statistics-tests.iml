@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/testSrc" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="usage-statistics-api" />
-    <orderEntry type="module" module-name="usage-statistics-util" />
     <orderEntry type="module" module-name="usage-statistics-impl" />
-    <orderEntry type="module" module-name="server" />
-    <orderEntry type="module" module-name="server-test-core" />
-    <orderEntry type="module" module-name="remote-api-impl" />
-    <orderEntry type="module" module-name="cloud-server" />
-    <orderEntry type="library" name="ServletApi" level="project" />
+    <orderEntry type="module" module-name="usage-statistics-api" />
   </component>
 </module>
